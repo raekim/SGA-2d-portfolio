@@ -20,8 +20,9 @@ void Player::Init(Map* map)
 
 	m_AABBOffset = { 0.0f, 0.0f };
 
-	m_jumpSpeed = 600.0f;
-	m_walkSpeed = 400.0f;
+	m_jumpSpeed = 500.0f;
+	m_maxWalkSpeed = 400.0f;
+	m_walkSpeed = 0.0f;
 
 	m_curState = STATE::Stand;
 	m_position = { WINSIZEX*0.5f, WINSIZEY };
@@ -33,6 +34,25 @@ void Player::Init(Map* map)
 
 void Player::Update()
 {
+
+	// 왼쪽, 오른쪽 이동
+	if (g_pKeyManager->IsStayKeyDown(VK_LEFT) == g_pKeyManager->IsStayKeyDown(VK_RIGHT))
+	{
+		m_walkSpeed = 0.0f;
+	}
+	else if (g_pKeyManager->IsStayKeyDown(VK_LEFT))
+	{
+		if (m_walkSpeed > 0.0f) m_walkSpeed = 0.0f;
+		m_walkSpeed -= m_maxWalkSpeed * 3.5f* g_pTimeManager->GetDeltaTime();
+		if (fabs(m_walkSpeed) > m_maxWalkSpeed) m_walkSpeed = -m_maxWalkSpeed;
+	}
+	else if (g_pKeyManager->IsStayKeyDown(VK_RIGHT))
+	{
+		if (m_walkSpeed < 0.0f) m_walkSpeed = 0.0f;
+		m_walkSpeed += m_maxWalkSpeed * 3.5f* g_pTimeManager->GetDeltaTime();
+		if (fabs(m_walkSpeed) > m_maxWalkSpeed) m_walkSpeed = m_maxWalkSpeed;
+	}
+
 	switch (m_curState)
 	{
 	case STATE::Stand:
@@ -57,20 +77,7 @@ void Player::Update()
 			m_curState = STATE::Jump;
 			break;
 		}
-
-		// 왼쪽, 오른쪽 이동
-		if (g_pKeyManager->IsStayKeyDown(VK_LEFT) == g_pKeyManager->IsStayKeyDown(VK_RIGHT))
-		{
-			m_speed = { 0.0f, 0.0f };
-		}
-		else if (g_pKeyManager->IsStayKeyDown(VK_LEFT))
-		{
-			m_speed = { -m_walkSpeed, 0.0f };
-		}
-		else if (g_pKeyManager->IsStayKeyDown(VK_RIGHT))
-		{
-			m_speed = { m_walkSpeed, 0.0f };
-		}
+		m_speed = { m_walkSpeed, 0.0f };
 
 		// 점프
 		if (g_pKeyManager->IsOnceKeyDown(VK_SPACE))
@@ -83,11 +90,11 @@ void Player::Update()
 	case STATE::Jump:
 		if (m_onGround)
 		{
+			m_speed.y = 0.0f;
 			m_curState = STATE::Stand;
 			break;
 		}
-
-		// 왼쪽, 오른쪽 이동
+		// 점프중에 왼쪽, 오른쪽 이동
 		if (g_pKeyManager->IsStayKeyDown(VK_LEFT) == g_pKeyManager->IsStayKeyDown(VK_RIGHT))
 		{
 			if(!m_isWallJumpingTowardLeft && !m_isWallJumpingTowardRight)
@@ -95,30 +102,36 @@ void Player::Update()
 		}
 		else if (g_pKeyManager->IsStayKeyDown(VK_LEFT))
 		{
-			if (!m_isWallJumpingTowardLeft && !m_isWallJumpingTowardRight)
-				m_speed.x = -m_walkSpeed;
-			else
+			// 벽점프중
+			if(m_isWallJumpingTowardLeft || m_isWallJumpingTowardRight)
 			{
-				m_speed.x -= m_walkSpeed * 3.5f * g_pTimeManager->GetDeltaTime();
-				if (m_speed.x < -m_walkSpeed)
+				m_speed.x += m_walkSpeed * 2.5f * g_pTimeManager->GetDeltaTime();
+				if (m_speed.x < -m_maxWalkSpeed)
 				{
 					m_isWallJumpingTowardLeft = m_isWallJumpingTowardRight = false;
-					m_speed.x = -m_walkSpeed;
+					m_speed.x = -m_maxWalkSpeed;
 				}
+			}
+			else
+			{
+				m_speed.x = m_walkSpeed;
 			}
 		}
 		else if (g_pKeyManager->IsStayKeyDown(VK_RIGHT))
 		{
-			if (!m_isWallJumpingTowardLeft && !m_isWallJumpingTowardRight)
-				m_speed.x = m_walkSpeed;
-			else
+			// 벽점프중
+			if (m_isWallJumpingTowardLeft || m_isWallJumpingTowardRight)
 			{
-				m_speed.x += m_walkSpeed * 3.5f * g_pTimeManager->GetDeltaTime();
-				if (m_speed.x > m_walkSpeed)
+				m_speed.x += m_walkSpeed * 2.5f * g_pTimeManager->GetDeltaTime();
+				if (m_speed.x > m_maxWalkSpeed)
 				{
 					m_isWallJumpingTowardLeft = m_isWallJumpingTowardRight = false;
-					m_speed.x = m_walkSpeed;
+					m_speed.x = m_maxWalkSpeed;
 				}
+			}
+			else
+			{
+				m_speed.x = m_walkSpeed;
 			}
 		}
 
@@ -131,24 +144,21 @@ void Player::Update()
 		}
 
 		// 벽점프
-		if (g_pKeyManager->IsOnceKeyDown(VK_SPACE))
+		if (g_pKeyManager->IsOnceKeyDown(VK_SPACE) && m_isWallSliding)
 		{
-			if (m_isWallSliding)
+			// 슬라이딩 중인 벽의 반대 방향으로 튕겨나간다
+			if (m_pushesLeftWall)
 			{
-				// 슬라이딩 중인 벽의 반대 방향으로 튕겨나간다
-				if (m_pushesLeftWall)
-				{
-					m_speed.x = m_jumpSpeed * 0.5f;
-					m_isWallJumpingTowardRight = true;
-				}
-				else
-				{
-					m_speed.x = -m_jumpSpeed * 0.5f;
-					m_isWallJumpingTowardLeft = true;
-				}
-				m_speed.y = m_jumpSpeed;
-				m_pressingJumpingButton = true;
+				m_speed.x = m_jumpSpeed * 0.7f;
+				m_isWallJumpingTowardRight = true;
 			}
+			else
+			{
+				m_speed.x = -m_jumpSpeed * 0.7f;
+				m_isWallJumpingTowardLeft = true;
+			}
+			m_speed.y = m_jumpSpeed;
+			m_pressingJumpingButton = true;
 		}
 		break;
 	case STATE::GrabLedge:

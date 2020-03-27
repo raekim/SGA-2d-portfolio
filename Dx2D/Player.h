@@ -49,6 +49,7 @@ class Player
 	STATE m_curState;
 	float m_jumpSpeed;
 	float m_walkSpeed;
+	float m_maxWalkSpeed;
 	float m_fallingSpeedBound;				// 캐릭터가 너무 급격하게 추락하지 않도록 해 주는 추락 속도 상한
 
 	bool m_pressingJumpingButton;			// 현재 점프 버튼을 누르고 있는가? (긴 점프, 짧은 점프에 사용)
