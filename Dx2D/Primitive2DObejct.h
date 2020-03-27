@@ -137,14 +137,15 @@ inline void Primitive2DObejct<T>::Init()
 template<typename T>
 inline void Primitive2DObejct<T>::Update()
 {
+	// SRT (Scale, Rotation, Transform)
 	D3DXMATRIX Scale, Translate, RotX, RotY, RotZ;
 	
 	D3DXMatrixScaling(&Scale, m_vSize.x, m_vSize.y, 1);
-	D3DXMatrixTranslation(&Translate, m_vPosition.x, m_vPosition.y, 0);
-	
+
 	D3DXMatrixRotationX(&RotX, m_vRotation.x);
 	D3DXMatrixRotationY(&RotY, m_vRotation.y);
 	D3DXMatrixRotationZ(&RotZ, m_vRotation.z);
+	D3DXMatrixTranslation(&Translate, m_vPosition.x, m_vPosition.y, 0);
 
 	m_matWorld = Scale * RotX * RotY * RotZ * Translate;
 	m_matSRT = m_matWorld;

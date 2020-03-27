@@ -6,24 +6,39 @@ class Player
 	Map*		m_map;
 	enum class STATE
 	{
-		Ready = 1,
 		Stand,
 		Walk,
 		Jump,
-		GrabLedge,
 		Max
 	};
 
-	D3DXVECTOR2 m_oldPosition;
-	D3DXVECTOR2 m_position;
+	// 애니메이션 state
+	enum class ANIM_STATE
+	{
+		READY = -1,
+		IDLE,
+		FLIP_STAND,
+		WALK,
+		Max
+	};
 
-	D3DXVECTOR2 m_oldSpeed;
-	D3DXVECTOR2 m_speed;
+	map<ANIM_STATE, D3DXVECTOR2> m_mapAnimOffset;	// 각 애니메이션 클립의 오프셋
 
-	D3DXVECTOR2 m_scale;
+	Animation<ANIM_STATE>*	m_pAnimation;
+	ANIM_STATE				m_flipAnimState;
+	ANIM_STATE				m_animState;
 
-	AABB* m_AABB;
-	D3DXVECTOR2 m_AABBOffset;
+	D3DXVECTOR2				m_oldPosition;
+	D3DXVECTOR2				m_position;
+	D3DXVECTOR3				m_rotation;
+
+	D3DXVECTOR2				m_oldSpeed;
+	D3DXVECTOR2				m_speed;
+
+	D3DXVECTOR2				m_scale;
+
+	AABB*					m_AABB;
+	D3DXVECTOR2				m_AABBOffset;
 
 	// Position States
 	bool m_pushedRightWall;
@@ -45,6 +60,8 @@ class Player
 	bool m_isWalkingRight;
 
 	bool m_hasNoWalls;						// 캐릭터의 4방향 어디에도 벽이 없는 상태
+	bool m_facingRight;
+	bool m_isFlipping;
 
 	STATE m_curState;
 	float m_jumpSpeed;
@@ -57,7 +74,15 @@ class Player
 	bool m_isWallJumpingTowardRight;		// 오른쪽으로 튕겨나가는 벽점프 중
 
 private:
+	// Update 관련 함수
+	void UpdateWalkSpeed();
+	void UpdateJump();
+	void UpdateWalk();
+	void UpdateStand();
 	void UpdatePhysics();
+	void UpdateAnimation();
+	void UpdateAnimationFlip();				// 캐릭터 애니메이션 좌/우가 뒤바뀔 때 flip 애니메이션을 적절히 재생
+
 	// 상,하,좌,우 타일맵 벽과 충돌
 	bool HasGround(D3DXVECTOR2 oldPosition, D3DXVECTOR2 position, D3DXVECTOR2 speed, float& groundY);
 	bool HasCeiling(D3DXVECTOR2 oldPosition, D3DXVECTOR2 position, float& ceilingY);

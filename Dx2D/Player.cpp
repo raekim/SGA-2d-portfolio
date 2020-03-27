@@ -26,84 +26,103 @@ void Player::Init(Map* map)
 
 	m_curState = STATE::Stand;
 	m_position = { WINSIZEX*0.5f, WINSIZEY };
+	m_rotation = { 0.0f, 0.0f, 0.0f };
 	m_oldPosition = m_position;
 	m_pressingJumpingButton = false;
 
 	m_fallingSpeedBound = -1500.0f;
+	m_animState = ANIM_STATE::IDLE;
+
+	m_facingRight = true;
+
+	// 애니메이션 추가
+	m_pAnimation = new Animation<ANIM_STATE>;
+	Clip* clip;
+
+	// IDLE
+	clip = new Clip;
+	for (int i = 0; i < 3; ++i)
+	{
+		Sprite* sprite = new Sprite(L"Chicken-Sheet", 13, 1, i);
+		clip->AddFrame(sprite, 1 / 12.0f);
+	}
+	m_pAnimation->AddClip(ANIM_STATE::IDLE, clip);
+	m_mapAnimOffset.insert(make_pair(ANIM_STATE::IDLE, D3DXVECTOR2(5.0f, 20.0f)));
+
+	// FLIP_STAND
+	clip = new Clip(PlayMode::Once);
+	for (int i = 0; i < 2; ++i)
+	{
+		Sprite* sprite = new Sprite(L"Chicken-Sheet", 13, 1, i + 3);
+		clip->AddFrame(sprite, 1 / 20.0f);
+	}
+	m_pAnimation->AddClip(ANIM_STATE::FLIP_STAND, clip);
+	m_mapAnimOffset.insert(make_pair(ANIM_STATE::FLIP_STAND, D3DXVECTOR2(5.0f, 20.0f)));
+
+	// WALK
+	clip = new Clip;
+	for (int i = 0; i < 8; ++i)
+	{
+		Sprite* sprite = new Sprite(L"Chicken-Sheet", 13, 1, i + 5);
+		clip->AddFrame(sprite, 1 / 12.0f);
+	}
+	m_pAnimation->AddClip(ANIM_STATE::WALK, clip);
+	m_mapAnimOffset.insert(make_pair(ANIM_STATE::WALK, D3DXVECTOR2(5.0f, 20.0f)));
+
+	m_pAnimation->SetScale(0.5f, 0.5f);
+	m_isFlipping = false;
 }
 
 void Player::Update()
 {
-
-	// 왼쪽, 오른쪽 이동
-	if (g_pKeyManager->IsStayKeyDown(VK_LEFT) == g_pKeyManager->IsStayKeyDown(VK_RIGHT))
-	{
-		m_walkSpeed = 0.0f;
-	}
-	else if (g_pKeyManager->IsStayKeyDown(VK_LEFT))
-	{
-		if (m_walkSpeed > 0.0f) m_walkSpeed = 0.0f;
-		m_walkSpeed -= m_maxWalkSpeed * 3.5f* g_pTimeManager->GetDeltaTime();
-		if (fabs(m_walkSpeed) > m_maxWalkSpeed) m_walkSpeed = -m_maxWalkSpeed;
-	}
-	else if (g_pKeyManager->IsStayKeyDown(VK_RIGHT))
-	{
-		if (m_walkSpeed < 0.0f) m_walkSpeed = 0.0f;
-		m_walkSpeed += m_maxWalkSpeed * 3.5f* g_pTimeManager->GetDeltaTime();
-		if (fabs(m_walkSpeed) > m_maxWalkSpeed) m_walkSpeed = m_maxWalkSpeed;
-	}
+	UpdateWalkSpeed();
 
 	switch (m_curState)
 	{
 	case STATE::Stand:
-		m_speed = { 0.0f, 0.0f };
-		// show the appropriate sprite for the state.
-		//...
-		if (!m_onGround) m_curState = STATE::Jump;
-		if (g_pKeyManager->IsStayKeyDown(VK_LEFT) || g_pKeyManager->IsStayKeyDown(VK_RIGHT))
-		{
-			m_curState = STATE::Walk;
-		}
-		if (g_pKeyManager->IsOnceKeyDown(VK_SPACE))
-		{
-			m_speed.y = m_jumpSpeed;
-			m_curState = STATE::Jump;
-			m_pressingJumpingButton = true;
-		}
+		m_animState = ANIM_STATE::IDLE;
+		UpdateStand();
 		break;		
 	case STATE::Walk:
-		if (!m_onGround)
-		{
-			m_curState = STATE::Jump;
-			break;
-		}
-		m_speed = { m_walkSpeed, 0.0f };
-
-		// 점프
-		if (g_pKeyManager->IsOnceKeyDown(VK_SPACE))
-		{
-			m_speed.y = m_jumpSpeed;
-			m_curState = STATE::Jump;
-			m_pressingJumpingButton = true;
-		}
+		m_animState = ANIM_STATE::WALK;
+		UpdateWalk();
 		break; 
 	case STATE::Jump:
-		if (m_onGround)
-		{
-			m_speed.y = 0.0f;
-			m_curState = STATE::Stand;
-			break;
-		}
+		UpdateJump();
+		break;
+	}
+
+	UpdatePhysics();
+
+	if (m_onGround && !m_wasOnGround)
+	{
+		// 방금 땅에 떨어짐
+		// 먼지 이펙트 등 땅에 떨어진 효과 주기
+	}
+
+	UpdateAnimationFlip();
+	UpdateAnimation();
+}
+
+void Player::UpdateJump()
+{
+	if (m_onGround)
+	{
+		m_speed.y = 0.0f;
+		m_curState = STATE::Stand;
+	}
+	else
+	{
 		// 점프중에 왼쪽, 오른쪽 이동
 		if (g_pKeyManager->IsStayKeyDown(VK_LEFT) == g_pKeyManager->IsStayKeyDown(VK_RIGHT))
 		{
-			if(!m_isWallJumpingTowardLeft && !m_isWallJumpingTowardRight)
+			if (!m_isWallJumpingTowardLeft && !m_isWallJumpingTowardRight)
 				m_speed.x = 0.0f;
 		}
 		else if (g_pKeyManager->IsStayKeyDown(VK_LEFT))
 		{
 			// 벽점프중
-			if(m_isWallJumpingTowardLeft || m_isWallJumpingTowardRight)
+			if (m_isWallJumpingTowardLeft || m_isWallJumpingTowardRight)
 			{
 				m_speed.x += m_walkSpeed * 2.5f * g_pTimeManager->GetDeltaTime();
 				if (m_speed.x < -m_maxWalkSpeed)
@@ -160,17 +179,104 @@ void Player::Update()
 			m_speed.y = m_jumpSpeed;
 			m_pressingJumpingButton = true;
 		}
-		break;
-	case STATE::GrabLedge:
-		break;
+	}
+}
+
+void Player::UpdateWalk()
+{
+	if (!m_onGround)
+	{
+		m_curState = STATE::Jump;
+	}
+	else if (m_walkSpeed == 0.0f)
+	{
+		m_curState = STATE::Stand;
+	}
+	else
+	{
+		m_speed = { m_walkSpeed, 0.0f };
+
+		// 점프
+		if (g_pKeyManager->IsOnceKeyDown(VK_SPACE))
+		{
+			m_speed.y = m_jumpSpeed;
+			m_curState = STATE::Jump;
+			m_pressingJumpingButton = true;
+		}
+	}
+}
+
+void Player::UpdateStand()
+{
+	m_speed = { 0.0f, 0.0f };
+	// show the appropriate sprite for the state.
+	//...
+	if (!m_onGround) m_curState = STATE::Jump;
+	if (g_pKeyManager->IsStayKeyDown(VK_LEFT) || g_pKeyManager->IsStayKeyDown(VK_RIGHT))
+	{
+		m_curState = STATE::Walk;
+	}
+	if (g_pKeyManager->IsOnceKeyDown(VK_SPACE))
+	{
+		m_speed.y = m_jumpSpeed;
+		m_curState = STATE::Jump;
+		m_pressingJumpingButton = true;
+	}
+}
+
+void Player::UpdateAnimationFlip()
+{
+	// flip이 시작되는 상황 : 왼쪽을 바라보고 있는데 오른쪽을 바라보는 키를 누를 때 또는 vice versa.
+	if (g_pKeyManager->IsStayKeyDown(VK_LEFT) && !g_pKeyManager->IsStayKeyDown(VK_RIGHT) && m_facingRight)
+	{
+		m_facingRight = false;
+		m_isFlipping = true;
+	}
+	else if (g_pKeyManager->IsStayKeyDown(VK_RIGHT) && !g_pKeyManager->IsStayKeyDown(VK_LEFT) && !m_facingRight)
+	{
+		m_facingRight = true;
+		m_isFlipping = true;
 	}
 
-	UpdatePhysics();
-
-	if (m_onGround && !m_wasOnGround)
+	// flip 중
+	if (m_isFlipping)
 	{
-		// 방금 땅에 떨어짐
-		// 먼지 이펙트 등 땅에 떨어진 효과 주기
+		// flip 애니메이션을 결정
+		switch (m_animState)
+		{
+		case ANIM_STATE::IDLE:
+		case ANIM_STATE::WALK:
+			m_flipAnimState = ANIM_STATE::FLIP_STAND;
+			break;
+		}
+		// flip이 끝나는 상황 : flip 애니메이션이 play를 끝마쳤을 때. 
+		m_isFlipping = !m_pAnimation->IsDonePlaying();
+		if (!m_isFlipping)
+		{
+			// flip이 끝나면 rotation의 y값을 바꿔준다.
+			m_rotation.y = (m_facingRight) ? 0.0f : D3DX_PI;
+		}
+	}
+}
+
+void Player::UpdateWalkSpeed()
+{
+	// 왼쪽, 오른쪽 이동
+	if (g_pKeyManager->IsStayKeyDown(VK_LEFT) == g_pKeyManager->IsStayKeyDown(VK_RIGHT))
+	{
+		m_walkSpeed = 0.0f;
+	}
+	else if (g_pKeyManager->IsStayKeyDown(VK_LEFT))
+	{
+		if (m_walkSpeed > 0.0f) m_walkSpeed = 0.0f;
+		m_walkSpeed -= m_maxWalkSpeed * 3.5f* g_pTimeManager->GetDeltaTime();
+		if (fabs(m_walkSpeed) > m_maxWalkSpeed) m_walkSpeed = -m_maxWalkSpeed;
+	}
+	else if (g_pKeyManager->IsStayKeyDown(VK_RIGHT))
+	{
+		if (m_walkSpeed < 0.0f) m_walkSpeed = 0.0f;
+		m_walkSpeed += m_maxWalkSpeed * 3.5f* g_pTimeManager->GetDeltaTime();
+		if (fabs(m_walkSpeed) > m_maxWalkSpeed) m_walkSpeed = m_maxWalkSpeed;
 	}
 }
 
@@ -412,13 +518,36 @@ bool Player::HasRightWall(D3DXVECTOR2 oldPosition, D3DXVECTOR2 position, float &
 	return false;
 }
 
+void Player::UpdateAnimation()
+{
+	// ******* Play 먼저 하고 Update!!! *******중요!!
+	// Play를 먼저 하는 이유 : 새로운 애니메이션을 플레이 하게 된 경우 때문.
+	// Update를 먼저 하면 현재 플레이 해야 할 애니메이션이 아닌, 이전에 플레이 하고 있었던 애니메이션을 쌩뚱맞게 업데이트 하게 된다.
+	m_pAnimation->SetPosition({ m_position.x,  m_position.y + 23.0f});
+	if (m_isFlipping)
+	{
+		//m_pAnimation->SetPosition({ m_position.x + m_mapAnimOffset[m_flipAnimState].x,  m_position.y + m_mapAnimOffset[m_flipAnimState].y });
+		m_pAnimation->Play(m_flipAnimState);
+	}
+	else
+	{
+		m_pAnimation->Play(m_animState);
+		//m_pAnimation->SetPosition({ m_position.x + m_mapAnimOffset[m_animState].x,  m_position.y + m_mapAnimOffset[m_animState].y });
+	}
+
+	m_pAnimation->SetRotation(m_rotation.x, m_rotation.y, m_rotation.z);
+	m_pAnimation->Update();
+}
+
 void Player::Render()
 {
 	m_AABB->Render();
+	m_pAnimation->Render();
 }
 
 void Player::Release()
 {
 	m_AABB->Release();
 	SAFE_DELETE(m_AABB);
+	SAFE_DELETE(m_pAnimation);
 }

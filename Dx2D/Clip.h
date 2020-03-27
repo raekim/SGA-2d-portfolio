@@ -65,5 +65,6 @@ public:
 
 	float GetWidth() { return m_vecFrame[m_nCurrFrame]->pSprite->GetWidth(); }
 	float GetHeight() { return m_vecFrame[m_nCurrFrame]->pSprite->GetHeight(); }
+	bool IsDonePlaying() { return !m_isPlaying; }
 };
 

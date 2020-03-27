@@ -19,6 +19,7 @@ public:
 	void Play(T state);
 	void PlayReverse(T state);
 	void SetStartFrame(T state, int start);
+	bool IsDonePlaying() { return m_mapClip[m_eCurrState]->IsDonePlaying(); }	// 현재 애니메이션 플레이가 끝났는가?
 
 	D3DXMATRIX& GetWMatrix() { return m_mapClip[m_eCurrState]->GetWMatrix(); }
 
