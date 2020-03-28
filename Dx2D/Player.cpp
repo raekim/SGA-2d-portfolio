@@ -134,7 +134,7 @@ void Player::InitAnimation()
 	//JUMP_TOP_FLIP
 	clip = new Clip(PlayMode::Once);
 	sprite = new Sprite(L"Chicken-Sheet", sheetX / 2, sheetY, sheetX / 2 + 6);
-	clip->AddFrame(sprite, 1 / 12.0f);
+	clip->AddFrame(sprite, 1 / 24.0f);
 	m_pAnimation->AddClip(ANIM_STATE::JUMP_TOP_FLIP, clip);
 
 	m_pAnimation->SetScale(0.5f, 0.5f);
@@ -667,7 +667,7 @@ void Player::GetNextAnimationState()
 		}
 		break;
 	case ANIM_STATE::LANDING_SOFT:
-		if (m_speed.y != 0.0f)
+		if (m_speed.y != 0.0f || m_speed.x != 0.0f)
 		{
 			m_animState = ANIM_STATE::IDLE;
 			GetNextAnimationState();

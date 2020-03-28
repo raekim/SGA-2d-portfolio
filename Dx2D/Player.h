@@ -30,6 +30,10 @@ class Player
 		JUMP_TOP_FLIP,
 
 		// 벽 슬라이딩, 벽점프 관련
+		TOP_TO_WALLSLIDE,
+		TO_WALLSLIDE,
+		WALLSLIDE,
+		WALLSLIDE_TO_JUMP_UP,
 		Max
 	};
 
