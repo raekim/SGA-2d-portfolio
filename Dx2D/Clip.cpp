@@ -149,7 +149,11 @@ void Clip::Update()
 			case PlayMode::Once:
 				m_nCurrFrame++;
 				if (m_nCurrFrame == m_vecFrame.size())
-					Stop();
+				{
+					// 마지막 프레임에 멈춰있기
+					m_nCurrFrame--;
+					m_isPlaying = false;
+				}
 				break;
 			case PlayMode::Loop:
 				m_nCurrFrame++;

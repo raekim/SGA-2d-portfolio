@@ -552,7 +552,7 @@ bool Player::IsFlipping()
 	return (m_facingRight && g_pKeyManager->IsStayKeyDown(VK_LEFT)) || (!m_facingRight && g_pKeyManager->IsStayKeyDown(VK_RIGHT));
 }
 
-void Player::UpdateAnimation()
+void Player::GetNextAnimationState()
 {
 	switch (m_animState)
 	{
@@ -565,11 +565,27 @@ void Player::UpdateAnimation()
 		{
 			m_animState = ANIM_STATE::FLIP_STAND;
 		}
+		if (m_speed.y > 0.0f)
+		{
+			m_animState = ANIM_STATE::JUMP_GOING_UP;
+		}
+		if (m_speed.y < 0.0f)
+		{
+			m_animState = ANIM_STATE::JUMP_TOP;
+		}
 		break;
 	case ANIM_STATE::WALK:
-		if (m_speed.x == 0.0f)
+		if (m_curState == STATE::Stand)
 		{
 			m_animState = ANIM_STATE::IDLE;
+		}
+		if (m_speed.y > 0.0f)
+		{
+			m_animState = ANIM_STATE::JUMP_GOING_UP;
+		}
+		if (m_speed.y < 0.0f)
+		{
+			m_animState = ANIM_STATE::JUMP_TOP;
 		}
 		if (IsFlipping())
 		{
@@ -584,7 +600,111 @@ void Player::UpdateAnimation()
 			m_animState = (m_speed.x == 0.0f) ? ANIM_STATE::IDLE : ANIM_STATE::WALK;
 		}
 		break;
+	case ANIM_STATE::JUMP_GOING_UP:
+		if (IsFlipping())
+		{
+			m_animState = ANIM_STATE::JUMP_TOP_FLIP;
+		}
+		if (0.0f < m_speed.y && m_speed.y <= 100.0f)
+		{
+			m_animState = ANIM_STATE::UP_TO_TOP;
+		}
+		if (m_onGround)
+		{
+			m_animState = ANIM_STATE::LANDING_SOFT;
+		}
+		break;
+	case ANIM_STATE::UP_TO_TOP:
+		if (IsFlipping())
+		{
+			m_animState = ANIM_STATE::JUMP_TOP_FLIP;
+		}
+		if (m_pAnimation->IsDonePlaying(ANIM_STATE::UP_TO_TOP))
+		{
+			m_animState = ANIM_STATE::JUMP_TOP;
+		}
+		if (m_onGround)
+		{
+			m_animState = ANIM_STATE::LANDING_SOFT;
+		}
+		break;
+	case ANIM_STATE::JUMP_TOP:
+		if (IsFlipping())
+		{
+			m_animState = ANIM_STATE::JUMP_TOP_FLIP;
+		}
+		if (m_speed.y < 0.0f && m_speed.y <= -250.0f)
+		{
+			m_animState = ANIM_STATE::TOP_TO_DOWN;
+		}
+		if (m_onGround)
+		{
+			m_animState = ANIM_STATE::LANDING_SOFT;
+		}
+		break;
+	case ANIM_STATE::TOP_TO_DOWN:
+		if (IsFlipping())
+		{
+			m_animState = ANIM_STATE::JUMP_TOP_FLIP;
+		}
+		if (m_pAnimation->IsDonePlaying(ANIM_STATE::TOP_TO_DOWN))
+		{
+			m_animState = ANIM_STATE::JUMP_GOING_DOWN;
+		}
+		if (m_onGround)
+		{
+			m_animState = ANIM_STATE::LANDING_SOFT;
+		}
+		break;
+	case ANIM_STATE::JUMP_GOING_DOWN:
+		if (IsFlipping())
+		{
+			m_animState = ANIM_STATE::JUMP_TOP_FLIP;
+		}
+		if (m_onGround)
+		{
+			m_animState = ANIM_STATE::LANDING_SOFT;
+		}
+		break;
+	case ANIM_STATE::LANDING_SOFT:
+		if (m_speed.y != 0.0f)
+		{
+			m_animState = ANIM_STATE::IDLE;
+			GetNextAnimationState();
+		}
+		if (m_pAnimation->IsDonePlaying(ANIM_STATE::LANDING_SOFT))
+		{
+			if (m_curState == STATE::Walk)
+				m_animState = ANIM_STATE::WALK;
+			if (m_curState == STATE::Stand)
+				m_animState = ANIM_STATE::IDLE;
+		}
+		break;
+	case ANIM_STATE::JUMP_TOP_FLIP:
+		if (m_pAnimation->IsDonePlaying(ANIM_STATE::JUMP_TOP_FLIP))
+		{
+			m_facingRight = !m_facingRight;
+			m_rotation.y = (m_facingRight) ? 0.0f : D3DX_PI;
+			if (m_speed.y > 0.0f)
+			{
+				m_animState = ANIM_STATE::JUMP_GOING_UP;
+			}
+			else
+			{
+				m_animState = ANIM_STATE::JUMP_TOP;
+			}
+			if (m_onGround)
+			{
+				m_animState = ANIM_STATE::LANDING_SOFT;
+			}
+		}
+		break;
 	}
+}
+
+void Player::UpdateAnimation()
+{
+	GetNextAnimationState();
 
 	m_pAnimation->SetPosition({ m_position.x,  m_position.y + 23.0f });
 	m_pAnimation->SetRotation(m_rotation.x, m_rotation.y, m_rotation.z);
