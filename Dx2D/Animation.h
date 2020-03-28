@@ -19,7 +19,6 @@ public:
 	void Play(T state);
 	void PlayReverse(T state);
 	void SetStartFrame(T state, int start);
-	bool IsDonePlaying() { return m_mapClip[m_eCurrState]->IsDonePlaying(); }	// 현재 애니메이션 플레이가 끝났는가?
 
 	D3DXMATRIX& GetWMatrix() { return m_mapClip[m_eCurrState]->GetWMatrix(); }
 
@@ -43,7 +42,15 @@ public:
 
 	float GetWidth() { return m_mapClip[m_eCurrState]->GetWidth(); }
 	float GetHeight() { return m_mapClip[m_eCurrState]->GetHeight(); }
+
+	bool IsDonePlaying(T clip);
 };
+
+template <typename T>
+inline bool Animation<T>::IsDonePlaying(T clip)
+{
+	return m_mapClip[clip]->IsDonePlaying();
+}
 
 template <typename T>
 inline Animation<T>::Animation()
@@ -70,7 +77,7 @@ inline void Animation<T>::AddClip(T state, Clip * clip)
 template <typename T>
 inline void Animation<T>::Play(T state)
 {
-	if (m_eCurrState == state) return;
+	//if (m_eCurrState == state) return;
 
 	m_eCurrState = state;
 

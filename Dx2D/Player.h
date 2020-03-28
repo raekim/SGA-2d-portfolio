@@ -19,14 +19,25 @@ class Player
 		IDLE,
 		FLIP_STAND,
 		WALK,
+
+		// 점프 관련
+		JUMP_GOING_UP,
+		UP_TO_TOP,
+		JUMP_TOP,
+		TOP_TO_DOWN,
+		JUMP_GOING_DOWN,
+		LANDING_SOFT,
+		JUMP_TOP_FLIP,
+
+		// 벽 슬라이딩, 벽점프 관련
 		Max
 	};
 
 	map<ANIM_STATE, D3DXVECTOR2> m_mapAnimOffset;	// 각 애니메이션 클립의 오프셋
 
 	Animation<ANIM_STATE>*	m_pAnimation;
-	ANIM_STATE				m_flipAnimState;
 	ANIM_STATE				m_animState;
+	ANIM_STATE				m_prevAnimState;
 
 	D3DXVECTOR2				m_oldPosition;
 	D3DXVECTOR2				m_position;
@@ -61,7 +72,6 @@ class Player
 
 	bool m_hasNoWalls;						// 캐릭터의 4방향 어디에도 벽이 없는 상태
 	bool m_facingRight;
-	bool m_isFlipping;
 
 	STATE m_curState;
 	float m_jumpSpeed;
@@ -74,6 +84,9 @@ class Player
 	bool m_isWallJumpingTowardRight;		// 오른쪽으로 튕겨나가는 벽점프 중
 
 private:
+	// Init 관련 함수
+	void InitAnimation();
+
 	// Update 관련 함수
 	void UpdateWalkSpeed();
 	void UpdateJump();
@@ -81,7 +94,6 @@ private:
 	void UpdateStand();
 	void UpdatePhysics();
 	void UpdateAnimation();
-	void UpdateAnimationFlip();				// 캐릭터 애니메이션 좌/우가 뒤바뀔 때 flip 애니메이션을 적절히 재생
 
 	// 상,하,좌,우 타일맵 벽과 충돌
 	bool HasGround(D3DXVECTOR2 oldPosition, D3DXVECTOR2 position, D3DXVECTOR2 speed, float& groundY);

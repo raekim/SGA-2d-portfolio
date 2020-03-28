@@ -52,7 +52,6 @@ public:
 
 	void SetConstantScale(float x, float y);
 	void SetConstantScale(D3DXVECTOR2 s);
-
 	void Play();
 	void Play(UINT startFrame);
 	void PlayReverse();
