@@ -77,7 +77,7 @@ inline void Animation<T>::AddClip(T state, Clip * clip)
 template <typename T>
 inline void Animation<T>::Play(T state)
 {
-	//if (m_eCurrState == state) return;
+	if (m_eCurrState == state) return;
 
 	m_eCurrState = state;
 

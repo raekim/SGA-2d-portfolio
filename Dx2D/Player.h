@@ -100,6 +100,8 @@ private:
 	bool HasCeiling(D3DXVECTOR2 oldPosition, D3DXVECTOR2 position, float& ceilingY);
 	bool HasLeftWall(D3DXVECTOR2 oldPosition, D3DXVECTOR2 position, float& WallX);
 	bool HasRightWall(D3DXVECTOR2 oldPosition, D3DXVECTOR2 position, float& WallX);
+
+	bool IsFlipping();		// 현재 왼쪽을 보고 있는데 오른쪽을 보려고 하는가? (또는 그 반대)
 public:
 	Player();
 	~Player();

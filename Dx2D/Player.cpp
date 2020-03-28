@@ -547,22 +547,48 @@ bool Player::HasRightWall(D3DXVECTOR2 oldPosition, D3DXVECTOR2 position, float &
 	return false;
 }
 
+bool Player::IsFlipping()
+{
+	return (m_facingRight && g_pKeyManager->IsStayKeyDown(VK_LEFT)) || (!m_facingRight && g_pKeyManager->IsStayKeyDown(VK_RIGHT));
+}
+
 void Player::UpdateAnimation()
 {
 	switch (m_animState)
 	{
 	case ANIM_STATE::IDLE:
+		if (m_curState == STATE::Walk)
+		{
+			m_animState = ANIM_STATE::WALK;
+		}
+		if (IsFlipping())
+		{
+			m_animState = ANIM_STATE::FLIP_STAND;
+		}
 		break;
 	case ANIM_STATE::WALK:
+		if (m_speed.x == 0.0f)
+		{
+			m_animState = ANIM_STATE::IDLE;
+		}
+		if (IsFlipping())
+		{
+			m_animState = ANIM_STATE::FLIP_STAND;
+		}
 		break;
 	case ANIM_STATE::FLIP_STAND:
+		if (m_pAnimation->IsDonePlaying(ANIM_STATE::FLIP_STAND))
+		{
+			m_facingRight = !m_facingRight;
+			m_rotation.y = (m_facingRight) ? 0.0f : D3DX_PI;
+			m_animState = (m_speed.x == 0.0f) ? ANIM_STATE::IDLE : ANIM_STATE::WALK;
+		}
 		break;
 	}
 
-	//m_rotation.y = (m_facingRight) ? 0.0f : D3DX_PI;
-
 	m_pAnimation->SetPosition({ m_position.x,  m_position.y + 23.0f });
 	m_pAnimation->SetRotation(m_rotation.x, m_rotation.y, m_rotation.z);
+	m_pAnimation->Play(m_animState);
 	m_pAnimation->Update();
 
 	// 애니메이션 상태 업데이트
@@ -572,7 +598,7 @@ void Player::UpdateAnimation()
 void Player::Render()
 {
 	m_AABB->Render();
-	//m_pAnimation->Render();
+	m_pAnimation->Render();
 }
 
 void Player::Release()
