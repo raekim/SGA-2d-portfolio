@@ -137,6 +137,39 @@ void Player::InitAnimation()
 	clip->AddFrame(sprite, 1 / 24.0f);
 	m_pAnimation->AddClip(ANIM_STATE::JUMP_TOP_FLIP, clip);
 
+	//WALLSLIDE
+	clip = new Clip;
+	for (int i = 0; i < 3; ++i)
+	{
+		sprite = new Sprite(L"Chicken-Sheet", sheetX / 2, sheetY, sheetX * 2 + i + 5);
+		clip->AddFrame(sprite, 1 / 24.0f);
+	}
+	m_pAnimation->AddClip(ANIM_STATE::WALLSLIDE, clip);
+
+	//TO_WALLSLIDE
+	clip = new Clip(PlayMode::Once);
+	for (int i = 0; i < 2; ++i)
+	{
+		sprite = new Sprite(L"Chicken-Sheet", sheetX / 2, sheetY, sheetX * 2 + i + 8);
+		clip->AddFrame(sprite, 1 / 24.0f);
+	}
+	m_pAnimation->AddClip(ANIM_STATE::TO_WALLSLIDE, clip);
+
+	//TOP_TO_WALLSLIDE
+	clip = new Clip(PlayMode::Once);
+	for (int i = 0; i < 2; ++i)
+	{
+		sprite = new Sprite(L"Chicken-Sheet", sheetX / 2, sheetY, sheetX * 2 + i + 10);
+		clip->AddFrame(sprite, 1 / 24.0f);
+	}
+	m_pAnimation->AddClip(ANIM_STATE::TOP_TO_WALLSLIDE, clip);
+
+	//WALLSLIDE_TO_JUMP_UP
+	clip = new Clip(PlayMode::Once);
+	sprite = new Sprite(L"Chicken-Sheet", sheetX / 2, sheetY, sheetX * 2 + 12);
+	clip->AddFrame(sprite, 1 / 24.0f);
+	m_pAnimation->AddClip(ANIM_STATE::TOP_TO_WALLSLIDE, clip);
+
 	m_pAnimation->SetScale(0.5f, 0.5f);
 }
 
