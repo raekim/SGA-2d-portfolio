@@ -24,7 +24,6 @@ void Player::Init(Map* map)
 	m_maxWalkSpeed = 400.0f;
 	m_walkSpeed = 0.0f;
 
-	m_curState = STATE::Stand;
 	m_position = { WINSIZEX*0.5f, WINSIZEY };
 	m_rotation = { 0.0f, 0.0f, 0.0f };
 	m_oldPosition = m_position;
@@ -37,6 +36,7 @@ void Player::Init(Map* map)
 
 	m_prevAnimState = ANIM_STATE::READY;
 	m_animState = ANIM_STATE::IDLE;
+	m_curState = STATE::Stand;
 }
 
 void Player::InitAnimation()
@@ -141,33 +141,27 @@ void Player::InitAnimation()
 	clip = new Clip;
 	for (int i = 0; i < 3; ++i)
 	{
-		sprite = new Sprite(L"Chicken-Sheet", sheetX / 2, sheetY, sheetX * 2 + i + 5);
-		clip->AddFrame(sprite, 1 / 24.0f);
+		sprite = new Sprite(L"Chicken-Sheet", sheetX, sheetY, sheetX * 2 + i + 5);
+		clip->AddFrame(sprite, 1 / 12.0f);
 	}
 	m_pAnimation->AddClip(ANIM_STATE::WALLSLIDE, clip);
 
-	//TO_WALLSLIDE
+	//TO_WALLSLIDE_OPPOSITE_START
 	clip = new Clip(PlayMode::Once);
 	for (int i = 0; i < 2; ++i)
 	{
-		sprite = new Sprite(L"Chicken-Sheet", sheetX / 2, sheetY, sheetX * 2 + i + 8);
-		clip->AddFrame(sprite, 1 / 24.0f);
+		sprite = new Sprite(L"Chicken-Sheet", sheetX, sheetY, sheetX * 2 + i + 8);
+		clip->AddFrame(sprite, 1 / 12.0f);
 	}
-	m_pAnimation->AddClip(ANIM_STATE::TO_WALLSLIDE, clip);
+	m_pAnimation->AddClip(ANIM_STATE::TO_WALLSLIDE_OPPOSITE_START, clip);
 
 	//TOP_TO_WALLSLIDE
 	clip = new Clip(PlayMode::Once);
 	for (int i = 0; i < 2; ++i)
 	{
-		sprite = new Sprite(L"Chicken-Sheet", sheetX / 2, sheetY, sheetX * 2 + i + 10);
-		clip->AddFrame(sprite, 1 / 24.0f);
+		sprite = new Sprite(L"Chicken-Sheet", sheetX, sheetY, sheetX * 2 + i + 10);
+		clip->AddFrame(sprite, 1 / 12.0f);
 	}
-	m_pAnimation->AddClip(ANIM_STATE::TOP_TO_WALLSLIDE, clip);
-
-	//WALLSLIDE_TO_JUMP_UP
-	clip = new Clip(PlayMode::Once);
-	sprite = new Sprite(L"Chicken-Sheet", sheetX / 2, sheetY, sheetX * 2 + 12);
-	clip->AddFrame(sprite, 1 / 24.0f);
 	m_pAnimation->AddClip(ANIM_STATE::TOP_TO_WALLSLIDE, clip);
 
 	m_pAnimation->SetScale(0.5f, 0.5f);
@@ -191,14 +185,19 @@ void Player::Update()
 	}
 
 	UpdatePhysics();
-
-	if (m_onGround && !m_wasOnGround)
-	{
-		// 방금 땅에 떨어짐
-		// 먼지 이펙트 등 땅에 떨어진 효과 주기
-	}
-
 	UpdateAnimation();
+
+	// 움직임 상태 정보 갱신
+	m_oldPosition = m_position;
+	m_oldSpeed = m_speed;
+
+	m_wasOnGround = m_onGround;
+	m_pushedRightWall = m_pushesRightWall;
+	m_pushedLeftWall = m_pushesLeftWall;
+	m_wasAtCeiling = m_atCeiling;
+	m_wasWallSliding = m_isWallSliding;
+	m_slidRightWall = m_slidesRightWall;
+	m_slidLeftWall = m_slidesLeftWall;
 }
 
 void Player::UpdateJump()
@@ -349,7 +348,7 @@ void Player::UpdatePhysics()
 
 	// 왼쪽 벽 충돌
 	float leftWallX;
-	bool hasLeftWall = m_speed.x < 0 && HasLeftWall(m_oldPosition, m_position, leftWallX) && m_oldPosition.x >= leftWallX;
+	bool hasLeftWall = m_speed.x <= 0.0f && HasLeftWall(m_oldPosition, m_position, leftWallX) && m_oldPosition.x >= leftWallX;
 	if (hasLeftWall)
 	{
 		m_position.x = leftWallX + m_AABB->GetHalfSize().x;
@@ -363,7 +362,7 @@ void Player::UpdatePhysics()
 
 	// 오른쪽 벽 충돌
 	float rightWallX;
-	bool hasRightWall = m_speed.x > 0 && HasRightWall(m_oldPosition, m_position, rightWallX);
+	bool hasRightWall = m_speed.x >= 0.0f && HasRightWall(m_oldPosition, m_position, rightWallX);
 	if (hasRightWall)
 	{
 		m_position.x = rightWallX - m_AABB->GetHalfSize().x;
@@ -408,17 +407,22 @@ void Player::UpdatePhysics()
 	}
 
 	// 벽 슬라이드
-	m_isWallSliding = (hasLeftWall || hasRightWall) && !hasGround && !hasCeiling && m_speed.y < 0.0f;
+	bool wallSlideStart = (hasLeftWall || hasRightWall) && !hasGround && !hasCeiling && m_speed.y < 0.0f;
+	m_isWallSliding = wallSlideStart || (m_isWallSliding && !hasGround && !hasCeiling && m_speed.y < 0.0f);
+	if (wallSlideStart)
+	{
+		m_slidesLeftWall = hasLeftWall;
+		m_slidesRightWall = hasRightWall;
+	}
+	m_slidesLeftWall = m_slidesLeftWall && m_isWallSliding;
+	m_slidesRightWall = m_slidesRightWall && m_isWallSliding;
 
-	// 움직임 상태 정보 업데이트
-	m_oldPosition = m_position;
-	m_oldSpeed = m_speed;
-
-	m_wasOnGround = m_onGround;
-	m_pushedRightWall = m_pushesRightWall;
-	m_pushedLeftWall = m_pushesLeftWall;
-	m_wasAtCeiling = m_atCeiling;
-	m_wasWallSliding = m_isWallSliding;
+	// 이전 움직임과 현재 움직임 상태를 비교해서 효과를 주는 경우
+	if (m_onGround && !m_wasOnGround)
+	{
+		// 방금 땅에 떨어짐
+		// 먼지 이펙트 등 땅에 떨어진 효과 주기
+	}
 
 	m_hasNoWalls = !hasLeftWall && !hasRightWall && !hasGround && !hasCeiling;
 	m_isWallJumpingTowardLeft = m_isWallJumpingTowardLeft && m_hasNoWalls && !g_pKeyManager->IsStayKeyDown(VK_LEFT);
@@ -582,6 +586,8 @@ bool Player::HasRightWall(D3DXVECTOR2 oldPosition, D3DXVECTOR2 position, float &
 
 bool Player::IsFlipping()
 {
+	bool res;
+
 	return (m_facingRight && g_pKeyManager->IsStayKeyDown(VK_LEFT)) || (!m_facingRight && g_pKeyManager->IsStayKeyDown(VK_RIGHT));
 }
 
@@ -646,6 +652,10 @@ void Player::GetNextAnimationState()
 		{
 			m_animState = ANIM_STATE::LANDING_SOFT;
 		}
+		if (m_isWallSliding)
+		{
+			m_animState = ANIM_STATE::TOP_TO_WALLSLIDE;
+		}
 		break;
 	case ANIM_STATE::UP_TO_TOP:
 		if (IsFlipping())
@@ -660,6 +670,10 @@ void Player::GetNextAnimationState()
 		{
 			m_animState = ANIM_STATE::LANDING_SOFT;
 		}
+		if (m_isWallSliding)
+		{
+			m_animState = ANIM_STATE::TOP_TO_WALLSLIDE;
+		}
 		break;
 	case ANIM_STATE::JUMP_TOP:
 		if (IsFlipping())
@@ -673,6 +687,10 @@ void Player::GetNextAnimationState()
 		if (m_onGround)
 		{
 			m_animState = ANIM_STATE::LANDING_SOFT;
+		}
+		if (m_isWallSliding)
+		{
+			m_animState = ANIM_STATE::TOP_TO_WALLSLIDE;
 		}
 		break;
 	case ANIM_STATE::TOP_TO_DOWN:
@@ -697,6 +715,10 @@ void Player::GetNextAnimationState()
 		if (m_onGround)
 		{
 			m_animState = ANIM_STATE::LANDING_SOFT;
+		}
+		if (m_isWallSliding)
+		{
+			m_animState = ANIM_STATE::TOP_TO_WALLSLIDE;
 		}
 		break;
 	case ANIM_STATE::LANDING_SOFT:
@@ -731,8 +753,60 @@ void Player::GetNextAnimationState()
 				m_animState = ANIM_STATE::LANDING_SOFT;
 			}
 		}
+		if (m_isWallSliding)
+		{
+			m_animState = ANIM_STATE::TOP_TO_WALLSLIDE;
+		}
+		break;
+	case ANIM_STATE::TOP_TO_WALLSLIDE:
+		// 슬라이딩 하고 있는 벽의 위치에 따라 좌우반전
+		if (m_isWallSliding)
+		{
+			m_facingRight = m_slidesRightWall;
+		}
+		if (m_pAnimation->IsDonePlaying(ANIM_STATE::TOP_TO_WALLSLIDE))
+		{
+			m_animState = ANIM_STATE::WALLSLIDE;
+		}
+		if (!m_isWallSliding)
+		{
+			m_animState = ANIM_STATE::TO_WALLSLIDE_OPPOSITE_START;
+		}
+		break;
+	case ANIM_STATE::WALLSLIDE:
+		// 슬라이딩 하고 있는 벽의 위치에 따라 좌우반전
+		if (m_isWallSliding)
+		{
+			m_facingRight = m_slidesRightWall;
+		}
+		if (!m_isWallSliding)
+		{
+			m_animState = ANIM_STATE::TO_WALLSLIDE_OPPOSITE_START;
+			GetNextAnimationState();
+		}
+		break;
+	case ANIM_STATE::TO_WALLSLIDE_OPPOSITE_START:
+		if (m_onGround)
+		{
+			if (m_curState == STATE::Walk || m_pAnimation->IsDonePlaying(ANIM_STATE::TO_WALLSLIDE_OPPOSITE_START))
+			{
+				// 착지로 벽 슬라이드가 끝났을 때 방향 반전
+				m_facingRight = m_slidLeftWall;
+				m_animState = ANIM_STATE::IDLE;
+				GetNextAnimationState();
+			}
+		}
+		else if(!m_isWallSliding)
+		{
+			// 점프로 벽 슬라이드가 끝났을 때 방향 반전
+			m_facingRight =m_slidLeftWall;
+			m_animState = ANIM_STATE::JUMP_GOING_UP;
+			GetNextAnimationState();
+		}
 		break;
 	}
+
+	m_rotation.y = (m_facingRight) ? 0.0f : D3DX_PI;
 }
 
 void Player::UpdateAnimation()

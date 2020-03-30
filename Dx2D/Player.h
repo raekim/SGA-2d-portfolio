@@ -31,7 +31,7 @@ class Player
 
 		// 벽 슬라이딩, 벽점프 관련
 		TOP_TO_WALLSLIDE,
-		TO_WALLSLIDE,
+		TO_WALLSLIDE_OPPOSITE_START,
 		WALLSLIDE,
 		WALLSLIDE_TO_JUMP_UP,
 		Max
@@ -58,9 +58,13 @@ class Player
 	// Position States
 	bool m_pushedRightWall;
 	bool m_pushesRightWall;
+	bool m_slidRightWall;
+	bool m_slidesRightWall;
 
 	bool m_pushedLeftWall;
 	bool m_pushesLeftWall;
+	bool m_slidLeftWall;
+	bool m_slidesLeftWall;
 
 	bool m_wasOnGround;
 	bool m_onGround;
