@@ -157,6 +157,7 @@
     <ClInclude Include="Animation.h" />
     <ClInclude Include="Camera.h" />
     <ClInclude Include="FileManager.h" />
+    <ClInclude Include="honeyPlatform.h" />
     <ClInclude Include="LoadingScene.h" />
     <ClInclude Include="LoadManager.h" />
     <ClInclude Include="Clip.h" />
@@ -169,6 +170,7 @@
     <ClInclude Include="KeyManager.h" />
     <ClInclude Include="MainGame.h" />
     <ClInclude Include="Map.h" />
+    <ClInclude Include="MovingObject.h" />
     <ClInclude Include="Player.h" />
     <ClInclude Include="Primitive2DObejct.h">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">false</ExcludedFromBuild>
@@ -180,6 +182,7 @@
     <ClInclude Include="Resource.h" />
     <ClInclude Include="SceneManager.h" />
     <ClInclude Include="Shader.h" />
+    <ClInclude Include="ShaderManager.h" />
     <ClInclude Include="SingletonBase.h" />
     <ClInclude Include="SoundManager.h" />
     <ClInclude Include="Sprite.h" />
@@ -197,6 +200,7 @@
     <ClCompile Include="Animation.cpp" />
     <ClCompile Include="Camera.cpp" />
     <ClCompile Include="FileManager.cpp" />
+    <ClCompile Include="honeyPlatform.cpp" />
     <ClCompile Include="LoadingScene.cpp" />
     <ClCompile Include="LoadManager.cpp" />
     <ClCompile Include="Clip.cpp" />
@@ -207,6 +211,7 @@
     <ClCompile Include="KeyManager.cpp" />
     <ClCompile Include="MainGame.cpp" />
     <ClCompile Include="Map.cpp" />
+    <ClCompile Include="MovingObject.cpp" />
     <ClCompile Include="Player.cpp" />
     <ClCompile Include="Primitive2DObejct.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">false</ExcludedFromBuild>
@@ -217,6 +222,7 @@
     <ClCompile Include="RenderTextureTest.cpp" />
     <ClCompile Include="SceneManager.cpp" />
     <ClCompile Include="Shader.cpp" />
+    <ClCompile Include="ShaderManager.cpp" />
     <ClCompile Include="SoundManager.cpp" />
     <ClCompile Include="Sprite.cpp" />
     <ClCompile Include="stdafx.cpp">

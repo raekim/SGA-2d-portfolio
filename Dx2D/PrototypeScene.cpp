@@ -18,6 +18,8 @@ void PrototypeScene::Init()
 
 	m_player = new Player;
 	m_player->Init(m_map);
+
+	m_honeyPlatform.Init();
 }
 
 void PrototypeScene::Update()
@@ -26,12 +28,14 @@ void PrototypeScene::Update()
 	{
 		PostQuitMessage(0); // WM_QUIT 메시지 발생
 	}
-	m_player->Update();
+	m_honeyPlatform.Update();
+	m_player->Update(m_honeyPlatform.GetAABB());
 }
 
 void PrototypeScene::Render()
 {
 	m_map->Render();
+	m_honeyPlatform.Render();
 	m_player->Render();
 }
 

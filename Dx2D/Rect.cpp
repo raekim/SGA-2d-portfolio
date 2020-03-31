@@ -87,8 +87,7 @@ Rect::Rect()
 
 	// 셰이더 클래스 생성
 	{
-		m_pShader = new Shader(L"Color");
-		m_pShader->CreateinputLayout(PCElementDesc, PCElementCount);
+		m_pShader = g_pShaderManager->AddShader(L"Color", PCElementDesc, PCElementCount);
 	}
 
 	// 보더라인 버퍼 생성

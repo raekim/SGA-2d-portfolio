@@ -167,7 +167,7 @@ void Player::InitAnimation()
 	m_pAnimation->SetScale(0.5f, 0.5f);
 }
 
-void Player::Update()
+void Player::Update(AABB* obj)
 {
 	UpdateWalkSpeed();
 
@@ -184,13 +184,12 @@ void Player::Update()
 		break;
 	}
 
-	UpdatePhysics();
+	UpdatePhysics(obj);
 	UpdateAnimation();
 
 	// 움직임 상태 정보 갱신
 	m_oldPosition = m_position;
 	m_oldSpeed = m_speed;
-
 	m_wasOnGround = m_onGround;
 	m_pushedRightWall = m_pushesRightWall;
 	m_pushedLeftWall = m_pushesLeftWall;
@@ -341,7 +340,7 @@ void Player::UpdateWalkSpeed()
 	}
 }
 
-void Player::UpdatePhysics()
+void Player::UpdatePhysics(AABB* obj)
 {
 	// 캐릭터의 x 위치 업데이트 (가로축 충돌 판정을 위해)
 	m_position.x += m_speed.x * g_pTimeManager->GetDeltaTime();
@@ -380,7 +379,8 @@ void Player::UpdatePhysics()
 
 	// 아래쪽 벽 충돌
 	float groundY;
-	bool hasGround = m_speed.y <= 0 && HasGround(m_oldPosition, m_position, m_speed, groundY);
+	bool hasGround = m_speed.y <= 0 && 
+		(HasGround(m_oldPosition, m_position, m_speed, groundY) || HasGround(obj, m_oldPosition, m_position, groundY));
 	if (hasGround)
 	{
 		m_position.y = groundY + m_AABB->GetHalfSize().y;
@@ -581,6 +581,50 @@ bool Player::HasRightWall(D3DXVECTOR2 oldPosition, D3DXVECTOR2 position, float &
 		}
 	}
 
+	return false;
+}
+
+bool Player::HasGround(AABB* other, D3DXVECTOR2 oldPosition, D3DXVECTOR2 position, float & groundY)
+{
+	// 캐릭터 발 밑을 검사
+	int newPixelY = position.y - m_AABB->GetHalfSize().y - 1;
+	int oldPixelY = min(newPixelY, oldPosition.y - m_AABB->GetHalfSize().y - 1);
+	int startPixelX = position.x - m_AABB->GetHalfSize().x + 2;
+	int endPixelX = position.x + m_AABB->GetHalfSize().x - 2;
+
+	// 위에서 아래로 검사
+	for (int pixelY = oldPixelY; pixelY >= newPixelY; --pixelY)
+	{
+		// startPixelX부터 endPixelX지점을 잇는 선에 닿는 모든 타일들을 검사한다
+		for (D3DXVECTOR2 checkPoint = D3DXVECTOR2(startPixelX, pixelY); ; checkPoint.x = min(checkPoint.x + 1, endPixelX))
+		{
+			if (other->pointInAABB(checkPoint))
+			{
+				// ground인 경우 그 타일의 윗부분 y좌표를 저장하고 true 반환
+				groundY = other->GetAABBTop();
+				return true;
+			}
+
+			// break 조건 : bottomRight에 해당하는 타일까지 검사 완료
+			if (checkPoint.x >= endPixelX) break;
+		}
+	}
+
+	return false;
+}
+
+bool Player::HasCeiling(AABB* other, D3DXVECTOR2 oldPosition, D3DXVECTOR2 position, float & ceilingY)
+{
+	return false;
+}
+
+bool Player::HasLeftWall(AABB* other, D3DXVECTOR2 oldPosition, D3DXVECTOR2 position, float & WallX)
+{
+	return false;
+}
+
+bool Player::HasRightWall(AABB* other, D3DXVECTOR2 oldPosition, D3DXVECTOR2 position, float & WallX)
+{
 	return false;
 }
 
@@ -824,7 +868,7 @@ void Player::UpdateAnimation()
 
 void Player::Render()
 {
-	m_AABB->Render();
+	//m_AABB->Render();
 	m_pAnimation->Render();
 }
 

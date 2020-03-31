@@ -73,6 +73,12 @@
     <Filter Include="Dx2D Framework\Scene\Prototype">
       <UniqueIdentifier>{15a656fe-4dd4-4b3e-bd8e-39141293b49d}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Dx2D Framework\Scene\Prototype\PlaceableObjects">
+      <UniqueIdentifier>{9e53387a-45a4-4cbf-8a4e-6d02ad72c1c8}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Dx2D Framework\2. Manager\Shader">
+      <UniqueIdentifier>{60863825-365f-45b5-bdf5-08085c8a7728}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="targetver.h">
@@ -112,9 +118,6 @@
       <Filter>Dx2D Framework\3. Objects</Filter>
     </ClInclude>
     <ClInclude Include="Sprite.h">
-      <Filter>Dx2D Framework\3. Objects</Filter>
-    </ClInclude>
-    <ClInclude Include="Shader.h">
       <Filter>Dx2D Framework\3. Objects</Filter>
     </ClInclude>
     <ClInclude Include="Utility.h">
@@ -177,6 +180,18 @@
     <ClInclude Include="Map.h">
       <Filter>Dx2D Framework\Scene\Prototype</Filter>
     </ClInclude>
+    <ClInclude Include="MovingObject.h">
+      <Filter>Dx2D Framework\Scene\Prototype</Filter>
+    </ClInclude>
+    <ClInclude Include="honeyPlatform.h">
+      <Filter>Dx2D Framework\Scene\Prototype\PlaceableObjects</Filter>
+    </ClInclude>
+    <ClInclude Include="ShaderManager.h">
+      <Filter>Dx2D Framework\2. Manager\Shader</Filter>
+    </ClInclude>
+    <ClInclude Include="Shader.h">
+      <Filter>Dx2D Framework\2. Manager\Shader</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="MainGame.cpp">
@@ -201,9 +216,6 @@
       <Filter>Dx2D Framework\3. Objects</Filter>
     </ClCompile>
     <ClCompile Include="Sprite.cpp">
-      <Filter>Dx2D Framework\3. Objects</Filter>
-    </ClCompile>
-    <ClCompile Include="Shader.cpp">
       <Filter>Dx2D Framework\3. Objects</Filter>
     </ClCompile>
     <ClCompile Include="TimeManager.cpp">
@@ -262,6 +274,18 @@
     </ClCompile>
     <ClCompile Include="Map.cpp">
       <Filter>Dx2D Framework\Scene\Prototype</Filter>
+    </ClCompile>
+    <ClCompile Include="MovingObject.cpp">
+      <Filter>Dx2D Framework\Scene\Prototype</Filter>
+    </ClCompile>
+    <ClCompile Include="honeyPlatform.cpp">
+      <Filter>Dx2D Framework\Scene\Prototype\PlaceableObjects</Filter>
+    </ClCompile>
+    <ClCompile Include="ShaderManager.cpp">
+      <Filter>Dx2D Framework\2. Manager\Shader</Filter>
+    </ClCompile>
+    <ClCompile Include="Shader.cpp">
+      <Filter>Dx2D Framework\2. Manager\Shader</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

@@ -16,8 +16,7 @@ bool AABB::Collide(AABB* other)
 {
 	if (fabs(m_center.x - other->m_center.x) > (m_halfSize.x + other->m_halfSize.x)) return false; // x축 검사
 	if (fabs(m_center.y - other->m_center.y) > (m_halfSize.y + other->m_halfSize.y)) return false; // y축 검사
-	
-	return true; // x축과 y축 둘 다 겹치면 충돌
+	return true;
 }
 
 void AABB::SetCenter(D3DXVECTOR2 c)
@@ -25,6 +24,13 @@ void AABB::SetCenter(D3DXVECTOR2 c)
 	m_center = c;
 	m_rect->SetPosition(m_center);
 	m_rect->Update();
+}
+
+bool AABB::pointInAABB(D3DXVECTOR2 p)
+{
+	if (p.x < m_center.x - m_halfSize.x || m_center.x + m_halfSize.x < p.x) return false; // x축 검사
+	if (p.y < m_center.y - m_halfSize.y || m_center.y + m_halfSize.y < p.y) return false; // y축 검사
+	return true;
 }
 
 void AABB::Init()

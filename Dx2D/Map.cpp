@@ -32,20 +32,6 @@ void Map::Init()
 		m_Tiles[x][0] = TileType::Block;
 	}
 
-	m_Tiles[3][2] = TileType::Block;
-	m_Tiles[4][2] = TileType::Block;
-	m_Tiles[5][2] = TileType::Block;
-	m_Tiles[4][3] = TileType::Block;
-	m_Tiles[3][4] = TileType::Block;
-
-	m_Tiles[10][2] = TileType::Block;
-	m_Tiles[11][2] = TileType::Block;
-	m_Tiles[12][2] = TileType::Block;
-	m_Tiles[12][3] = TileType::Block;
-	m_Tiles[12][4] = TileType::Block;
-	m_Tiles[12][5] = TileType::Block;
-	m_Tiles[12][6] = TileType::Block;
-
 	m_Tiles[9][2] = TileType::Block;
 	m_Tiles[9][3] = TileType::Block;
 	m_Tiles[9][4] = TileType::Block;
@@ -110,7 +96,8 @@ bool Map::IsObstacle(int x, int y)
 	if (x < 0 || x >= MAP_WIDTH ||
 		y < 0 || y >= MAP_HEIGHT)
 	{
-		return true;
+		//return true;
+		return false;
 	}
 	return (m_Tiles[x][y] == TileType::Block);
 }

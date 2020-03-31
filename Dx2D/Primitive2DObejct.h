@@ -82,9 +82,6 @@ template<typename T>
 inline Primitive2DObejct<T>::~Primitive2DObejct()
 {
 	SAFE_RELEASE(m_pBorderBuffer);
-	SAFE_DELETE(m_pBorderShader);
-	SAFE_DELETE(m_pShader);
-
 	SAFE_RELEASE(m_pColorBuffer);
 	SAFE_RELEASE(m_pIndexBuffer);
 	SAFE_RELEASE(m_pVertexBuffer);
@@ -95,8 +92,7 @@ inline Primitive2DObejct<T>::~Primitive2DObejct()
 template<typename T>
 inline void Primitive2DObejct<T>::CreateBorderVertexBuffer(int start)
 {
-	m_pBorderShader = new Shader(L"Color");
-	m_pBorderShader->CreateinputLayout(PCElementDesc, PCElementCount);
+	m_pBorderShader = g_pShaderManager->AddShader(L"Color", PCElementDesc, PCElementCount);
 
 	vector<PCVertex> vecVertex;
 
@@ -205,8 +201,5 @@ inline void Primitive2DObejct<T>::SetLBPosition(float x, float y)
 template<typename T>
 inline void Primitive2DObejct<T>::CreateShader(wstring fileName, D3D11_INPUT_ELEMENT_DESC desc[], UINT count)
 {
-	SAFE_DELETE(m_pShader);
-
-	m_pShader = new Shader(fileName);
-	m_pShader->CreateinputLayout(desc, count);
+	m_pShader = g_pShaderManager->AddShader(fileName, desc, count);
 }

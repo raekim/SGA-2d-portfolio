@@ -1,7 +1,8 @@
 #pragma once
 #include "AABB.h"
+#include "MovingObject.h"
 class Map;
-class Player
+class Player : public MovingObject
 {
 	Map*		m_map;
 	enum class STATE
@@ -49,8 +50,6 @@ class Player
 
 	D3DXVECTOR2				m_oldSpeed;
 	D3DXVECTOR2				m_speed;
-
-	D3DXVECTOR2				m_scale;
 
 	AABB*					m_AABB;
 	D3DXVECTOR2				m_AABBOffset;
@@ -100,7 +99,7 @@ private:
 	void UpdateJump();
 	void UpdateWalk();
 	void UpdateStand();
-	void UpdatePhysics();
+	void UpdatePhysics(AABB* obj);
 	void UpdateAnimation();
 
 	// 상,하,좌,우 타일맵 벽과 충돌
@@ -109,6 +108,12 @@ private:
 	bool HasLeftWall(D3DXVECTOR2 oldPosition, D3DXVECTOR2 position, float& WallX);
 	bool HasRightWall(D3DXVECTOR2 oldPosition, D3DXVECTOR2 position, float& WallX);
 
+	// 상,하,좌,우 AABB 충돌
+	bool HasGround(AABB* other, D3DXVECTOR2 oldPosition, D3DXVECTOR2 position, float& groundY);
+	bool HasCeiling(AABB* other, D3DXVECTOR2 oldPosition, D3DXVECTOR2 position, float& ceilingY);
+	bool HasLeftWall(AABB* other, D3DXVECTOR2 oldPosition, D3DXVECTOR2 position, float& WallX);
+	bool HasRightWall(AABB* other, D3DXVECTOR2 oldPosition, D3DXVECTOR2 position, float& WallX);
+
 	bool IsFlipping();		// 현재 왼쪽을 보고 있는데 오른쪽을 보려고 하는가? (또는 그 반대)
 	void GetNextAnimationState();
 public:
@@ -116,7 +121,7 @@ public:
 	~Player();
 
 	void Init(Map* map);
-	void Update();
+	void Update(AABB* obj);
 	void Render();
 	void Release();
 };
