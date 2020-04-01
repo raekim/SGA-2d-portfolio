@@ -1,15 +1,15 @@
 #pragma once
 #include "Player.h"
 #include "Map.h"
-#include "honeyPlatform.h"
+#include "PlaceableObject.h"
 
 class PrototypeScene : public iGameNode
 {
-	Map*				m_map;
-	Player*				m_player;
-	vector<Rect*>		m_vecRect;
+	Map*						m_map;
+	Player*						m_player;
+	vector<Rect*>				m_vecRect;
 
-	honeyPlatform		m_honeyPlatform;
+	vector<PlaceableObject*>	m_vecObjectList;
 public:
 	PrototypeScene();
 	~PrototypeScene();

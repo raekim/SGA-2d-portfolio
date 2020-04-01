@@ -1,6 +1,6 @@
 #include "stdafx.h"
 #include "honeyPlatform.h"
-
+#include "Player.h"
 
 honeyPlatform::honeyPlatform()
 {
@@ -53,4 +53,25 @@ void honeyPlatform::Render()
 void honeyPlatform::Release()
 {
 	m_AABB->Release();
+}
+
+bool honeyPlatform::handleCollision(D3DXVECTOR2 pos, Player * player, collisionCheckDir dir)
+{
+	if (m_AABB->pointInAABB(pos))
+	{
+		switch (dir)
+		{
+		case collisionCheckDir::BOTTOM:
+			break;
+		case collisionCheckDir::CEILING:
+			break;
+		case collisionCheckDir::LEFT_WALL:
+			break;
+		case collisionCheckDir::RIGHT_WALL:
+			break;
+		}
+		player->m_movingPlatformOffset = m_moveDelta;
+		return true;
+	}
+	return false;
 }

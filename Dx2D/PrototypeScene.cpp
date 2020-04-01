@@ -1,6 +1,6 @@
 #include "stdafx.h"
 #include "PrototypeScene.h"
-
+#include "SimplePlatform.h"
 
 PrototypeScene::PrototypeScene()
 {
@@ -17,9 +17,12 @@ void PrototypeScene::Init()
 	m_map->Init();
 
 	m_player = new Player;
-	m_player->Init(m_map);
 
-	m_honeyPlatform.Init();
+	m_player->Init();
+
+	m_vecObjectList.push_back(new SimplePlatform({ 50.0f, WINSIZEY*0.8f }, {WINSIZEX*0.5f, 50.0f}));
+
+	for (auto obj : m_vecObjectList) obj->Init();
 }
 
 void PrototypeScene::Update()
@@ -28,19 +31,19 @@ void PrototypeScene::Update()
 	{
 		PostQuitMessage(0); // WM_QUIT 메시지 발생
 	}
-	m_honeyPlatform.Update();
-	m_player->Update(m_honeyPlatform.GetAABB());
+	for (auto obj : m_vecObjectList) obj->Update();
+	m_player->Update(m_vecObjectList);
 }
 
 void PrototypeScene::Render()
 {
-	m_map->Render();
-	m_honeyPlatform.Render();
+	for (auto obj : m_vecObjectList) obj->Render();
 	m_player->Render();
 }
 
 void PrototypeScene::Release()
 {
 	m_player->Release();
-	m_map->Release();
+	for (auto obj : m_vecObjectList) obj->Release();
+	m_vecObjectList.clear();
 }

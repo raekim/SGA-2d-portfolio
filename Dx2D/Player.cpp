@@ -1,6 +1,7 @@
 #include "stdafx.h"
 #include "Player.h"
 #include "Map.h"
+#include "PlaceableObject.h"
 
 Player::Player()
 {
@@ -11,10 +12,8 @@ Player::~Player()
 {
 }
 
-void Player::Init(Map* map)
+void Player::Init()
 {
-	m_map = map;
-
 	m_AABB = new AABB({ 40.0f, 53.0f });
 	m_AABB->Init();
 
@@ -169,7 +168,7 @@ void Player::InitAnimation()
 	m_pAnimation->SetScale(0.5f, 0.5f);
 }
 
-void Player::Update(AABB* obj)
+void Player::Update(vector<PlaceableObject*> obj)
 {
 	UpdateWalkSpeed();
 
@@ -342,39 +341,55 @@ void Player::UpdateWalkSpeed()
 	}
 }
 
-void Player::UpdatePhysics(AABB* obj)
+void Player::UpdatePhysics(vector<PlaceableObject*> objList)
 {
 	// 캐릭터의 x 위치 업데이트 (가로축 충돌 판정을 위해)
 	m_position.x += m_speed.x * g_pTimeManager->GetDeltaTime();
 
-	// 왼쪽 벽 충돌
-	float leftWallX;
-	bool hasLeftWall = m_speed.x <= 0.0f &&
-		(HasLeftWall(m_oldPosition, m_position, leftWallX) || HasLeftWall(obj, m_oldPosition, m_position, leftWallX));
-	if (hasLeftWall)
+	// 근처에 있는 오브젝트들에 대해 충돌검사
+	for (auto obj : objList)
 	{
-		m_position.x = leftWallX + m_AABB->GetHalfSize().x;
-		m_speed.x = 0.0f;
-		m_pushesLeftWall = true;
+		CheckFourSides(obj);
 	}
-	else
+
+	UpdateWallSlideAndJump();
+
+	// AABB 위치 업데이트
+	m_AABB->SetCenter(m_position + m_AABBOffset);
+}
+
+void Player::UpdateWallSlideAndJump()
+{
+	// 벽 슬라이드
+	bool wallSlideStart = (m_pushesLeftWall || m_pushedRightWall) && !m_onGround && !m_atCeiling && m_speed.y < 0.0f;
+	m_isWallSliding = wallSlideStart || (m_isWallSliding && !m_onGround && !m_atCeiling && m_speed.y < 0.0f);
+	if (wallSlideStart)
 	{
-		m_pushesLeftWall = false;
+		m_slidesLeftWall = m_pushesLeftWall;
+		m_slidesRightWall = m_pushedRightWall;
+	}
+	m_slidesLeftWall = m_slidesLeftWall && m_isWallSliding;
+	m_slidesRightWall = m_slidesRightWall && m_isWallSliding;
+
+	m_hasNoWalls = !m_pushesLeftWall && !m_pushedRightWall && !m_onGround && !m_atCeiling;
+	m_isWallJumpingTowardLeft = m_isWallJumpingTowardLeft && m_hasNoWalls && !g_pKeyManager->IsStayKeyDown(VK_LEFT);
+	m_isWallJumpingTowardRight = m_isWallJumpingTowardRight && m_hasNoWalls && !g_pKeyManager->IsStayKeyDown(VK_RIGHT);
+}
+
+void Player::CheckFourSides(PlaceableObject* obj)
+{
+	// 왼쪽 벽 충돌
+	m_pushesLeftWall = m_speed.x <= 0.0f && HasLeftWall(obj, m_oldPosition, m_position);
+	if (m_pushesLeftWall)
+	{
+		m_speed.x = 0.0f;
 	}
 
 	// 오른쪽 벽 충돌
-	float rightWallX;
-	bool hasRightWall = m_speed.x >= 0.0f &&
-		(HasRightWall(m_oldPosition, m_position, rightWallX) || HasRightWall(obj, m_oldPosition, m_position, rightWallX));
-	if (hasRightWall)
+	m_pushedRightWall = m_speed.x >= 0.0f && HasRightWall(obj, m_oldPosition, m_position);
+	if (m_pushedRightWall)
 	{
-		m_position.x = rightWallX - m_AABB->GetHalfSize().x;
 		m_speed.x = 0.0f;
-		m_pushesRightWall = true;
-	}
-	else
-	{
-		m_pushesRightWall = false;
 	}
 
 	// 캐릭터의 y 위치 업데이트 (세로축 충돌 판정을 위해)
@@ -382,218 +397,21 @@ void Player::UpdatePhysics(AABB* obj)
 	m_position.y += m_speed.y * g_pTimeManager->GetDeltaTime();
 
 	// 아래쪽 벽 충돌
-	float groundY;
-	bool hasGround = m_speed.y <= 0 &&
-		(HasGround(m_oldPosition, m_position, m_speed, groundY) || HasGround(obj, m_oldPosition, m_position, groundY));
-	if (hasGround)
+	m_onGround = m_speed.y <= 0 && HasGround(obj, m_oldPosition, m_position);
+	if (m_onGround)
 	{
-		m_position.y = groundY + m_AABB->GetHalfSize().y;
 		m_speed.y = 0.0f;
-		m_onGround = true;
-	}
-	else
-	{
-		m_onGround = false;
 	}
 
 	// 위쪽 벽 충돌
-	float ceilingY;
-	bool hasCeiling = m_speed.y > 0 && (HasCeiling(m_oldPosition, m_position, ceilingY) || HasCeiling(obj, m_oldPosition, m_position, ceilingY));
-	if (hasCeiling)
+	m_atCeiling = m_speed.y > 0 && HasCeiling(obj, m_oldPosition, m_position);
+	if (m_atCeiling)
 	{
-		m_position.y = ceilingY - m_AABB->GetHalfSize().y;
 		m_speed.y = 0.0f;
-		m_atCeiling = true;
 	}
-	else
-	{
-		m_atCeiling = false;
-	}
-
-	// 벽 슬라이드
-	bool wallSlideStart = (hasLeftWall || hasRightWall) && !hasGround && !hasCeiling && m_speed.y < 0.0f;
-	m_isWallSliding = wallSlideStart || (m_isWallSliding && !hasGround && !hasCeiling && m_speed.y < 0.0f);
-	if (wallSlideStart)
-	{
-		m_slidesLeftWall = hasLeftWall;
-		m_slidesRightWall = hasRightWall;
-	}
-	m_slidesLeftWall = m_slidesLeftWall && m_isWallSliding;
-	m_slidesRightWall = m_slidesRightWall && m_isWallSliding;
-
-	// 이전 움직임과 현재 움직임 상태를 비교해서 효과를 주는 경우
-	if (m_onGround && !m_wasOnGround)
-	{
-		// 방금 땅에 떨어짐
-		// 먼지 이펙트 등 땅에 떨어진 효과 주기
-	}
-
-	m_hasNoWalls = !hasLeftWall && !hasRightWall && !hasGround && !hasCeiling;
-	m_isWallJumpingTowardLeft = m_isWallJumpingTowardLeft && m_hasNoWalls && !g_pKeyManager->IsStayKeyDown(VK_LEFT);
-	m_isWallJumpingTowardRight = m_isWallJumpingTowardRight && m_hasNoWalls && !g_pKeyManager->IsStayKeyDown(VK_RIGHT);
-
-	if (m_isRidingMovingPlatform)
-	{
-		m_position += m_movingPlatformOffset;
-	}
-
-	// AABB 위치 업데이트
-	m_AABB->SetCenter(m_position + m_AABBOffset);
 }
 
-bool Player::HasGround(D3DXVECTOR2 oldPosition, D3DXVECTOR2 position, D3DXVECTOR2 speed, float & groundY)
-{
-	// 캐릭터 발 밑을 검사
-	D3DXVECTOR2 oldBottomLeft = oldPosition - m_AABB->GetHalfSize(); oldBottomLeft.x += 2; oldBottomLeft.y -= 1;
-	D3DXVECTOR2 newBottomLeft = position - m_AABB->GetHalfSize(); newBottomLeft.x += 2; newBottomLeft.y -= 1;
-	D3DXVECTOR2 newBottomRight = { newBottomLeft.x + 2 * m_AABB->GetHalfSize().x - 4, newBottomLeft.y };
-
-	// 오브젝트가 한 프레임 동안 많은 이동을 했을 수 있으므로 이전 위치와 현재 위치 간의 차이도 고려하여 검사한다
-	int endTileY = m_map->GetTilePointAtWorldPoint(newBottomLeft).y;
-	int beginTileY = max(m_map->GetTilePointAtWorldPoint(oldBottomLeft).y, endTileY); 
-	int dist = beginTileY - endTileY;
-
-	// 위에서 아래로 검사
-	for (int TileY = beginTileY; TileY >= endTileY; --TileY)
-	{
-		float t = (TileY == endTileY) ? 0.0f : ((float)TileY - endTileY) / dist; // 선형보간에 사용될 비율 (0~1)
-		D3DXVECTOR2 bottomLeft = LinearInterpolation(newBottomLeft, oldBottomLeft, t);
-		D3DXVECTOR2 bottomRight = { bottomLeft.x + 2 * m_AABB->GetHalfSize().x - 4, bottomLeft.y };
-	
-		// bottomLeft부터 bottomRight지점을 잇는 선에 닿는 모든 타일들을 검사한다
-		for (D3DXVECTOR2 checkPoint = bottomLeft; ;checkPoint.x = min(checkPoint.x + TILE_SIZE, bottomRight.x))
-		{
-			POINT tileIdx = m_map->GetTilePointAtWorldPoint(checkPoint);
-			if (m_map->IsGround(tileIdx.x, tileIdx.y))
-			{
-				// ground인 경우 그 타일의 윗부분 y좌표를 저장하고 true 반환
-				groundY = m_map->GetTileTop(tileIdx);
-				return true;
-			}
-
-			// break 조건 : bottomRight에 해당하는 타일까지 검사 완료
-			if (checkPoint.x >= bottomRight.x) break;
-		}
-	}
-
-	return false;
-}
-
-bool Player::HasCeiling(D3DXVECTOR2 oldPosition, D3DXVECTOR2 position, float & ceilingY)
-{
-	// 캐릭터 머리 위를 검사
-	D3DXVECTOR2 oldtopRight = oldPosition + m_AABB->GetHalfSize(); oldtopRight.x -= 2; oldtopRight.y += 1;
-	D3DXVECTOR2 newtopRight = position + m_AABB->GetHalfSize(); newtopRight.x -= 2; newtopRight.y += 1;
-	D3DXVECTOR2 newTopLeft = { newtopRight.x + 4 - m_AABB->GetHalfSize().x * 2, newtopRight.y };
-
-	// 오브젝트가 한 프레임 동안 많은 이동을 했을 수 있으므로 이전 위치와 현재 위치 간의 차이도 고려하여 검사한다
-	int endTileY = m_map->GetTilePointAtWorldPoint(newtopRight).y;
-	int beginTileY = min(m_map->GetTilePointAtWorldPoint(oldtopRight).y, endTileY);
-	int dist = endTileY - beginTileY;
-
-	// 밑에서 위로 검사
-	for (int TileY = beginTileY; TileY <= endTileY; ++TileY)
-	{
-		float t = (TileY == endTileY) ? 0.0f : ((float)endTileY - TileY) / dist; // 선형보간에 사용될 비율 (0~1)
-		D3DXVECTOR2 topRight = LinearInterpolation(newtopRight, oldtopRight, t);
-		D3DXVECTOR2 topLeft = { topRight.x + 4 - m_AABB->GetHalfSize().x * 2, topRight.y };
-
-		// topLeft부터 topRight지점을 잇는 선에 닿는 모든 타일들을 검사한다
-		for (D3DXVECTOR2 checkPoint = topLeft; ; checkPoint.x = min(checkPoint.x + TILE_SIZE, topRight.x))
-		{
-			POINT tileIdx = m_map->GetTilePointAtWorldPoint(checkPoint);
-			if (m_map->IsObstacle(tileIdx.x, tileIdx.y))
-			{
-				// 장애물 타일의 밑부분 y좌표를 저장하고 true 반환
-				ceilingY = m_map->GetTileBottom(tileIdx);
-				return true;
-			}
-
-			// break 조건 : topRight에 해당하는 타일까지 검사 완료
-			if (checkPoint.x >= topRight.x) break;
-		}
-	}
-
-	return false;
-}
-
-bool Player::HasLeftWall(D3DXVECTOR2 oldPosition, D3DXVECTOR2 position, float & WallX)
-{
-	// 캐릭터 왼쪽을 검사
-	D3DXVECTOR2 oldLeftBottom = oldPosition - m_AABB->GetHalfSize(); oldLeftBottom.x -= 1; oldLeftBottom.y += 2;
-	D3DXVECTOR2 newLeftBottom = position - m_AABB->GetHalfSize(); newLeftBottom.x -= 1; newLeftBottom.y += 2;
-	D3DXVECTOR2 newLeftTop = { newLeftBottom.x, newLeftBottom.y - 4 + m_AABB->GetHalfSize().y * 2 };
-
-	// 오브젝트가 한 프레임 동안 많은 이동을 했을 수 있으므로 이전 위치와 현재 위치 간의 차이도 고려하여 검사한다
-	int endTileX = m_map->GetTilePointAtWorldPoint(newLeftBottom).x;
-	int beginTileX = max(m_map->GetTilePointAtWorldPoint(oldLeftBottom).x, endTileX);
-	int dist = beginTileX - endTileX;
-
-	// 오른쪽에서 왼쪽으로 검사
-	for (int TileX = beginTileX; TileX >= endTileX; --TileX)
-	{
-		float t = (TileX == endTileX) ? 0.0f : ((float)TileX - endTileX) / dist; // 선형보간에 사용될 비율 (0~1)
-		D3DXVECTOR2 leftBottom = LinearInterpolation(newLeftBottom, oldLeftBottom, t);
-		D3DXVECTOR2 leftTop = { leftBottom.x, leftBottom.y - 4 + m_AABB->GetHalfSize().y * 2 };
-
-		// leftBottom부터 leftTop지점을 잇는 선에 닿는 모든 타일들을 검사한다
-		for (D3DXVECTOR2 checkPoint = leftBottom; ; checkPoint.y = min(checkPoint.y + TILE_SIZE, leftTop.y))
-		{
-			POINT tileIdx = m_map->GetTilePointAtWorldPoint(checkPoint);
-			if (m_map->IsObstacle(tileIdx.x, tileIdx.y))
-			{
-				// 장애물 타일의 오른쪽 모서리 x좌표를 저장하고 true 반환
-				WallX = m_map->GetTileRight(tileIdx);
-				return true;
-			}
-
-			// break 조건 : leftTop에 해당하는 타일까지 검사 완료
-			if (checkPoint.y >= leftTop.y) break;
-		}
-	}
-
-	return false;
-}
-
-bool Player::HasRightWall(D3DXVECTOR2 oldPosition, D3DXVECTOR2 position, float & WallX)
-{
-	// 캐릭터 오른쪽을 검사
-	D3DXVECTOR2 oldRightTop = oldPosition + m_AABB->GetHalfSize(); oldRightTop.x += 1; oldRightTop.y -= 2;
-	D3DXVECTOR2 newRightTop = position + m_AABB->GetHalfSize(); newRightTop.x += 1; newRightTop.y -= 2;
-	D3DXVECTOR2 newRightBottom = { newRightTop.x, newRightTop.y + 4 - m_AABB->GetHalfSize().y * 2 };
-
-	// 오브젝트가 한 프레임 동안 많은 이동을 했을 수 있으므로 이전 위치와 현재 위치 간의 차이도 고려하여 검사한다
-	int endTileX = m_map->GetTilePointAtWorldPoint(newRightTop).x;
-	int beginTileX = min(m_map->GetTilePointAtWorldPoint(oldRightTop).x, endTileX);
-	int dist = endTileX - beginTileX;
-
-	// 왼쪽에서 오른쪽으로 검사
-	for (int TileX = beginTileX; TileX <= endTileX; ++TileX)
-	{
-		float t = (TileX == endTileX) ? 0.0f : ((float)endTileX - TileX) / dist; // 선형보간에 사용될 비율 (0~1)
-		D3DXVECTOR2 rightTop = LinearInterpolation(newRightTop, oldRightTop, t);
-		D3DXVECTOR2 rightBottom = { rightTop.x, rightTop.y + 4 - m_AABB->GetHalfSize().y * 2 };
-
-		// rigghtBottom부터 rightTop지점을 잇는 선에 닿는 모든 타일들을 검사한다
-		for (D3DXVECTOR2 checkPoint = rightBottom; ; checkPoint.y = min(checkPoint.y + TILE_SIZE, rightTop.y))
-		{
-			POINT tileIdx = m_map->GetTilePointAtWorldPoint(checkPoint);
-			if (m_map->IsObstacle(tileIdx.x, tileIdx.y))
-			{
-				// 장애물 타일의 왼쪽 모서리 x좌표를 저장하고 true 반환
-				WallX = m_map->GetTileLeft(tileIdx);
-				return true;
-			}
-
-			// break 조건 : rightTop에 해당하는 타일까지 검사 완료
-			if (checkPoint.y >= rightTop.y) break;
-		}
-	}
-
-	return false;
-}
-
-bool Player::HasGround(AABB* other, D3DXVECTOR2 oldPosition, D3DXVECTOR2 position, float & groundY)
+bool Player::HasGround(PlaceableObject* other, D3DXVECTOR2 oldPosition, D3DXVECTOR2 position)
 {
 	// 캐릭터 발 밑을 검사
 	int newPixelY = position.y - m_AABB->GetHalfSize().y - 1;
@@ -607,13 +425,10 @@ bool Player::HasGround(AABB* other, D3DXVECTOR2 oldPosition, D3DXVECTOR2 positio
 		// startPixelX부터 endPixelX지점을 잇는 선에 닿는 모든 AABB들을 검사한다
 		for (D3DXVECTOR2 checkPoint = D3DXVECTOR2(startPixelX, pixelY); ; checkPoint.x = min(checkPoint.x + 1, endPixelX))
 		{
-			if (other->pointInAABB(checkPoint))
+			if (other->handleCollision(checkPoint, this, PlaceableObject::collisionCheckDir::BOTTOM))
 			{
-				// ground인 경우 그 AABB의 윗부분 y좌표를 저장하고 true 반환
-				groundY = other->GetAABBTop();
 				return true;
 			}
-
 			// break 조건 : endPixelX에 해당하는 타일까지 검사 완료
 			if (checkPoint.x >= endPixelX) break;
 		}
@@ -622,7 +437,7 @@ bool Player::HasGround(AABB* other, D3DXVECTOR2 oldPosition, D3DXVECTOR2 positio
 	return false;
 }
 
-bool Player::HasCeiling(AABB* other, D3DXVECTOR2 oldPosition, D3DXVECTOR2 position, float & ceilingY)
+bool Player::HasCeiling(PlaceableObject* other, D3DXVECTOR2 oldPosition, D3DXVECTOR2 position)
 {
 	// 캐릭터 머리 위를 검사
 	int newPixelY = position.y + m_AABB->GetHalfSize().y + 1;
@@ -636,13 +451,10 @@ bool Player::HasCeiling(AABB* other, D3DXVECTOR2 oldPosition, D3DXVECTOR2 positi
 		// startPixelX부터 endPixelX지점을 잇는 선에 닿는 모든 AABB들을 검사한다
 		for (D3DXVECTOR2 checkPoint = D3DXVECTOR2(startPixelX, pixelY); ; checkPoint.x = min(checkPoint.x + 1, endPixelX))
 		{
-			if (other->pointInAABB(checkPoint))
+			if (other->handleCollision(checkPoint, this, PlaceableObject::collisionCheckDir::CEILING))
 			{
-				// ceiling인 경우 그 AABB의 아랫부분 y좌표를 저장하고 true 반환
-				ceilingY = other->GetAABBBottom();
 				return true;
 			}
-
 			// break 조건 : endPixelX에 해당하는 AABB까지 검사 완료
 			if (checkPoint.x >= endPixelX) break;
 		}
@@ -651,7 +463,7 @@ bool Player::HasCeiling(AABB* other, D3DXVECTOR2 oldPosition, D3DXVECTOR2 positi
 	return false;
 }
 
-bool Player::HasLeftWall(AABB* other, D3DXVECTOR2 oldPosition, D3DXVECTOR2 position, float & WallX)
+bool Player::HasLeftWall(PlaceableObject* other, D3DXVECTOR2 oldPosition, D3DXVECTOR2 position)
 {
 	// 캐릭터 왼쪽을 검사
 	int newPixelX = position.x - m_AABB->GetHalfSize().x - 1;
@@ -665,13 +477,10 @@ bool Player::HasLeftWall(AABB* other, D3DXVECTOR2 oldPosition, D3DXVECTOR2 posit
 		// startPixelY부터 endPixelY지점을 잇는 선에 닿는 모든 AABB들을 검사한다
 		for (D3DXVECTOR2 checkPoint = D3DXVECTOR2(pixelX, startPixelY); ; checkPoint.y = min(checkPoint.y + 1, endPixelY))
 		{
-			if (other->pointInAABB(checkPoint))
+			if (other->handleCollision(checkPoint, this, PlaceableObject::collisionCheckDir::LEFT_WALL))
 			{
-				// leftWall인 경우 그 AABB의 오른쪽부분 y좌표를 저장하고 true 반환
-				WallX = other->GetAABBRight();
 				return true;
 			}
-
 			// break 조건 : endPixelY에 해당하는 타일까지 검사 완료
 			if (checkPoint.y >= endPixelY) break;
 		}
@@ -680,7 +489,7 @@ bool Player::HasLeftWall(AABB* other, D3DXVECTOR2 oldPosition, D3DXVECTOR2 posit
 	return false;
 }
 
-bool Player::HasRightWall(AABB* other, D3DXVECTOR2 oldPosition, D3DXVECTOR2 position, float & WallX)
+bool Player::HasRightWall(PlaceableObject* other, D3DXVECTOR2 oldPosition, D3DXVECTOR2 position)
 {
 	// 캐릭터 오른쪽을 검사
 	int newPixelX = position.x + m_AABB->GetHalfSize().x + 1;
@@ -694,13 +503,10 @@ bool Player::HasRightWall(AABB* other, D3DXVECTOR2 oldPosition, D3DXVECTOR2 posi
 		// startPixelY부터 endPixelY지점을 잇는 선에 닿는 모든 AABB들을 검사한다
 		for (D3DXVECTOR2 checkPoint = D3DXVECTOR2(pixelX, startPixelY); ; checkPoint.y = min(checkPoint.y + 1, endPixelY))
 		{
-			if (other->pointInAABB(checkPoint))
+			if (other->handleCollision(checkPoint, this, PlaceableObject::collisionCheckDir::RIGHT_WALL))
 			{
-				// rightWall인 경우 그 AABB의 왼쪽부분 y좌표를 저장하고 true 반환
-				WallX = other->GetAABBLeft();
 				return true;
 			}
-
 			// break 조건 : endPixelY에 해당하는 타일까지 검사 완료
 			if (checkPoint.y >= endPixelY) break;
 		}

@@ -1,8 +1,8 @@
 #pragma once
 #include "AABB.h"
-#include "MovingObject.h"
 class Map;
-class Player : public MovingObject
+class PlaceableObject;
+class Player
 {
 	Map*		m_map;
 	enum class STATE
@@ -47,7 +47,6 @@ class Player : public MovingObject
 	D3DXVECTOR2				m_oldPosition;
 	D3DXVECTOR2				m_position;
 	D3DXVECTOR3				m_rotation;
-	D3DXVECTOR2				m_movingPlatformOffset;	// 움직이는 플랫폼을 타고 있는 경우 캐릭터에 적용해야 할 offset
 
 	D3DXVECTOR2				m_oldSpeed;
 	D3DXVECTOR2				m_speed;
@@ -90,7 +89,6 @@ class Player : public MovingObject
 	bool m_pressingJumpingButton;			// 현재 점프 버튼을 누르고 있는가? (긴 점프, 짧은 점프에 사용)
 	bool m_isWallJumpingTowardLeft;			// 왼쪽으로 튕겨나가는 벽점프 중
 	bool m_isWallJumpingTowardRight;		// 오른쪽으로 튕겨나가는 벽점프 중
-	bool m_isRidingMovingPlatform;
 
 private:
 	// Init 관련 함수
@@ -101,30 +99,34 @@ private:
 	void UpdateJump();
 	void UpdateWalk();
 	void UpdateStand();
-	void UpdatePhysics(AABB* obj);
+	void UpdatePhysics(vector<PlaceableObject*> obj);
+	void UpdateWallSlideAndJump();
+	void CheckFourSides(PlaceableObject* obj);
 	void UpdateAnimation();
 
-	// 상,하,좌,우 타일맵 벽과 충돌
-	bool HasGround(D3DXVECTOR2 oldPosition, D3DXVECTOR2 position, D3DXVECTOR2 speed, float& groundY);
-	bool HasCeiling(D3DXVECTOR2 oldPosition, D3DXVECTOR2 position, float& ceilingY);
-	bool HasLeftWall(D3DXVECTOR2 oldPosition, D3DXVECTOR2 position, float& WallX);
-	bool HasRightWall(D3DXVECTOR2 oldPosition, D3DXVECTOR2 position, float& WallX);
-
-	// 상,하,좌,우 AABB 충돌
-	bool HasGround(AABB* other, D3DXVECTOR2 oldPosition, D3DXVECTOR2 position, float& groundY);
-	bool HasCeiling(AABB* other, D3DXVECTOR2 oldPosition, D3DXVECTOR2 position, float& ceilingY);
-	bool HasLeftWall(AABB* other, D3DXVECTOR2 oldPosition, D3DXVECTOR2 position, float& WallX);
-	bool HasRightWall(AABB* other, D3DXVECTOR2 oldPosition, D3DXVECTOR2 position, float& WallX);
+	// 상,하,좌,우 오브젝트 충돌
+	bool HasGround(PlaceableObject* other, D3DXVECTOR2 oldPosition, D3DXVECTOR2 position);
+	bool HasCeiling(PlaceableObject* other, D3DXVECTOR2 oldPosition, D3DXVECTOR2 position);
+	bool HasLeftWall(PlaceableObject* other, D3DXVECTOR2 oldPosition, D3DXVECTOR2 position);
+	bool HasRightWall(PlaceableObject* other, D3DXVECTOR2 oldPosition, D3DXVECTOR2 position);
 
 	bool IsFlipping();		// 현재 왼쪽을 보고 있는데 오른쪽을 보려고 하는가? (또는 그 반대)
 	void GetNextAnimationState();
 public:
+		bool					m_isRidingMovingPlatform;
+		D3DXVECTOR2				m_movingPlatformOffset;	// 움직이는 플랫폼을 타고 있는 경우 캐릭터에 적용해야 할 offset
+public:
 	Player();
 	~Player();
 
-	void Init(Map* map);
-	void Update(AABB* obj);
+	void Init();
+	void Update(vector<PlaceableObject*> obj);
 	void Render();
 	void Release();
+
+	D3DXVECTOR2 GetAABBHalfSize() { return m_AABB->GetHalfSize(); }
+	void SetPosition(D3DXVECTOR2 pos) { m_position = pos; }
+	void SetPositionY(float val) { m_position.y = val; }
+	void SetPositionX(float val) { m_position.x = val; }
 };
 

@@ -1,7 +1,7 @@
 #pragma once
 #include "AABB.h"
-#include "MovingObject.h"
-class honeyPlatform : public MovingObject
+#include "PlaceableObject.h""
+class honeyPlatform : public PlaceableObject
 {
 	D3DXVECTOR2				m_oldPosition;
 	D3DXVECTOR2				m_moveDelta;
@@ -24,8 +24,6 @@ public:
 	void Render();
 	void Release();
 
-	AABB* GetAABB() { return m_AABB; }
-	D3DXVECTOR2 GetMoveDelta() { return m_moveDelta; }
-	bool isMovingPlatform() { return true; };
+	virtual bool handleCollision(D3DXVECTOR2 pos, Player* player, collisionCheckDir dir) override;
 };
 
