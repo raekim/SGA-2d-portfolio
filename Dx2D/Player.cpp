@@ -37,6 +37,8 @@ void Player::Init(Map* map)
 	m_prevAnimState = ANIM_STATE::READY;
 	m_animState = ANIM_STATE::IDLE;
 	m_curState = STATE::Stand;
+
+	m_isRidingMovingPlatform = false;
 }
 
 void Player::InitAnimation()
@@ -347,7 +349,8 @@ void Player::UpdatePhysics(AABB* obj)
 
 	// 왼쪽 벽 충돌
 	float leftWallX;
-	bool hasLeftWall = m_speed.x <= 0.0f && HasLeftWall(m_oldPosition, m_position, leftWallX) && m_oldPosition.x >= leftWallX;
+	bool hasLeftWall = m_speed.x <= 0.0f &&
+		(HasLeftWall(m_oldPosition, m_position, leftWallX) || HasLeftWall(obj, m_oldPosition, m_position, leftWallX));
 	if (hasLeftWall)
 	{
 		m_position.x = leftWallX + m_AABB->GetHalfSize().x;
@@ -361,7 +364,8 @@ void Player::UpdatePhysics(AABB* obj)
 
 	// 오른쪽 벽 충돌
 	float rightWallX;
-	bool hasRightWall = m_speed.x >= 0.0f && HasRightWall(m_oldPosition, m_position, rightWallX);
+	bool hasRightWall = m_speed.x >= 0.0f &&
+		(HasRightWall(m_oldPosition, m_position, rightWallX) || HasRightWall(obj, m_oldPosition, m_position, rightWallX));
 	if (hasRightWall)
 	{
 		m_position.x = rightWallX - m_AABB->GetHalfSize().x;
@@ -374,12 +378,12 @@ void Player::UpdatePhysics(AABB* obj)
 	}
 
 	// 캐릭터의 y 위치 업데이트 (세로축 충돌 판정을 위해)
-	m_position.y = max(m_fallingSpeedBound, m_position.y);
+	m_speed.y = max(m_fallingSpeedBound, m_speed.y);
 	m_position.y += m_speed.y * g_pTimeManager->GetDeltaTime();
 
 	// 아래쪽 벽 충돌
 	float groundY;
-	bool hasGround = m_speed.y <= 0 && 
+	bool hasGround = m_speed.y <= 0 &&
 		(HasGround(m_oldPosition, m_position, m_speed, groundY) || HasGround(obj, m_oldPosition, m_position, groundY));
 	if (hasGround)
 	{
@@ -394,7 +398,7 @@ void Player::UpdatePhysics(AABB* obj)
 
 	// 위쪽 벽 충돌
 	float ceilingY;
-	bool hasCeiling = m_speed.y > 0 && HasCeiling(m_oldPosition, m_position, ceilingY);
+	bool hasCeiling = m_speed.y > 0 && (HasCeiling(m_oldPosition, m_position, ceilingY) || HasCeiling(obj, m_oldPosition, m_position, ceilingY));
 	if (hasCeiling)
 	{
 		m_position.y = ceilingY - m_AABB->GetHalfSize().y;
@@ -427,6 +431,11 @@ void Player::UpdatePhysics(AABB* obj)
 	m_hasNoWalls = !hasLeftWall && !hasRightWall && !hasGround && !hasCeiling;
 	m_isWallJumpingTowardLeft = m_isWallJumpingTowardLeft && m_hasNoWalls && !g_pKeyManager->IsStayKeyDown(VK_LEFT);
 	m_isWallJumpingTowardRight = m_isWallJumpingTowardRight && m_hasNoWalls && !g_pKeyManager->IsStayKeyDown(VK_RIGHT);
+
+	if (m_isRidingMovingPlatform)
+	{
+		m_position += m_movingPlatformOffset;
+	}
 
 	// AABB 위치 업데이트
 	m_AABB->SetCenter(m_position + m_AABBOffset);
@@ -588,24 +597,24 @@ bool Player::HasGround(AABB* other, D3DXVECTOR2 oldPosition, D3DXVECTOR2 positio
 {
 	// 캐릭터 발 밑을 검사
 	int newPixelY = position.y - m_AABB->GetHalfSize().y - 1;
-	int oldPixelY = min(newPixelY, oldPosition.y - m_AABB->GetHalfSize().y - 1);
+	int oldPixelY = max(newPixelY, oldPosition.y - m_AABB->GetHalfSize().y - 1);
 	int startPixelX = position.x - m_AABB->GetHalfSize().x + 2;
 	int endPixelX = position.x + m_AABB->GetHalfSize().x - 2;
 
 	// 위에서 아래로 검사
 	for (int pixelY = oldPixelY; pixelY >= newPixelY; --pixelY)
 	{
-		// startPixelX부터 endPixelX지점을 잇는 선에 닿는 모든 타일들을 검사한다
+		// startPixelX부터 endPixelX지점을 잇는 선에 닿는 모든 AABB들을 검사한다
 		for (D3DXVECTOR2 checkPoint = D3DXVECTOR2(startPixelX, pixelY); ; checkPoint.x = min(checkPoint.x + 1, endPixelX))
 		{
 			if (other->pointInAABB(checkPoint))
 			{
-				// ground인 경우 그 타일의 윗부분 y좌표를 저장하고 true 반환
+				// ground인 경우 그 AABB의 윗부분 y좌표를 저장하고 true 반환
 				groundY = other->GetAABBTop();
 				return true;
 			}
 
-			// break 조건 : bottomRight에 해당하는 타일까지 검사 완료
+			// break 조건 : endPixelX에 해당하는 타일까지 검사 완료
 			if (checkPoint.x >= endPixelX) break;
 		}
 	}
@@ -615,16 +624,88 @@ bool Player::HasGround(AABB* other, D3DXVECTOR2 oldPosition, D3DXVECTOR2 positio
 
 bool Player::HasCeiling(AABB* other, D3DXVECTOR2 oldPosition, D3DXVECTOR2 position, float & ceilingY)
 {
+	// 캐릭터 머리 위를 검사
+	int newPixelY = position.y + m_AABB->GetHalfSize().y + 1;
+	int oldPixelY = min(newPixelY, oldPosition.y + m_AABB->GetHalfSize().y + 1);
+	int startPixelX = position.x - m_AABB->GetHalfSize().x + 2;
+	int endPixelX = position.x + m_AABB->GetHalfSize().x - 2;
+
+	// 밑에서 위로 검사
+	for (int pixelY = oldPixelY; pixelY <= newPixelY; ++pixelY)
+	{
+		// startPixelX부터 endPixelX지점을 잇는 선에 닿는 모든 AABB들을 검사한다
+		for (D3DXVECTOR2 checkPoint = D3DXVECTOR2(startPixelX, pixelY); ; checkPoint.x = min(checkPoint.x + 1, endPixelX))
+		{
+			if (other->pointInAABB(checkPoint))
+			{
+				// ceiling인 경우 그 AABB의 아랫부분 y좌표를 저장하고 true 반환
+				ceilingY = other->GetAABBBottom();
+				return true;
+			}
+
+			// break 조건 : endPixelX에 해당하는 AABB까지 검사 완료
+			if (checkPoint.x >= endPixelX) break;
+		}
+	}
+
 	return false;
 }
 
 bool Player::HasLeftWall(AABB* other, D3DXVECTOR2 oldPosition, D3DXVECTOR2 position, float & WallX)
 {
+	// 캐릭터 왼쪽을 검사
+	int newPixelX = position.x - m_AABB->GetHalfSize().x - 1;
+	int oldPixelX = max(newPixelX, oldPosition.x - m_AABB->GetHalfSize().x - 1);
+	int startPixelY = position.y - m_AABB->GetHalfSize().y + 2;
+	int endPixelY = position.y + m_AABB->GetHalfSize().y - 2;
+
+	// 오른쪽에서 왼쪽으로 검사
+	for (int pixelX = oldPixelX; pixelX >= newPixelX; --pixelX)
+	{
+		// startPixelY부터 endPixelY지점을 잇는 선에 닿는 모든 AABB들을 검사한다
+		for (D3DXVECTOR2 checkPoint = D3DXVECTOR2(pixelX, startPixelY); ; checkPoint.y = min(checkPoint.y + 1, endPixelY))
+		{
+			if (other->pointInAABB(checkPoint))
+			{
+				// leftWall인 경우 그 AABB의 오른쪽부분 y좌표를 저장하고 true 반환
+				WallX = other->GetAABBRight();
+				return true;
+			}
+
+			// break 조건 : endPixelY에 해당하는 타일까지 검사 완료
+			if (checkPoint.y >= endPixelY) break;
+		}
+	}
+
 	return false;
 }
 
 bool Player::HasRightWall(AABB* other, D3DXVECTOR2 oldPosition, D3DXVECTOR2 position, float & WallX)
 {
+	// 캐릭터 오른쪽을 검사
+	int newPixelX = position.x + m_AABB->GetHalfSize().x + 1;
+	int oldPixelX = min(newPixelX, oldPosition.x + m_AABB->GetHalfSize().x + 1);
+	int startPixelY = position.y - m_AABB->GetHalfSize().y + 2;
+	int endPixelY = position.y + m_AABB->GetHalfSize().y - 2;
+
+	// 왼쪽에서 오른쪽으로 검사
+	for (int pixelX = oldPixelX; pixelX <= newPixelX; ++pixelX)
+	{
+		// startPixelY부터 endPixelY지점을 잇는 선에 닿는 모든 AABB들을 검사한다
+		for (D3DXVECTOR2 checkPoint = D3DXVECTOR2(pixelX, startPixelY); ; checkPoint.y = min(checkPoint.y + 1, endPixelY))
+		{
+			if (other->pointInAABB(checkPoint))
+			{
+				// rightWall인 경우 그 AABB의 왼쪽부분 y좌표를 저장하고 true 반환
+				WallX = other->GetAABBLeft();
+				return true;
+			}
+
+			// break 조건 : endPixelY에 해당하는 타일까지 검사 완료
+			if (checkPoint.y >= endPixelY) break;
+		}
+	}
+
 	return false;
 }
 

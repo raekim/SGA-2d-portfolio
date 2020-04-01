@@ -16,13 +16,13 @@ void honeyPlatform::Init()
 	m_AABB = new AABB({ 40.0f, 40.0f });
 	m_AABB->Init();
 
-	m_position = { WINSIZEX*0.5f - 300.0f, WINSIZEY - 400.0f };
+	m_oldPosition = m_position = { WINSIZEX*0.5f - 300.0f, WINSIZEY - 600.0f };
 	m_rotation = { 0.0f, 0.0f, 0.0f };
 
 	m_movingStartPoint = m_position - D3DXVECTOR2(200.0f, 200.0f);
 	m_movingEndPoint = m_position + D3DXVECTOR2(200.0f, 200.0f);
 
-	m_moveSecond = 1.5f;
+	m_moveSecond = 2.5f;
 	m_movingDelta = 0.0f;
 }
 
@@ -40,6 +40,9 @@ void honeyPlatform::Update()
 	// 두 기준점 m_movingStartPoint, m_movingEndPoint 사이를 선형 보간을 사용하여 움직인다
 	m_position = LinearInterpolation(m_movingStartPoint, m_movingEndPoint, m_movingDelta / m_moveSecond);
 	m_AABB->SetCenter(m_position);
+	m_moveDelta = m_position - m_oldPosition;
+
+	m_oldPosition = m_position;
 }
 
 void honeyPlatform::Render()

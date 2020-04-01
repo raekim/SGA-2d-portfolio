@@ -47,6 +47,7 @@ class Player : public MovingObject
 	D3DXVECTOR2				m_oldPosition;
 	D3DXVECTOR2				m_position;
 	D3DXVECTOR3				m_rotation;
+	D3DXVECTOR2				m_movingPlatformOffset;	// 움직이는 플랫폼을 타고 있는 경우 캐릭터에 적용해야 할 offset
 
 	D3DXVECTOR2				m_oldSpeed;
 	D3DXVECTOR2				m_speed;
@@ -89,6 +90,7 @@ class Player : public MovingObject
 	bool m_pressingJumpingButton;			// 현재 점프 버튼을 누르고 있는가? (긴 점프, 짧은 점프에 사용)
 	bool m_isWallJumpingTowardLeft;			// 왼쪽으로 튕겨나가는 벽점프 중
 	bool m_isWallJumpingTowardRight;		// 오른쪽으로 튕겨나가는 벽점프 중
+	bool m_isRidingMovingPlatform;
 
 private:
 	// Init 관련 함수
