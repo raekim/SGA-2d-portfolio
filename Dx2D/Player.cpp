@@ -343,14 +343,8 @@ void Player::UpdateWalkSpeed()
 
 void Player::UpdatePhysics(vector<PlaceableObject*> objList)
 {
-	// 캐릭터의 x 위치 업데이트 (가로축 충돌 판정을 위해)
-	m_position.x += m_speed.x * g_pTimeManager->GetDeltaTime();
-
 	// 근처에 있는 오브젝트들에 대해 충돌검사
-	for (auto obj : objList)
-	{
-		CheckFourSides(obj);
-	}
+	CheckFourSides(objList);
 
 	UpdateWallSlideAndJump();
 
@@ -361,54 +355,48 @@ void Player::UpdatePhysics(vector<PlaceableObject*> objList)
 void Player::UpdateWallSlideAndJump()
 {
 	// 벽 슬라이드
-	bool wallSlideStart = (m_pushesLeftWall || m_pushedRightWall) && !m_onGround && !m_atCeiling && m_speed.y < 0.0f;
+	bool wallSlideStart = (m_pushesLeftWall || m_pushesRightWall) && !m_onGround && !m_atCeiling && m_speed.y < 0.0f;
 	m_isWallSliding = wallSlideStart || (m_isWallSliding && !m_onGround && !m_atCeiling && m_speed.y < 0.0f);
 	if (wallSlideStart)
 	{
 		m_slidesLeftWall = m_pushesLeftWall;
-		m_slidesRightWall = m_pushedRightWall;
+		m_slidesRightWall = m_pushesRightWall;
 	}
 	m_slidesLeftWall = m_slidesLeftWall && m_isWallSliding;
 	m_slidesRightWall = m_slidesRightWall && m_isWallSliding;
 
-	m_hasNoWalls = !m_pushesLeftWall && !m_pushedRightWall && !m_onGround && !m_atCeiling;
+	m_hasNoWalls = !m_pushesLeftWall && !m_pushesRightWall && !m_onGround && !m_atCeiling;
 	m_isWallJumpingTowardLeft = m_isWallJumpingTowardLeft && m_hasNoWalls && !g_pKeyManager->IsStayKeyDown(VK_LEFT);
 	m_isWallJumpingTowardRight = m_isWallJumpingTowardRight && m_hasNoWalls && !g_pKeyManager->IsStayKeyDown(VK_RIGHT);
 }
 
-void Player::CheckFourSides(PlaceableObject* obj)
+void Player::CheckFourSides(vector<PlaceableObject*> objList)
 {
-	// 왼쪽 벽 충돌
-	m_pushesLeftWall = m_speed.x <= 0.0f && HasLeftWall(obj, m_oldPosition, m_position);
-	if (m_pushesLeftWall)
+	// 캐릭터의 x 위치 업데이트 (가로축 충돌 판정을 위해)
+	m_position.x += m_speed.x * g_pTimeManager->GetDeltaTime();
+	m_pushesLeftWall = m_pushesRightWall = m_onGround = m_atCeiling = false;
+	for (auto obj : objList)
 	{
-		m_speed.x = 0.0f;
-	}
+		// 왼쪽 벽 충돌
+		m_pushesLeftWall |= m_speed.x <= 0.0f && HasLeftWall(obj, m_oldPosition, m_position);
 
-	// 오른쪽 벽 충돌
-	m_pushedRightWall = m_speed.x >= 0.0f && HasRightWall(obj, m_oldPosition, m_position);
-	if (m_pushedRightWall)
-	{
-		m_speed.x = 0.0f;
+		// 오른쪽 벽 충돌
+		m_pushesRightWall |= m_speed.x >= 0.0f && HasRightWall(obj, m_oldPosition, m_position);
 	}
 
 	// 캐릭터의 y 위치 업데이트 (세로축 충돌 판정을 위해)
 	m_speed.y = max(m_fallingSpeedBound, m_speed.y);
 	m_position.y += m_speed.y * g_pTimeManager->GetDeltaTime();
 
-	// 아래쪽 벽 충돌
-	m_onGround = m_speed.y <= 0 && HasGround(obj, m_oldPosition, m_position);
-	if (m_onGround)
+	for (auto obj : objList)
 	{
-		m_speed.y = 0.0f;
+		// 아래쪽 벽 충돌
+		m_onGround |= m_speed.y <= 0 && HasGround(obj, m_oldPosition, m_position);
+
+		// 위쪽 벽 충돌
+		m_atCeiling |= m_speed.y > 0 && HasCeiling(obj, m_oldPosition, m_position);
 	}
 
-	// 위쪽 벽 충돌
-	m_atCeiling = m_speed.y > 0 && HasCeiling(obj, m_oldPosition, m_position);
-	if (m_atCeiling)
-	{
-		m_speed.y = 0.0f;
-	}
 }
 
 bool Player::HasGround(PlaceableObject* other, D3DXVECTOR2 oldPosition, D3DXVECTOR2 position)

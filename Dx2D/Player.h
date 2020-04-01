@@ -49,7 +49,7 @@ class Player
 	D3DXVECTOR3				m_rotation;
 
 	D3DXVECTOR2				m_oldSpeed;
-	D3DXVECTOR2				m_speed;
+	
 
 	AABB*					m_AABB;
 	D3DXVECTOR2				m_AABBOffset;
@@ -99,9 +99,9 @@ private:
 	void UpdateJump();
 	void UpdateWalk();
 	void UpdateStand();
-	void UpdatePhysics(vector<PlaceableObject*> obj);
+	void UpdatePhysics(vector<PlaceableObject*> objList);
 	void UpdateWallSlideAndJump();
-	void CheckFourSides(PlaceableObject* obj);
+	void CheckFourSides(vector<PlaceableObject*> objList);
 	void UpdateAnimation();
 
 	// 상,하,좌,우 오브젝트 충돌
@@ -115,6 +115,7 @@ private:
 public:
 		bool					m_isRidingMovingPlatform;
 		D3DXVECTOR2				m_movingPlatformOffset;	// 움직이는 플랫폼을 타고 있는 경우 캐릭터에 적용해야 할 offset
+		D3DXVECTOR2				m_speed;
 public:
 	Player();
 	~Player();
