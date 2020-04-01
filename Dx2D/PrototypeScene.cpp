@@ -1,6 +1,7 @@
 #include "stdafx.h"
 #include "PrototypeScene.h"
 #include "SimplePlatform.h"
+#include "honeyPlatform.h"
 
 PrototypeScene::PrototypeScene()
 {
@@ -22,6 +23,7 @@ void PrototypeScene::Init()
 
 	m_vecObjectList.push_back(new SimplePlatform({ WINSIZEY*0.8f, 50.0f}, {WINSIZEX*0.5f, 50.0f}));
 	m_vecObjectList.push_back(new SimplePlatform({ 50.0f, 400.0f }, { WINSIZEX*0.5f+300.0f, 700.0f }));
+	m_vecObjectList.push_back(new honeyPlatform());
 
 	for (auto obj : m_vecObjectList) obj->Init();
 }
@@ -33,6 +35,7 @@ void PrototypeScene::Update()
 		PostQuitMessage(0); // WM_QUIT 메시지 발생
 	}
 	for (auto obj : m_vecObjectList) obj->Update();
+
 	m_player->Update(m_vecObjectList);
 }
 

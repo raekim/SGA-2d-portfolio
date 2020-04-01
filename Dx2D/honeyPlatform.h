@@ -25,5 +25,6 @@ public:
 	void Release();
 
 	virtual bool handleCollision(D3DXVECTOR2 pos, Player* player, collisionCheckDir dir) override;
+	void SetPosition(D3DXVECTOR2 pos);
 };
 

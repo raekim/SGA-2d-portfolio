@@ -45,7 +45,7 @@ class Player
 	ANIM_STATE				m_prevAnimState;
 
 	D3DXVECTOR2				m_oldPosition;
-	D3DXVECTOR2				m_position;
+	
 	D3DXVECTOR3				m_rotation;
 
 	D3DXVECTOR2				m_oldSpeed;
@@ -53,6 +53,7 @@ class Player
 
 	AABB*					m_AABB;
 	D3DXVECTOR2				m_AABBOffset;
+	PlaceableObject*		m_ridingBlock;			// 타고 있는 움직이는 블록
 
 	// Position States
 	bool m_pushedRightWall;
@@ -116,6 +117,7 @@ public:
 		bool					m_isRidingMovingPlatform;
 		D3DXVECTOR2				m_movingPlatformOffset;	// 움직이는 플랫폼을 타고 있는 경우 캐릭터에 적용해야 할 offset
 		D3DXVECTOR2				m_speed;
+		D3DXVECTOR2				m_position;
 public:
 	Player();
 	~Player();

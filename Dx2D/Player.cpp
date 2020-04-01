@@ -38,6 +38,8 @@ void Player::Init()
 	m_curState = STATE::Stand;
 
 	m_isRidingMovingPlatform = false;
+
+	m_ridingBlock = nullptr;
 }
 
 void Player::InitAnimation()
@@ -343,13 +345,13 @@ void Player::UpdateWalkSpeed()
 
 void Player::UpdatePhysics(vector<PlaceableObject*> objList)
 {
+	// AABB 위치 업데이트
+	m_AABB->SetCenter(m_position + m_AABBOffset);
+
 	// 근처에 있는 오브젝트들에 대해 충돌검사
 	CheckFourSides(objList);
 
 	UpdateWallSlideAndJump();
-
-	// AABB 위치 업데이트
-	m_AABB->SetCenter(m_position + m_AABBOffset);
 }
 
 void Player::UpdateWallSlideAndJump()
@@ -402,10 +404,10 @@ void Player::CheckFourSides(vector<PlaceableObject*> objList)
 bool Player::HasGround(PlaceableObject* other, D3DXVECTOR2 oldPosition, D3DXVECTOR2 position)
 {
 	// 캐릭터 발 밑을 검사
-	int newPixelY = position.y - m_AABB->GetHalfSize().y - 1;
-	int oldPixelY = max(newPixelY, oldPosition.y - m_AABB->GetHalfSize().y - 1);
-	int startPixelX = position.x - m_AABB->GetHalfSize().x + 2;
-	int endPixelX = position.x + m_AABB->GetHalfSize().x - 2;
+	int newPixelY = position.y - m_AABB->GetHalfSize().y - 5;
+	int oldPixelY = max(newPixelY, oldPosition.y - m_AABB->GetHalfSize().y - 5);
+	int startPixelX = position.x - m_AABB->GetHalfSize().x + 5;
+	int endPixelX = position.x + m_AABB->GetHalfSize().x - 5;
 
 	// 위에서 아래로 검사
 	for (int pixelY = oldPixelY; pixelY >= newPixelY; --pixelY)
@@ -456,8 +458,8 @@ bool Player::HasLeftWall(PlaceableObject* other, D3DXVECTOR2 oldPosition, D3DXVE
 	// 캐릭터 왼쪽을 검사
 	int newPixelX = position.x - m_AABB->GetHalfSize().x - 1;
 	int oldPixelX = max(newPixelX, oldPosition.x - m_AABB->GetHalfSize().x - 1);
-	int startPixelY = position.y - m_AABB->GetHalfSize().y + 2;
-	int endPixelY = position.y + m_AABB->GetHalfSize().y - 2;
+	int startPixelY = position.y - m_AABB->GetHalfSize().y + 5;
+	int endPixelY = position.y + m_AABB->GetHalfSize().y - 5;
 
 	// 오른쪽에서 왼쪽으로 검사
 	for (int pixelX = oldPixelX; pixelX >= newPixelX; --pixelX)
@@ -482,8 +484,8 @@ bool Player::HasRightWall(PlaceableObject* other, D3DXVECTOR2 oldPosition, D3DXV
 	// 캐릭터 오른쪽을 검사
 	int newPixelX = position.x + m_AABB->GetHalfSize().x + 1;
 	int oldPixelX = min(newPixelX, oldPosition.x + m_AABB->GetHalfSize().x + 1);
-	int startPixelY = position.y - m_AABB->GetHalfSize().y + 2;
-	int endPixelY = position.y + m_AABB->GetHalfSize().y - 2;
+	int startPixelY = position.y - m_AABB->GetHalfSize().y + 5;
+	int endPixelY = position.y + m_AABB->GetHalfSize().y - 5;
 
 	// 왼쪽에서 오른쪽으로 검사
 	for (int pixelX = oldPixelX; pixelX <= newPixelX; ++pixelX)
