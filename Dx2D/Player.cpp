@@ -406,8 +406,8 @@ bool Player::HasGround(PlaceableObject* other, D3DXVECTOR2 oldPosition, D3DXVECT
 	// 캐릭터 발 밑을 검사
 	int newPixelY = position.y - m_AABB->GetHalfSize().y - 5;
 	int oldPixelY = max(newPixelY, oldPosition.y - m_AABB->GetHalfSize().y - 5);
-	int startPixelX = position.x - m_AABB->GetHalfSize().x + 5;
-	int endPixelX = position.x + m_AABB->GetHalfSize().x - 5;
+	int startPixelX = position.x - m_AABB->GetHalfSize().x + 8;
+	int endPixelX = position.x + m_AABB->GetHalfSize().x - 8;
 
 	// 위에서 아래로 검사
 	for (int pixelY = oldPixelY; pixelY >= newPixelY; --pixelY)
@@ -458,8 +458,8 @@ bool Player::HasLeftWall(PlaceableObject* other, D3DXVECTOR2 oldPosition, D3DXVE
 	// 캐릭터 왼쪽을 검사
 	int newPixelX = position.x - m_AABB->GetHalfSize().x - 1;
 	int oldPixelX = max(newPixelX, oldPosition.x - m_AABB->GetHalfSize().x - 1);
-	int startPixelY = position.y - m_AABB->GetHalfSize().y + 5;
-	int endPixelY = position.y + m_AABB->GetHalfSize().y - 5;
+	int startPixelY = position.y - m_AABB->GetHalfSize().y + 8;
+	int endPixelY = position.y + m_AABB->GetHalfSize().y - 8;
 
 	// 오른쪽에서 왼쪽으로 검사
 	for (int pixelX = oldPixelX; pixelX >= newPixelX; --pixelX)
@@ -484,8 +484,8 @@ bool Player::HasRightWall(PlaceableObject* other, D3DXVECTOR2 oldPosition, D3DXV
 	// 캐릭터 오른쪽을 검사
 	int newPixelX = position.x + m_AABB->GetHalfSize().x + 1;
 	int oldPixelX = min(newPixelX, oldPosition.x + m_AABB->GetHalfSize().x + 1);
-	int startPixelY = position.y - m_AABB->GetHalfSize().y + 5;
-	int endPixelY = position.y + m_AABB->GetHalfSize().y - 5;
+	int startPixelY = position.y - m_AABB->GetHalfSize().y + 8;
+	int endPixelY = position.y + m_AABB->GetHalfSize().y - 8;
 
 	// 왼쪽에서 오른쪽으로 검사
 	for (int pixelX = oldPixelX; pixelX <= newPixelX; ++pixelX)

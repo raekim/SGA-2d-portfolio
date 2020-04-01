@@ -195,6 +195,9 @@
     <ClInclude Include="SimplePlatform.h">
       <Filter>Dx2D Framework\Scene\Prototype\PlaceableObjects</Filter>
     </ClInclude>
+    <ClInclude Include="BallShooter.h">
+      <Filter>Dx2D Framework\Scene\Prototype\PlaceableObjects</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="MainGame.cpp">
@@ -291,6 +294,9 @@
       <Filter>Dx2D Framework\Scene\Prototype\PlaceableObjects</Filter>
     </ClCompile>
     <ClCompile Include="SimplePlatform.cpp">
+      <Filter>Dx2D Framework\Scene\Prototype\PlaceableObjects</Filter>
+    </ClCompile>
+    <ClCompile Include="BallShooter.cpp">
       <Filter>Dx2D Framework\Scene\Prototype\PlaceableObjects</Filter>
     </ClCompile>
   </ItemGroup>

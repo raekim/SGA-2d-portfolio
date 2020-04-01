@@ -2,7 +2,7 @@
 #include "honeyPlatform.h"
 #include "Player.h"
 
-honeyPlatform::honeyPlatform()
+honeyPlatform::honeyPlatform(D3DXVECTOR2 pos) : m_position(pos), m_oldPosition(pos)
 {
 }
 
@@ -16,7 +16,6 @@ void honeyPlatform::Init()
 	m_AABB = new AABB({ 40.0f, 40.0f });
 	m_AABB->Init();
 
-	m_oldPosition = m_position = { WINSIZEX*0.5f - 300.0f, WINSIZEY - 700.0f };
 	m_rotation = { 0.0f, 0.0f, 0.0f };
 
 	m_movingStartPoint = m_position - D3DXVECTOR2(200.0f, 200.0f);
