@@ -1,37 +1,23 @@
 #pragma once
 #include "AABB.h"
 #include "PlaceableObject.h"
+#include "Projectile.h"
 
 class BallShooter : public PlaceableObject
 {
-	struct Ball
+	struct Ball : public Projectile
 	{
 		Circle					m_circle;
 		D3DXVECTOR2				m_speed;
 		D3DXVECTOR2				m_position;
 		static float const		m_minXSpeed; // 발사된 공의 x 스피드가 점점 감소하다가 이 밑으로는 감소하지 않는 값
 
-		Ball()
-		{
-			m_circle.SetRadius(30.0f);
-			m_circle.SetDraw(true);
-			m_speed = {0.0f, 0.0f};
-		}
+		Ball();
+		void Update();
+		void Render();
 
-		void Update()
-		{
-			m_position += m_speed * g_pTimeManager->GetDeltaTime();
-			m_speed.x -= 200.0f * g_pTimeManager->GetDeltaTime();
-			m_speed.x = max(m_speed.x, m_minXSpeed);
-			m_speed.y -= GRAVITY * g_pTimeManager->GetDeltaTime();
-			m_circle.SetPosition(m_position);
-			m_circle.Update();
-		}
-
-		void Render()
-		{
-			m_circle.Render();
-		}
+		virtual void Destory() override;					// 캐릭터 또는 오브젝트와 충돌
+		virtual bool Collide(void* other) override;			// 다른 오브젝트와의 충돌 감지
 	};
 
 	D3DXVECTOR2				m_position;

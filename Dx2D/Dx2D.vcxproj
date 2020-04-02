@@ -177,6 +177,7 @@
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">false</ExcludedFromBuild>
     </ClInclude>
     <ClInclude Include="ProgressBar.h" />
+    <ClInclude Include="Projectile.h" />
     <ClInclude Include="PrototypeScene.h" />
     <ClInclude Include="Rect.h" />
     <ClInclude Include="RenderTextureTest.h" />
@@ -220,6 +221,7 @@
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">false</ExcludedFromBuild>
     </ClCompile>
     <ClCompile Include="ProgressBar.cpp" />
+    <ClCompile Include="Projectile.cpp" />
     <ClCompile Include="PrototypeScene.cpp" />
     <ClCompile Include="Rect.cpp" />
     <ClCompile Include="RenderTextureTest.cpp" />
