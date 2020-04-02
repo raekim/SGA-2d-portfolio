@@ -17,11 +17,11 @@ SimplePlatform::~SimplePlatform()
 void SimplePlatform::Init()
 {
 	m_rotation = { 0.0f, 0.0f, 0.0f };
-	m_AABB->SetCenter(m_position);
 }
 
 void SimplePlatform::Update()
 {
+	m_AABB->SetCenter(m_position);
 }
 
 void SimplePlatform::Render()
