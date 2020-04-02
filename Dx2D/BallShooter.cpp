@@ -88,6 +88,7 @@ bool BallShooter::handleCollision(D3DXVECTOR2 pos, Player * player, collisionChe
 				pBall->Destory();
 				m_disabledBalls.push_back(pBall);
 				m_enabledBalls.erase(it);
+				player->Die();
 				break;
 			}
 		}
