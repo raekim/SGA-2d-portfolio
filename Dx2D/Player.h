@@ -35,6 +35,10 @@ class Player
 		TO_WALLSLIDE_OPPOSITE_START,
 		WALLSLIDE,
 		WALLSLIDE_TO_JUMP_UP,
+
+		// 사망 관련
+		DEATH_SHOCK,
+		DEAD,
 		Max
 	};
 
@@ -49,11 +53,9 @@ class Player
 	D3DXVECTOR3				m_rotation;
 
 	D3DXVECTOR2				m_oldSpeed;
-	
 
 	AABB*					m_AABB;
 	D3DXVECTOR2				m_AABBOffset;
-	PlaceableObject*		m_ridingBlock;			// 타고 있는 움직이는 블록
 
 	// Position States
 	bool m_pushedRightWall;
@@ -111,8 +113,10 @@ private:
 	bool HasLeftWall(PlaceableObject* other, D3DXVECTOR2 oldPosition, D3DXVECTOR2 position);
 	bool HasRightWall(PlaceableObject* other, D3DXVECTOR2 oldPosition, D3DXVECTOR2 position);
 
-	bool IsFlipping();		// 현재 왼쪽을 보고 있는데 오른쪽을 보려고 하는가? (또는 그 반대)
+	bool IsFlipping();			// 현재 왼쪽을 보고 있는데 오른쪽을 보려고 하는가? (또는 그 반대)
 	void GetNextAnimationState();
+
+	bool m_isDead;
 public:
 		bool					m_isRidingMovingPlatform;
 		D3DXVECTOR2				m_movingPlatformOffset;	// 움직이는 플랫폼을 타고 있는 경우 캐릭터에 적용해야 할 offset
@@ -131,5 +135,6 @@ public:
 	void SetPosition(D3DXVECTOR2 pos) { m_position = pos; }
 	void SetPositionY(float val) { m_position.y = val; }
 	void SetPositionX(float val) { m_position.x = val; }
+	void Die() { m_isDead = true; m_speed.x = 0.0f; }
+	void Revive();
 };
-

@@ -38,8 +38,6 @@ void Player::Init()
 	m_curState = STATE::Stand;
 
 	m_isRidingMovingPlatform = false;
-
-	m_ridingBlock = nullptr;
 }
 
 void Player::InitAnimation()
@@ -50,7 +48,7 @@ void Player::InitAnimation()
 	Clip* clip;
 	Sprite* sprite;
 
-	int sheetY = 3;
+	int sheetY = 4;
 	int sheetX = 14;
 
 	// IDLE
@@ -167,24 +165,59 @@ void Player::InitAnimation()
 	}
 	m_pAnimation->AddClip(ANIM_STATE::TOP_TO_WALLSLIDE, clip);
 
+	//DEATH_SHOCK
+	clip = new Clip(PlayMode::Once);
+	for (int i = 0; i < 3; ++i)
+	{
+		sprite = new Sprite(L"Chicken-Sheet", sheetX, sheetY, sheetX * 3 + i);
+		clip->AddFrame(sprite, 1 / 16.0f);
+	}
+	m_pAnimation->AddClip(ANIM_STATE::DEATH_SHOCK, clip);
+
+	//DEAD
+	clip = new Clip(PlayMode::Once);
+	for (int i = 0; i < 5; ++i)
+	{
+		sprite = new Sprite(L"Chicken-Sheet", sheetX / 2, sheetY, (sheetX/2) * 3 + i + 2);
+		clip->AddFrame(sprite, 1 / 12.0f);
+	}
+	m_pAnimation->AddClip(ANIM_STATE::DEAD, clip);
+
 	m_pAnimation->SetScale(0.5f, 0.5f);
 }
 
 void Player::Update(vector<PlaceableObject*> obj)
 {
-	UpdateWalkSpeed();
-
-	switch (m_curState)
+	if (g_pKeyManager->IsOnceKeyDown(VK_RETURN))
 	{
-	case STATE::Stand:
-		UpdateStand();
-		break;		
-	case STATE::Walk:
-		UpdateWalk();
-		break; 
-	case STATE::Jump:
-		UpdateJump();
-		break;
+		if (!m_isDead)
+			this->Die();
+		else
+			this->Revive();
+		return;
+	}
+
+	if (!m_isDead)
+	{
+		UpdateWalkSpeed();
+
+		switch (m_curState)
+		{
+		case STATE::Stand:
+			UpdateStand();
+			break;
+		case STATE::Walk:
+			UpdateWalk();
+			break;
+		case STATE::Jump:
+			UpdateJump();
+			break;
+		}
+	}
+	else
+	{
+		m_speed.y -= GRAVITY * g_pTimeManager->GetDeltaTime();	// 기본 중력 적용
+		m_speed.y = max(m_speed.y, m_fallingSpeedBound);
 	}
 
 	UpdatePhysics(obj);
@@ -375,8 +408,11 @@ void Player::UpdateWallSlideAndJump()
 void Player::CheckFourSides(vector<PlaceableObject*> objList)
 {
 	// 캐릭터의 x 위치 업데이트 (가로축 충돌 판정을 위해)
-	m_position.x += m_speed.x * g_pTimeManager->GetDeltaTime();
-	m_pushesLeftWall = m_pushesRightWall = m_onGround = m_atCeiling = false;
+	if (!(m_animState == ANIM_STATE::DEATH_SHOCK))
+	{
+		m_position.x += m_speed.x * g_pTimeManager->GetDeltaTime();
+		m_pushesLeftWall = m_pushesRightWall = m_onGround = m_atCeiling = false;
+	}
 	for (auto obj : objList)
 	{
 		// 왼쪽 벽 충돌
@@ -387,8 +423,11 @@ void Player::CheckFourSides(vector<PlaceableObject*> objList)
 	}
 
 	// 캐릭터의 y 위치 업데이트 (세로축 충돌 판정을 위해)
-	m_speed.y = max(m_fallingSpeedBound, m_speed.y);
-	m_position.y += m_speed.y * g_pTimeManager->GetDeltaTime();
+	if (!(m_animState == ANIM_STATE::DEATH_SHOCK))
+	{
+		m_speed.y = max(m_fallingSpeedBound, m_speed.y);
+		m_position.y += m_speed.y * g_pTimeManager->GetDeltaTime();
+	}
 
 	for (auto obj : objList)
 	{
@@ -514,6 +553,23 @@ bool Player::IsFlipping()
 
 void Player::GetNextAnimationState()
 {
+	if (m_isDead)
+	{
+		m_rotation.y = (m_facingRight) ? 0.0f : D3DX_PI;
+		if (m_animState == ANIM_STATE::DEATH_SHOCK)
+		{
+			if (m_pAnimation->IsDonePlaying(ANIM_STATE::DEATH_SHOCK))
+			{
+				m_animState = ANIM_STATE::DEAD;
+			}
+		}
+		else if (!(m_animState == ANIM_STATE::DEAD))
+		{
+			m_animState = ANIM_STATE::DEATH_SHOCK;
+		}
+		return;
+	}
+
 	switch (m_animState)
 	{
 	case ANIM_STATE::IDLE:
@@ -754,4 +810,22 @@ void Player::Release()
 	m_AABB->Release();
 	SAFE_DELETE(m_AABB);
 	SAFE_DELETE(m_pAnimation);
+}
+
+void Player::Revive()
+{
+	m_isDead = false;
+
+	m_position = { WINSIZEX*0.5f, WINSIZEY };
+	m_rotation = { 0.0f, 0.0f, 0.0f };
+	m_oldPosition = m_position;
+	m_pressingJumpingButton = false;
+
+	m_facingRight = true;
+
+	m_prevAnimState = ANIM_STATE::READY;
+	m_animState = ANIM_STATE::IDLE;
+	m_curState = STATE::Stand;
+
+	m_isRidingMovingPlatform = false;
 }
