@@ -2,8 +2,14 @@
 #include "honeyPlatform.h"
 #include "Player.h"
 
-honeyPlatform::honeyPlatform(D3DXVECTOR2 pos) : m_position(pos), m_oldPosition(pos)
+honeyPlatform::honeyPlatform(D3DXVECTOR2 pos, bool flipped) : m_position(pos), m_oldPosition(pos)
 {
+	m_crateSprite = new Sprite(L"Object-Sheet-1", 6, 6, 7);
+	m_barSprite = new Sprite(L"Object-Sheet-1", 2, 2, 1);
+	m_isFlipped = flipped;
+
+	m_crateSprite->SetSize({ 0.6f, 0.6f });
+	m_barSprite->SetSize({ 0.6f, 0.6f });
 }
 
 
@@ -13,16 +19,30 @@ honeyPlatform::~honeyPlatform()
 
 void honeyPlatform::Init()
 {
-	m_AABB = new AABB({ 40.0f, 40.0f });
+	m_AABB = new AABB({ 20.0f, 20.0f });
 	m_AABB->Init();
 
-	m_rotation = { 0.0f, 0.0f, 0.0f };
-
-	m_movingStartPoint = m_position - D3DXVECTOR2(200.0f, 200.0f);
-	m_movingEndPoint = m_position + D3DXVECTOR2(200.0f, 200.0f);
+	m_midPosition = m_position;
 
 	m_moveSecond = 2.5f;
 	m_movingDelta = 0.0f;
+
+	if (m_isFlipped)
+	{
+		m_movingStartPoint = m_position - D3DXVECTOR2(130.0f, 130.0f);
+		m_movingEndPoint = m_position + D3DXVECTOR2(130.0f, 130.0f);
+		m_barSprite->SetRotation(0, 0, 0);
+		m_barSprite->SetPosition(m_midPosition + D3DXVECTOR2(7.0f, 0.0f));
+		m_barSprite->Update();
+	}
+	else
+	{
+		m_movingStartPoint = m_position + D3DXVECTOR2(-130.0f, 130.0f);
+		m_movingEndPoint = m_position + D3DXVECTOR2(130.0f, -130.0f);
+		m_barSprite->SetRotation(0, D3DX_PI, 0);
+		m_barSprite->SetPosition(m_midPosition + D3DXVECTOR2(-7.0f, 0.0f));
+		m_barSprite->Update();
+	}
 }
 
 void honeyPlatform::Update()
@@ -42,16 +62,24 @@ void honeyPlatform::Update()
 	
 	m_oldPosition = m_position; 
 	m_movingDelta += g_pTimeManager->GetDeltaTime();
+
+	m_crateSprite->SetPosition(m_position);
+	m_crateSprite->Update();
 }
 
 void honeyPlatform::Render()
 {
 	m_AABB->Render();
+
+	m_barSprite->Render();
+	m_crateSprite->Render();
 }
 
 void honeyPlatform::Release()
 {
 	m_AABB->Release();
+	SAFE_DELETE(m_crateSprite);
+	SAFE_DELETE(m_barSprite);
 }
 
 bool honeyPlatform::handleCollision(D3DXVECTOR2 pos, Player * player, collisionCheckDir dir)
@@ -61,23 +89,23 @@ bool honeyPlatform::handleCollision(D3DXVECTOR2 pos, Player * player, collisionC
 		switch (dir)
 		{
 		case collisionCheckDir::BOTTOM:
-			player->SetPositionY(m_AABB->GetAABBTop() + player->GetAABBHalfSize().y);
 			if (player->m_speed.y < 0.0f) player->m_speed.y = 0.0f;
 			player->m_position += m_moveDelta;
+			player->SetPositionY(m_AABB->GetAABBTop() + player->GetAABBHalfSize().y);
 			break;
 		case collisionCheckDir::CEILING:
 			player->SetPositionY(m_AABB->GetAABBBottom() - player->GetAABBHalfSize().y);
 			if (player->m_speed.y > 0.0f) player->m_speed.y = 0.0f;
 			break;
 		case collisionCheckDir::LEFT_WALL:
-			player->SetPositionX(m_AABB->GetAABBRight() + player->GetAABBHalfSize().x);
 			if (player->m_speed.x < 0.0f) player->m_speed.x = 0.0f;
 			player->m_position += m_moveDelta;
+			player->SetPositionX(m_AABB->GetAABBRight() + player->GetAABBHalfSize().x);
 			break;
 		case collisionCheckDir::RIGHT_WALL:
-			player->SetPositionX(m_AABB->GetAABBLeft() - player->GetAABBHalfSize().x);
 			if (player->m_speed.x > 0.0f) player->m_speed.x = 0.0f;
 			player->m_position += m_moveDelta;
+			player->SetPositionX(m_AABB->GetAABBLeft() - player->GetAABBHalfSize().x);
 			break;
 		}
 		return true;

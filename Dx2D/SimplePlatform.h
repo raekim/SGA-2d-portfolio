@@ -6,8 +6,10 @@ class SimplePlatform : public PlaceableObject
 	D3DXVECTOR2				m_position;
 	D3DXVECTOR3				m_rotation;
 	AABB*					m_AABB;
+	Sprite*					m_sprite;
 public:
 	SimplePlatform(D3DXVECTOR2 AABBHalfSize, D3DXVECTOR2 pos);
+	SimplePlatform(Sprite* sprite, D3DXVECTOR2 AABBHalfSize, D3DXVECTOR2 pos);
 	~SimplePlatform();
 
 	virtual void Init() override;

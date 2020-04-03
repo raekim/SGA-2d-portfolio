@@ -4,6 +4,15 @@
 
 SimplePlatform::SimplePlatform(D3DXVECTOR2 AABBHalfSize, D3DXVECTOR2 pos)
 {
+	m_sprite = NULL;
+	m_AABB = new AABB(AABBHalfSize);
+	m_AABB->Init();
+	m_position = pos;
+}
+
+SimplePlatform::SimplePlatform(Sprite * sprite, D3DXVECTOR2 AABBHalfSize, D3DXVECTOR2 pos)
+{
+	m_sprite = sprite;
 	m_AABB = new AABB(AABBHalfSize);
 	m_AABB->Init();
 	m_position = pos;
@@ -22,11 +31,21 @@ void SimplePlatform::Init()
 void SimplePlatform::Update()
 {
 	m_AABB->SetCenter(m_position);
+	
+	if (m_sprite)
+	{
+		m_sprite->SetPosition(m_position);
+		m_sprite->Update();
+	}
 }
 
 void SimplePlatform::Render()
 {
 	m_AABB->Render();
+	if (m_sprite)
+	{
+		m_sprite->Render();
+	}
 }
 
 void SimplePlatform::Release()

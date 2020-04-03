@@ -44,9 +44,12 @@ void AABB::Init()
 
 void AABB::Render()
 {
-	if (m_draw)
+	if (!g_pKeyManager->IsToggleKey('D'))
 	{
-		m_rect->Render();
+		if (m_draw)
+		{
+			m_rect->Render();
+		}
 	}
 }
 

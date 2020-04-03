@@ -83,6 +83,7 @@ void LoadManager::MakeAResourcesList()
 		case SCENE_KIND::Prototype:
 			m_vecResourceList.push_back(new tagTextureInfo(RESOURCE_TYPE::Image, L"Chicken-Sheet", L"kim-rae-hyang-images/chicken-sheet.png"));
 			m_vecResourceList.push_back(new tagTextureInfo(RESOURCE_TYPE::Image, L"City-background", L"kim-rae-hyang-images/city-background.png"));
+			m_vecResourceList.push_back(new tagTextureInfo(RESOURCE_TYPE::Image, L"Object-Sheet-1", L"kim-rae-hyang-images/objects1-sheet.png"));
 			break;
 	//case SCENE_KIND::Title:
 	//	m_vecResourceList.push_back(new tagTextureInfo(RESOURCE_TYPE::Image, L"TitleBack", L"ChloeBennet.bmp"));

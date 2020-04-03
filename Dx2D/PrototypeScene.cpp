@@ -26,7 +26,8 @@ void PrototypeScene::Init()
 
 	m_vecObjectList.push_back(new SimplePlatform({ 200.0f, 350.0f}, { 465.0f, 300.0f }));
 	m_vecObjectList.push_back(new SimplePlatform({ 447.0f, 380.0f }, { GAMESCREEN_X - 653, 300.0f }));
-	//m_vecObjectList.push_back(new honeyPlatform({ WINSIZEX*0.5f - 300.0f, WINSIZEY - 700.0f }));
+	m_vecObjectList.push_back(new honeyPlatform({ WINSIZEX*0.5f - 200.0f, WINSIZEY*0.5f }, true));
+	m_vecObjectList.push_back(new honeyPlatform({ WINSIZEX*0.5f + 20.0f, WINSIZEY*0.5f + 200.0f }, false));
 	//m_vecObjectList.push_back(new BallShooter({ WINSIZEX*0.5f - 300.0f, WINSIZEY - 700.0f }));
 
 	for (auto obj : m_vecObjectList) obj->Init();
