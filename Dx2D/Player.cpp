@@ -20,8 +20,8 @@ void Player::Init()
 
 	m_AABBOffset = { 0.0f, 0.0f };
 
-	m_jumpSpeed = 500.0f;
-	m_maxWalkSpeed = 400.0f;
+	m_jumpSpeed = 450.0f;
+	m_maxWalkSpeed = 350.0f;
 	m_walkSpeed = 0.0f;
 
 	m_position = { 500.0f ,800.0f };
@@ -223,11 +223,6 @@ void Player::Update(vector<PlaceableObject*> obj)
 
 	UpdatePhysics(obj);
 	UpdateAnimation();
-
-	if (m_animState == ANIM_STATE::DEAD)
-	{
-		m_AABB->SetHalfSize({ m_AABBHalfSize.x, m_AABBHalfSize.y*0.3f });
-	}
 
 	// 움직임 상태 정보 갱신
 	m_oldPosition = m_position;
