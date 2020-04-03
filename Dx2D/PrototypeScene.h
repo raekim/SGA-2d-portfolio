@@ -9,6 +9,8 @@ class PrototypeScene : public iGameNode
 	Player*						m_player;
 	vector<Rect*>				m_vecRect;
 
+	Sprite*						m_backgroundImage;
+
 	vector<PlaceableObject*>	m_vecObjectList;
 public:
 	PrototypeScene();

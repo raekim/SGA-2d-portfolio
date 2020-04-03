@@ -51,8 +51,8 @@ void Camera::Init()
 	m_vFocus = D3DXVECTOR2(HALFSIZEX, HALFSIZEY);
 	m_vPosition = D3DXVECTOR2(0, 0);
 
-	m_vMapSize.x = WINSIZEX;
-	m_vMapSize.y = WINSIZEY;
+	m_vMapSize.x = GAMESCREEN_X;
+	m_vMapSize.y = GAMESCREEN_Y;
 
 	m_pTarget = NULL;
 }

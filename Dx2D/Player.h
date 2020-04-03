@@ -56,6 +56,7 @@ class Player
 
 	AABB*					m_AABB;
 	D3DXVECTOR2				m_AABBOffset;
+	D3DXVECTOR2				m_AABBHalfSize;
 
 	// Position States
 	bool m_pushedRightWall;
@@ -135,6 +136,7 @@ public:
 	void SetPosition(D3DXVECTOR2 pos) { m_position = pos; }
 	void SetPositionY(float val) { m_position.y = val; }
 	void SetPositionX(float val) { m_position.x = val; }
-	void Die() { m_isDead = true; m_speed.x = 0.0f; }
+	void Die();
 	void Revive();
+	D3DXVECTOR2* GetPosition() { return &m_position; }
 };

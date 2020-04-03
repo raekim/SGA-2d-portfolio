@@ -14,7 +14,8 @@ Player::~Player()
 
 void Player::Init()
 {
-	m_AABB = new AABB({ 40.0f, 53.0f });
+	m_AABBHalfSize = { 18.0f, 34.0f };
+	m_AABB = new AABB(m_AABBHalfSize);
 	m_AABB->Init();
 
 	m_AABBOffset = { 0.0f, 0.0f };
@@ -23,7 +24,7 @@ void Player::Init()
 	m_maxWalkSpeed = 400.0f;
 	m_walkSpeed = 0.0f;
 
-	m_position = { WINSIZEX*0.5f, WINSIZEY };
+	m_position = { 500.0f ,800.0f };
 	m_rotation = { 0.0f, 0.0f, 0.0f };
 	m_oldPosition = m_position;
 	m_pressingJumpingButton = false;
@@ -183,7 +184,7 @@ void Player::InitAnimation()
 	}
 	m_pAnimation->AddClip(ANIM_STATE::DEAD, clip);
 
-	m_pAnimation->SetScale(0.5f, 0.5f);
+	m_pAnimation->SetScale(0.25f, 0.25f);
 }
 
 void Player::Update(vector<PlaceableObject*> obj)
@@ -222,6 +223,11 @@ void Player::Update(vector<PlaceableObject*> obj)
 
 	UpdatePhysics(obj);
 	UpdateAnimation();
+
+	if (m_animState == ANIM_STATE::DEAD)
+	{
+		m_AABB->SetHalfSize({ m_AABBHalfSize.x, m_AABBHalfSize.y*0.3f });
+	}
 
 	// 움직임 상태 정보 갱신
 	m_oldPosition = m_position;
@@ -385,6 +391,9 @@ void Player::UpdatePhysics(vector<PlaceableObject*> objList)
 	CheckFourSides(objList);
 
 	UpdateWallSlideAndJump();
+
+	// AABB 위치 업데이트
+	m_AABB->SetCenter(m_position + m_AABBOffset);
 }
 
 void Player::UpdateWallSlideAndJump()
@@ -416,10 +425,10 @@ void Player::CheckFourSides(vector<PlaceableObject*> objList)
 	for (auto obj : objList)
 	{
 		// 왼쪽 벽 충돌
-		m_pushesLeftWall |= m_speed.x <= 0.0f && HasLeftWall(obj, m_oldPosition, m_position);
+		m_pushesLeftWall |= m_speed.x <= 0.0f && HasLeftWall(obj, m_oldPosition + m_AABBOffset, m_position + m_AABBOffset);
 
 		// 오른쪽 벽 충돌
-		m_pushesRightWall |= m_speed.x >= 0.0f && HasRightWall(obj, m_oldPosition, m_position);
+		m_pushesRightWall |= m_speed.x >= 0.0f && HasRightWall(obj, m_oldPosition + m_AABBOffset, m_position + m_AABBOffset);
 	}
 
 	// 캐릭터의 y 위치 업데이트 (세로축 충돌 판정을 위해)
@@ -432,10 +441,10 @@ void Player::CheckFourSides(vector<PlaceableObject*> objList)
 	for (auto obj : objList)
 	{
 		// 아래쪽 벽 충돌
-		m_onGround |= m_speed.y <= 0 && HasGround(obj, m_oldPosition, m_position);
+		m_onGround |= m_speed.y <= 0 && HasGround(obj, m_oldPosition + m_AABBOffset, m_position + m_AABBOffset);
 
 		// 위쪽 벽 충돌
-		m_atCeiling |= m_speed.y > 0 && HasCeiling(obj, m_oldPosition, m_position);
+		m_atCeiling |= m_speed.y > 0 && HasCeiling(obj, m_oldPosition + m_AABBOffset, m_position + m_AABBOffset);
 	}
 
 }
@@ -443,10 +452,10 @@ void Player::CheckFourSides(vector<PlaceableObject*> objList)
 bool Player::HasGround(PlaceableObject* other, D3DXVECTOR2 oldPosition, D3DXVECTOR2 position)
 {
 	// 캐릭터 발 밑을 검사
-	int newPixelY = position.y - m_AABB->GetHalfSize().y - 5;
-	int oldPixelY = max(newPixelY, oldPosition.y - m_AABB->GetHalfSize().y - 5);
-	int startPixelX = position.x - m_AABB->GetHalfSize().x + 8;
-	int endPixelX = position.x + m_AABB->GetHalfSize().x - 8;
+	int newPixelY = position.y - m_AABB->GetHalfSize().y - 2;
+	int oldPixelY = max(newPixelY, oldPosition.y - m_AABB->GetHalfSize().y - 2);
+	int startPixelX = position.x - m_AABB->GetHalfSize().x + 2;
+	int endPixelX = position.x + m_AABB->GetHalfSize().x - 2;
 
 	// 위에서 아래로 검사
 	for (int pixelY = oldPixelY; pixelY >= newPixelY; --pixelY)
@@ -469,8 +478,8 @@ bool Player::HasGround(PlaceableObject* other, D3DXVECTOR2 oldPosition, D3DXVECT
 bool Player::HasCeiling(PlaceableObject* other, D3DXVECTOR2 oldPosition, D3DXVECTOR2 position)
 {
 	// 캐릭터 머리 위를 검사
-	int newPixelY = position.y + m_AABB->GetHalfSize().y + 1;
-	int oldPixelY = min(newPixelY, oldPosition.y + m_AABB->GetHalfSize().y + 1);
+	int newPixelY = position.y + m_AABB->GetHalfSize().y + 2;
+	int oldPixelY = min(newPixelY, oldPosition.y + m_AABB->GetHalfSize().y + 2);
 	int startPixelX = position.x - m_AABB->GetHalfSize().x + 2;
 	int endPixelX = position.x + m_AABB->GetHalfSize().x - 2;
 
@@ -495,10 +504,10 @@ bool Player::HasCeiling(PlaceableObject* other, D3DXVECTOR2 oldPosition, D3DXVEC
 bool Player::HasLeftWall(PlaceableObject* other, D3DXVECTOR2 oldPosition, D3DXVECTOR2 position)
 {
 	// 캐릭터 왼쪽을 검사
-	int newPixelX = position.x - m_AABB->GetHalfSize().x - 1;
-	int oldPixelX = max(newPixelX, oldPosition.x - m_AABB->GetHalfSize().x - 1);
-	int startPixelY = position.y - m_AABB->GetHalfSize().y + 8;
-	int endPixelY = position.y + m_AABB->GetHalfSize().y - 8;
+	int newPixelX = position.x - m_AABB->GetHalfSize().x - 2;
+	int oldPixelX = max(newPixelX, oldPosition.x - m_AABB->GetHalfSize().x - 2);
+	int startPixelY = position.y - m_AABB->GetHalfSize().y + 2;
+	int endPixelY = position.y + m_AABB->GetHalfSize().y - 2;
 
 	// 오른쪽에서 왼쪽으로 검사
 	for (int pixelX = oldPixelX; pixelX >= newPixelX; --pixelX)
@@ -521,10 +530,10 @@ bool Player::HasLeftWall(PlaceableObject* other, D3DXVECTOR2 oldPosition, D3DXVE
 bool Player::HasRightWall(PlaceableObject* other, D3DXVECTOR2 oldPosition, D3DXVECTOR2 position)
 {
 	// 캐릭터 오른쪽을 검사
-	int newPixelX = position.x + m_AABB->GetHalfSize().x + 1;
-	int oldPixelX = min(newPixelX, oldPosition.x + m_AABB->GetHalfSize().x + 1);
-	int startPixelY = position.y - m_AABB->GetHalfSize().y + 8;
-	int endPixelY = position.y + m_AABB->GetHalfSize().y - 8;
+	int newPixelX = position.x + m_AABB->GetHalfSize().x + 2;
+	int oldPixelX = min(newPixelX, oldPosition.x + m_AABB->GetHalfSize().x + 2);
+	int startPixelY = position.y - m_AABB->GetHalfSize().y + 2;
+	int endPixelY = position.y + m_AABB->GetHalfSize().y - 2;
 
 	// 왼쪽에서 오른쪽으로 검사
 	for (int pixelX = oldPixelX; pixelX <= newPixelX; ++pixelX)
@@ -790,7 +799,7 @@ void Player::UpdateAnimation()
 {
 	GetNextAnimationState();
 
-	m_pAnimation->SetPosition({ m_position.x,  m_position.y + 23.0f });
+	m_pAnimation->SetPosition({ m_position.x,  m_position.y });
 	m_pAnimation->SetRotation(m_rotation.x, m_rotation.y, m_rotation.z);
 	m_pAnimation->Play(m_animState);
 	m_pAnimation->Update();
@@ -801,7 +810,7 @@ void Player::UpdateAnimation()
 
 void Player::Render()
 {
-	//m_AABB->Render();
+	m_AABB->Render();
 	m_pAnimation->Render();
 }
 
@@ -812,11 +821,17 @@ void Player::Release()
 	SAFE_DELETE(m_pAnimation);
 }
 
+void Player::Die()
+{
+	m_isDead = true; 
+	m_speed.x = 0.0f; 
+}
+
 void Player::Revive()
 {
 	m_isDead = false;
 
-	m_position = { WINSIZEX*0.5f, WINSIZEY };
+	m_position = { 500.0f ,800.0f };
 	m_rotation = { 0.0f, 0.0f, 0.0f };
 	m_oldPosition = m_position;
 	m_pressingJumpingButton = false;
@@ -828,4 +843,6 @@ void Player::Revive()
 	m_curState = STATE::Stand;
 
 	m_isRidingMovingPlatform = false;
+
+	m_AABB->SetHalfSize(m_AABBHalfSize);
 }

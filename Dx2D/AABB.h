@@ -21,8 +21,9 @@ public:
 
 	bool Collide(AABB* other);
 	void SetCenter(D3DXVECTOR2 c);
-	void SetHalfSize(D3DXVECTOR2 sz) { m_halfSize = sz; }
-	void SetDraw(bool b) { m_draw = b; }
+	void SetHalfSize(D3DXVECTOR2 sz) { m_halfSize = sz; m_rect->SetSize({ m_halfSize.x*2.0f, m_halfSize.y*2.0f });
+	}
+	void SetDraw(bool b) { m_draw = b;}
 	D3DXVECTOR2 GetHalfSize() { return m_halfSize; }
 	D3DXVECTOR2 GetCenter() { return m_center; }
 
