@@ -29,7 +29,7 @@ void Player::Init()
 	m_oldPosition = m_position;
 	m_pressingJumpingButton = false;
 
-	m_fallingSpeedBound = -1500.0f;
+	m_fallingSpeedBound = -1000.0f;
 	m_facingRight = true;
 
 	InitAnimation();
@@ -296,7 +296,7 @@ void Player::UpdateJump()
 		m_pressingJumpingButton = g_pKeyManager->IsStayKeyDown(VK_SPACE) && m_pressingJumpingButton; // 처음 점프 시작 후 계속 점프 버튼을 누르고 있는가?
 		if (!m_pressingJumpingButton || m_speed.y < 0)
 		{
-			m_speed.y -= 3.5f * GRAVITY * g_pTimeManager->GetDeltaTime();	// 떨어질 때 추가 중력 적용
+			m_speed.y -= 4.5f * GRAVITY * g_pTimeManager->GetDeltaTime();	// 떨어질 때 추가 중력 적용
 		}
 		if (m_isWallSliding)
 		{
@@ -803,7 +803,7 @@ void Player::UpdateAnimation()
 {
 	GetNextAnimationState();
 
-	m_pAnimation->SetPosition({ m_position.x,  m_position.y });
+	m_pAnimation->SetPosition({ m_position.x,  m_position.y + 7});
 	m_pAnimation->SetRotation(m_rotation.x, m_rotation.y, m_rotation.z);
 	m_pAnimation->Play(m_animState);
 	m_pAnimation->Update();
@@ -835,7 +835,7 @@ void Player::Revive()
 {
 	m_isDead = false;
 
-	m_position = { 500.0f ,800.0f };
+	m_position = { 500.0f, 800.0f };
 	m_rotation = { 0.0f, 0.0f, 0.0f };
 	m_oldPosition = m_position;
 	m_pressingJumpingButton = false;

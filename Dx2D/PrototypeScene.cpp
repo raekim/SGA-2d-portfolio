@@ -17,7 +17,7 @@ void PrototypeScene::Init()
 {
 	m_backgroundImage = new Sprite(L"City-background", 1, 1, 0);
 	m_backgroundImage->Init();
-	m_backgroundImage->SetPosition(GAMESCREEN_X*0.5f, GAMESCREEN_Y*0.5f);
+	m_backgroundImage->SetLBPosition({ 0,0 });
 	m_backgroundImage->Update();
 
 	m_player = new Player;
@@ -26,12 +26,21 @@ void PrototypeScene::Init()
 
 	m_vecObjectList.push_back(new SimplePlatform({ 200.0f, 350.0f}, { 465.0f, 300.0f }));
 	m_vecObjectList.push_back(new SimplePlatform({ 447.0f, 380.0f }, { GAMESCREEN_X - 653, 300.0f }));
-	m_vecObjectList.push_back(new honeyPlatform({ WINSIZEX*0.5f - 200.0f, WINSIZEY*0.5f }, true));
+	m_vecObjectList.push_back(new honeyPlatform({ WINSIZEX*0.5f - 200.0f, WINSIZEY*0.7f }, true));
 	m_vecObjectList.push_back(new honeyPlatform({ WINSIZEX*0.5f + 20.0f, WINSIZEY*0.5f + 200.0f }, false));
 	//m_vecObjectList.push_back(new BallShooter({ WINSIZEX*0.5f - 300.0f, WINSIZEY - 700.0f }));
 
+	m_vecObjectList.push_back(new SimplePlatform(SimplePlatform::Platform_Type::SHORT_VERTICAL, { 500.0f, 800.0f }));
+	m_vecObjectList.push_back(new SimplePlatform(SimplePlatform::Platform_Type::SHORT_HORIZONTAL, {800.0f, 760.0f }));
+	//m_vecObjectList.push_back(new SimplePlatform(SimplePlatform::Platform_Type::MID_VERTICAL, {0.0f, WINSIZEY*0.5f }));
+	//m_vecObjectList.push_back(new SimplePlatform(SimplePlatform::Platform_Type::MID_HORIZONTAL, {500.0f, WINSIZEY*0.5f }));
+	//m_vecObjectList.push_back(new SimplePlatform(SimplePlatform::Platform_Type::LONG_VERTICAL, {0.0f, WINSIZEY*0.3f }));
+	//m_vecObjectList.push_back(new SimplePlatform(SimplePlatform::Platform_Type::LONG_HORIZONTAL, {500.0f, WINSIZEY*0.3f }));
+
+
 	for (auto obj : m_vecObjectList) obj->Init();
 
+	g_pCamera->SetMapSize(GAMESCREEN_X, GAMESCREEN_Y);
 	g_pCamera->SetTarget(m_player->GetPosition());
 }
 
