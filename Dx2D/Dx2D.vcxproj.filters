@@ -199,6 +199,12 @@
       <Filter>Dx2D Framework\Scene\Prototype\PlaceableObjects</Filter>
     </ClInclude>
     <ClInclude Include="Projectile.h">
+      <Filter>Dx2D Framework\Scene\Prototype\PlaceableObjects</Filter>
+    </ClInclude>
+    <ClInclude Include="SpringPlatform.h">
+      <Filter>Dx2D Framework\Scene\Prototype\PlaceableObjects</Filter>
+    </ClInclude>
+    <ClInclude Include="SpinWheel.h">
       <Filter>헤더 파일</Filter>
     </ClInclude>
   </ItemGroup>
@@ -303,6 +309,12 @@
       <Filter>Dx2D Framework\Scene\Prototype\PlaceableObjects</Filter>
     </ClCompile>
     <ClCompile Include="Projectile.cpp">
+      <Filter>Dx2D Framework\Scene\Prototype\PlaceableObjects</Filter>
+    </ClCompile>
+    <ClCompile Include="SpringPlatform.cpp">
+      <Filter>Dx2D Framework\Scene\Prototype\PlaceableObjects</Filter>
+    </ClCompile>
+    <ClCompile Include="SpinWheel.cpp">
       <Filter>소스 파일</Filter>
     </ClCompile>
   </ItemGroup>

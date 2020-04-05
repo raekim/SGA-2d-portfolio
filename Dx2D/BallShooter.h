@@ -10,9 +10,10 @@ class BallShooter : public PlaceableObject
 		Circle					m_circle;
 		D3DXVECTOR2				m_speed;
 		D3DXVECTOR2				m_position;
-		static float const		m_minXSpeed; // 발사된 공의 x 스피드가 점점 감소하다가 이 밑으로는 감소하지 않는 값
+		float					m_xSpeedBound; // 발사된 공의 x 스피드의 절대값이 점점 감소하다가 이 밑으로는 감소하지 않는 값
+		bool					m_isFlipped;
 
-		Ball();
+		Ball(bool flipped);
 		void Update();
 		void Render();
 
@@ -31,8 +32,15 @@ class BallShooter : public PlaceableObject
 	float					m_shootDelayCount;			// 연속 발사를 위해 카운트하는 시간
 
 	Circle*					m_tempBall;
+	Sprite*					m_ballSprite;
+	Sprite*					m_machineSprite;
+
+	bool					m_isFlipped;				// 좌/우 반전 여부
+	D3DXVECTOR2				m_ballOffset;				// 공 이미지 offset
+	D3DXVECTOR2				m_ballRotationOffest;		// 공 회전 중심점 offset
+
 public:
-	BallShooter(D3DXVECTOR2 pos);
+	BallShooter(D3DXVECTOR2 pos, bool flipped);
 	~BallShooter();
 
 	virtual void Init() override;

@@ -73,6 +73,8 @@ void SimplePlatform::Render()
 
 void SimplePlatform::Release()
 {
+	SAFE_DELETE(m_AABB);
+	SAFE_DELETE(m_sprite);
 }
 
 bool SimplePlatform::handleCollision(D3DXVECTOR2 pos, Player * player, collisionCheckDir dir)
@@ -82,20 +84,32 @@ bool SimplePlatform::handleCollision(D3DXVECTOR2 pos, Player * player, collision
 		switch (dir)
 		{
 		case collisionCheckDir::BOTTOM:
-			player->SetPositionY(m_AABB->GetAABBTop() + player->GetAABBHalfSize().y);
-			if (player->m_speed.y < 0.0f) player->m_speed.y = 0.0f;
+			if (player->m_speed.y < 0.0f)
+			{
+				player->SetPositionY(m_AABB->GetAABBTop() + player->GetAABBHalfSize().y);
+				player->m_speed.y = 0.0f;
+			}
 			break;
 		case collisionCheckDir::CEILING:
-			player->SetPositionY(m_AABB->GetAABBBottom() - player->GetAABBHalfSize().y);
-			if (player->m_speed.y > 0.0f) player->m_speed.y = 0.0f;
+			if (player->m_speed.y > 0.0f)
+			{
+				player->m_speed.y = 0.0f;
+				player->SetPositionY(m_AABB->GetAABBBottom() - player->GetAABBHalfSize().y);
+			}
 			break;
 		case collisionCheckDir::LEFT_WALL:
-			player->SetPositionX(m_AABB->GetAABBRight() + player->GetAABBHalfSize().x);
-			if (player->m_speed.x < 0.0f) player->m_speed.x = 0.0f;
+			if (player->m_speed.x < 0.0f)
+			{
+				player->SetPositionX(m_AABB->GetAABBRight() + player->GetAABBHalfSize().x);
+				player->m_speed.x = 0.0f;
+			}
 			break;
 		case collisionCheckDir::RIGHT_WALL:
-			player->SetPositionX(m_AABB->GetAABBLeft() - player->GetAABBHalfSize().x);
-			if (player->m_speed.x > 0.0f) player->m_speed.x = 0.0f;
+			if (player->m_speed.x > 0.0f)
+			{
+				player->m_speed.x = 0.0f;
+				player->SetPositionX(m_AABB->GetAABBLeft() - player->GetAABBHalfSize().x);
+			}
 			break;
 		}
 		return true;

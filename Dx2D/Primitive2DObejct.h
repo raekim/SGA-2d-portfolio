@@ -70,6 +70,8 @@ public:
 		wstring fileName = L"Sprite",
 		D3D11_INPUT_ELEMENT_DESC desc[] = PTElementDesc,
 		UINT count = PTElementCount);
+
+	void RotateAroundPointAndUpdate(D3DXVECTOR3 rotation, D3DXVECTOR2 point);
 };
 
 template<typename T>
@@ -128,6 +130,36 @@ inline void Primitive2DObejct<T>::Init()
 	m_isDrawBorder = false;
 
 	m_vRotation = D3DXVECTOR3(0, 0, 0);
+}
+
+template<typename T>
+inline void Primitive2DObejct<T>::RotateAroundPointAndUpdate(D3DXVECTOR3 rotation, D3DXVECTOR2 point)
+{
+	// SRT (Scale, Rotation, Transform)
+	D3DXMATRIX Scale, Translate, RotX, RotY, RotZ;
+
+	D3DXMatrixScaling(&Scale, m_vSize.x, m_vSize.y, 1);
+
+	// 미리 set해둔 회전이 있다면 먼저 한다
+	D3DXMatrixRotationX(&RotX, m_vRotation.x);
+	D3DXMatrixRotationY(&RotY, m_vRotation.y);
+	D3DXMatrixRotationZ(&RotZ, m_vRotation.z);
+	m_matWorld = Scale * RotX * RotY * RotZ;
+
+	// 회전 중심점을 바꾼 후 회전시킨다
+	D3DXMatrixRotationX(&RotX, rotation.x);
+	D3DXMatrixRotationY(&RotY, rotation.y);
+	D3DXMatrixRotationZ(&RotZ, rotation.z);
+	D3DXMatrixTranslation(&Translate, point.x, point.y, 0);
+
+	m_matWorld *= Translate * RotX * RotY * RotZ;
+
+	// 이동시킨다
+	D3DXMatrixTranslation(&Translate, m_vPosition.x, m_vPosition.y, 0);
+	m_matWorld *= Translate;
+
+	m_matSRT = m_matWorld;
+	D3DXMatrixTranspose(&m_matWorld, &m_matWorld);
 }
 
 template<typename T>

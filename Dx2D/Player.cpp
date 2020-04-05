@@ -20,11 +20,12 @@ void Player::Init()
 
 	m_AABBOffset = { 0.0f, 0.0f };
 
+	m_extSpeed = { 0.0f, 0.0f };
 	m_jumpSpeed = 450.0f;
 	m_maxWalkSpeed = 350.0f;
 	m_walkSpeed = 0.0f;
 
-	m_position = { 500.0f ,800.0f };
+	m_position = { 650.0f ,800.0f };
 	m_rotation = { 0.0f, 0.0f, 0.0f };
 	m_oldPosition = m_position;
 	m_pressingJumpingButton = false;
@@ -37,8 +38,6 @@ void Player::Init()
 	m_prevAnimState = ANIM_STATE::READY;
 	m_animState = ANIM_STATE::IDLE;
 	m_curState = STATE::Stand;
-
-	m_isRidingMovingPlatform = false;
 }
 
 void Player::InitAnimation()
@@ -302,7 +301,7 @@ void Player::UpdateJump()
 		if (g_pKeyManager->IsOnceKeyDown(VK_SPACE) && m_isWallSliding)
 		{
 			// 슬라이딩 중인 벽의 반대 방향으로 튕겨나간다
-			if (m_pushesLeftWall)
+			if (m_slidesLeftWall)
 			{
 				m_speed.x = m_jumpSpeed * 0.7f;
 				m_isWallJumpingTowardRight = true;
@@ -355,7 +354,7 @@ void Player::UpdateStand()
 	if (g_pKeyManager->IsOnceKeyDown(VK_SPACE))
 	{
 		m_speed.y = m_jumpSpeed;
-		m_curState = STATE::Jump;
+ 		m_curState = STATE::Jump;
 		m_pressingJumpingButton = true;
 	}
 }
@@ -398,15 +397,7 @@ void Player::UpdatePhysics(vector<PlaceableObject*> objList)
 void Player::UpdateWallSlideAndJump()
 {
 	// 벽 슬라이드
-	bool wallSlideStart = (m_pushesLeftWall || m_pushesRightWall) && !m_onGround && !m_atCeiling && m_speed.y < 0.0f;
-	m_isWallSliding = wallSlideStart || (m_isWallSliding && !m_onGround && !m_atCeiling && m_speed.y < 0.0f);
-	if (wallSlideStart)
-	{
-		m_slidesLeftWall = m_pushesLeftWall;
-		m_slidesRightWall = m_pushesRightWall;
-	}
-	m_slidesLeftWall = m_slidesLeftWall && m_isWallSliding;
-	m_slidesRightWall = m_slidesRightWall && m_isWallSliding;
+	m_isWallSliding = (m_slidesLeftWall || m_slidesRightWall) && !m_onGround && !m_atCeiling && m_speed.y < 0.0f;
 
 	m_hasNoWalls = !m_pushesLeftWall && !m_pushesRightWall && !m_onGround && !m_atCeiling;
 	m_isWallJumpingTowardLeft = m_isWallJumpingTowardLeft && m_hasNoWalls && !g_pKeyManager->IsStayKeyDown(VK_LEFT);
@@ -425,27 +416,30 @@ void Player::CheckFourSides(vector<PlaceableObject*> objList)
 	{
 		// 왼쪽 벽 충돌
 		m_pushesLeftWall |= m_speed.x <= 0.0f && HasLeftWall(obj, m_oldPosition + m_AABBOffset, m_position + m_AABBOffset);
-
+		
 		// 오른쪽 벽 충돌
 		m_pushesRightWall |= m_speed.x >= 0.0f && HasRightWall(obj, m_oldPosition + m_AABBOffset, m_position + m_AABBOffset);
 	}
+
+	m_slidesLeftWall = m_pushesLeftWall && m_speed.x == 0.0f;
+	m_slidesRightWall = m_pushesRightWall && m_speed.x == 0.0f;
 
 	// 캐릭터의 y 위치 업데이트 (세로축 충돌 판정을 위해)
 	if (!(m_animState == ANIM_STATE::DEATH_SHOCK))
 	{
 		m_speed.y = max(m_fallingSpeedBound, m_speed.y);
-		m_position.y += m_speed.y * g_pTimeManager->GetDeltaTime();
+		m_position.y += m_speed.y* g_pTimeManager->GetDeltaTime();
 	}
 
 	for (auto obj : objList)
 	{
 		// 아래쪽 벽 충돌
-		m_onGround |= m_speed.y <= 0 && HasGround(obj, m_oldPosition + m_AABBOffset, m_position + m_AABBOffset);
+		m_onGround |= HasGround(obj, m_oldPosition + m_AABBOffset, m_position + m_AABBOffset);
 
 		// 위쪽 벽 충돌
 		m_atCeiling |= m_speed.y > 0 && HasCeiling(obj, m_oldPosition + m_AABBOffset, m_position + m_AABBOffset);
 	}
-
+	m_onGround &= m_speed.y <= 0;
 }
 
 bool Player::HasGround(PlaceableObject* other, D3DXVECTOR2 oldPosition, D3DXVECTOR2 position)
@@ -453,8 +447,8 @@ bool Player::HasGround(PlaceableObject* other, D3DXVECTOR2 oldPosition, D3DXVECT
 	// 캐릭터 발 밑을 검사
 	int newPixelY = position.y - m_AABB->GetHalfSize().y - 5;
 	int oldPixelY = max(newPixelY, oldPosition.y - m_AABB->GetHalfSize().y - 5);
-	int startPixelX = position.x - m_AABB->GetHalfSize().x + 2;
-	int endPixelX = position.x + m_AABB->GetHalfSize().x - 2;
+	int startPixelX = position.x - m_AABB->GetHalfSize().x + 13;
+	int endPixelX = position.x + m_AABB->GetHalfSize().x - 13;
 
 	// 위에서 아래로 검사
 	for (int pixelY = oldPixelY; pixelY >= newPixelY; --pixelY)
@@ -505,8 +499,8 @@ bool Player::HasLeftWall(PlaceableObject* other, D3DXVECTOR2 oldPosition, D3DXVE
 	// 캐릭터 왼쪽을 검사
 	int newPixelX = position.x - m_AABB->GetHalfSize().x - 2;
 	int oldPixelX = max(newPixelX, oldPosition.x - m_AABB->GetHalfSize().x - 2);
-	int startPixelY = position.y - m_AABB->GetHalfSize().y + 5;
-	int endPixelY = position.y + m_AABB->GetHalfSize().y - 5;
+	int startPixelY = position.y - m_AABB->GetHalfSize().y + 8;
+	int endPixelY = position.y + m_AABB->GetHalfSize().y - 8;
 
 	// 오른쪽에서 왼쪽으로 검사
 	for (int pixelX = oldPixelX; pixelX >= newPixelX; --pixelX)
@@ -531,8 +525,8 @@ bool Player::HasRightWall(PlaceableObject* other, D3DXVECTOR2 oldPosition, D3DXV
 	// 캐릭터 오른쪽을 검사
 	int newPixelX = position.x + m_AABB->GetHalfSize().x + 2;
 	int oldPixelX = min(newPixelX, oldPosition.x + m_AABB->GetHalfSize().x + 2);
-	int startPixelY = position.y - m_AABB->GetHalfSize().y + 5;
-	int endPixelY = position.y + m_AABB->GetHalfSize().y - 5;
+	int startPixelY = position.y - m_AABB->GetHalfSize().y + 8;
+	int endPixelY = position.y + m_AABB->GetHalfSize().y - 8;
 
 	// 왼쪽에서 오른쪽으로 검사
 	for (int pixelX = oldPixelX; pixelX <= newPixelX; ++pixelX)
@@ -766,7 +760,7 @@ void Player::GetNextAnimationState()
 		}
 		if (!m_isWallSliding)
 		{
-			m_animState = ANIM_STATE::TO_WALLSLIDE_OPPOSITE_START;
+  			m_animState = ANIM_STATE::TO_WALLSLIDE_OPPOSITE_START;
 			GetNextAnimationState();
 		}
 		break;
@@ -784,7 +778,7 @@ void Player::GetNextAnimationState()
 		else if(!m_isWallSliding)
 		{
 			// 점프로 벽 슬라이드가 끝났을 때 방향 반전
-			m_facingRight =m_slidLeftWall;
+			m_facingRight = m_slidLeftWall;
 			m_animState = ANIM_STATE::JUMP_GOING_UP;
 			GetNextAnimationState();
 		}
@@ -830,7 +824,7 @@ void Player::Revive()
 {
 	m_isDead = false;
 
-	m_position = { 500.0f, 800.0f };
+	m_position = { 650.0f, 800.0f };
 	m_rotation = { 0.0f, 0.0f, 0.0f };
 	m_oldPosition = m_position;
 	m_pressingJumpingButton = false;
@@ -841,7 +835,14 @@ void Player::Revive()
 	m_animState = ANIM_STATE::IDLE;
 	m_curState = STATE::Stand;
 
-	m_isRidingMovingPlatform = false;
+	m_extSpeed = { 0.0f, 0.0f };
 
 	m_AABB->SetHalfSize(m_AABBHalfSize);
+}
+
+void Player::Jump()
+{
+	m_curState = STATE::Jump;
+	m_pressingJumpingButton = false;
+	m_animState = ANIM_STATE::JUMP_GOING_UP;
 }

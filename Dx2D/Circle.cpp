@@ -125,6 +125,6 @@ void Circle::Update()
 }
 
 void Circle::Render()
-{
+{ 
 	Primitive2DObejct::Render();
 }

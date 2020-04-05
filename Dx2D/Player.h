@@ -119,9 +119,8 @@ private:
 
 	bool m_isDead;
 public:
-		bool					m_isRidingMovingPlatform;
-		D3DXVECTOR2				m_movingPlatformOffset;	// 움직이는 플랫폼을 타고 있는 경우 캐릭터에 적용해야 할 offset
 		D3DXVECTOR2				m_speed;
+		D3DXVECTOR2				m_extSpeed;
 		D3DXVECTOR2				m_position;
 public:
 	Player();
@@ -139,4 +138,5 @@ public:
 	void Die();
 	void Revive();
 	D3DXVECTOR2* GetPosition() { return &m_position; }
+	void Jump();
 };

@@ -1,19 +1,10 @@
 #include "stdafx.h"
 #include "BallShooter.h"
 #include "Player.h"
+#include "Primitive2DObejct.h"
 
-float const BallShooter::Ball::m_minXSpeed = 400.0f;
-BallShooter::BallShooter(D3DXVECTOR2 pos) : m_position(pos)
+BallShooter::BallShooter(D3DXVECTOR2 pos, bool flipped) : m_position(pos), m_isFlipped(flipped)
 {
-	m_AABB = new AABB({25.0f, 25.0f});
-	m_AABB->Init();
-
-	m_shootStartPoint = { pos.x + 20.0f, pos.y };
-	m_shootDelay = 3.5f;
-	m_shootStartSpeed = { 700.f, 600.0f };
-
-	for(int i=0; i<10; ++i)
-		m_disabledBalls.emplace_back(new Ball());
 }
 
 BallShooter::~BallShooter()
@@ -22,6 +13,30 @@ BallShooter::~BallShooter()
 
 void BallShooter::Init()
 {
+	m_shootDelay = 3.5f;
+	m_AABB = new AABB({ 25.0f, 25.0f });
+	m_AABB->Init();
+
+	m_ballSprite = new Sprite(L"Object-Sheet-1", 6, 6, 2);
+	m_machineSprite = new Sprite(L"Object-Sheet-1", 6, 6, 1);
+	m_ballSprite->SetSize(0.9f, 0.9f);
+	m_machineSprite->SetSize(0.7f, 0.7f);
+	if (m_isFlipped) m_ballSprite->SetRotation(0, D3DX_PI, 0);
+
+	for (int i = 0; i < 5; ++i)
+		m_disabledBalls.emplace_back(new Ball(m_isFlipped));
+
+	if (m_isFlipped)
+	{
+		m_machineSprite->SetRotation(0, D3DX_PI, 0);
+		m_shootStartPoint = { m_position.x - 20.0f, m_position.y };
+		m_shootStartSpeed = D3DXVECTOR2(-600.f, 500.0f);
+	}
+	else
+	{
+		m_shootStartPoint = { m_position.x + 20.0f, m_position.y };
+		m_shootStartSpeed = D3DXVECTOR2(600.f, 500.0f);
+	}
 }
 
 void BallShooter::Update()
@@ -33,7 +48,7 @@ void BallShooter::Update()
 		// shoot ball
 		if (m_disabledBalls.size() <= 0)
 		{
-			m_disabledBalls.emplace_back(new Ball());
+			m_disabledBalls.emplace_back(new Ball(m_isFlipped));
 		}
 		Ball* pBall = m_disabledBalls.front(); m_disabledBalls.pop_front();
 		pBall->m_position = m_shootStartPoint;
@@ -48,6 +63,7 @@ void BallShooter::Update()
 	for (auto it = m_enabledBalls.begin(); it != m_enabledBalls.end(); ++it)
 	{
 		Ball* pBall = *(it);
+		// 게임 화면의 범위를 벗어났거나 파괴된 발사체에 대해서는 Update하지 않고 비활성화된 발사체들의 벡터에 저장한다
 		if (pBall->m_position.x < 0 || pBall->m_position.x > GAMESCREEN_X ||
 			pBall->m_position.y < 0 || pBall->m_position.y > GAMESCREEN_Y || pBall->IsDestroyed())
 		{
@@ -57,7 +73,10 @@ void BallShooter::Update()
 		}
 		pBall->Update();
 	}
+
 	m_AABB->SetCenter(m_position);
+	m_machineSprite->SetPosition(m_position);
+	m_machineSprite->Update();
 }
 
 void BallShooter::Render()
@@ -65,13 +84,22 @@ void BallShooter::Render()
 	// 활성화 된 Ball들 렌더
 	for (auto pBall : m_enabledBalls)
 	{
+		m_ballSprite->SetPosition({ pBall->m_position.x,  pBall->m_position.y + 4});
+		((Primitive2DObejct<Sprite>*)m_ballSprite)->RotateAroundPointAndUpdate(
+			{ 0, 0, tanhf(pBall->m_speed.y / pBall->m_speed.x) }, (m_isFlipped? D3DXVECTOR2(15, 0) : D3DXVECTOR2(-15, 0)));
+		m_ballSprite->Render();
 		pBall->Render();
 	}
+	m_machineSprite->Render();
 	m_AABB->Render();
 }
 
 void BallShooter::Release()
 {
+	SAFE_DELETE(m_AABB);
+	SAFE_DELETE(m_ballSprite);
+	SAFE_DELETE(m_machineSprite);
+	m_disabledBalls.clear();
 }
 
 bool BallShooter::handleCollision(D3DXVECTOR2 pos, Player * player, collisionCheckDir dir)
@@ -86,8 +114,8 @@ bool BallShooter::handleCollision(D3DXVECTOR2 pos, Player * player, collisionChe
 			if (PointInCircle(pBall->m_circle.GetPosition(), pBall->m_circle.GetRadius(), pos))
 			{
 				pBall->Destory();
-				m_disabledBalls.push_back(pBall);
-				m_enabledBalls.erase(it);
+				//m_disabledBalls.push_back(pBall);
+				//m_enabledBalls.erase(it);
 				player->Die();
 				break;
 			}
@@ -100,20 +128,32 @@ bool BallShooter::handleCollision(D3DXVECTOR2 pos, Player * player, collisionChe
 		switch (dir)
 		{
 		case collisionCheckDir::BOTTOM:
-			player->SetPositionY(m_AABB->GetAABBTop() + player->GetAABBHalfSize().y);
-			if (player->m_speed.y < 0.0f) player->m_speed.y = 0.0f;
+			if (player->m_speed.y < 0.0f)
+			{
+				player->m_speed.y = 0.0f;
+				player->SetPositionY(m_AABB->GetAABBTop() + player->GetAABBHalfSize().y);
+			}
 			break;
 		case collisionCheckDir::CEILING:
-			player->SetPositionY(m_AABB->GetAABBBottom() - player->GetAABBHalfSize().y);
-			if (player->m_speed.y > 0.0f) player->m_speed.y = 0.0f;
+			if (player->m_speed.y > 0.0f)
+			{
+				player->m_speed.y = 0.0f;
+				player->SetPositionY(m_AABB->GetAABBBottom() - player->GetAABBHalfSize().y);
+			}
 			break;
 		case collisionCheckDir::LEFT_WALL:
-			player->SetPositionX(m_AABB->GetAABBRight() + player->GetAABBHalfSize().x);
-			if (player->m_speed.x < 0.0f) player->m_speed.x = 0.0f;
+			if (player->m_speed.x < 0.0f)
+			{
+				player->m_speed.x = 0.0f;
+				player->SetPositionX(m_AABB->GetAABBRight() + player->GetAABBHalfSize().x);
+			}
 			break;
 		case collisionCheckDir::RIGHT_WALL:
-			player->SetPositionX(m_AABB->GetAABBLeft() - player->GetAABBHalfSize().x);
-			if (player->m_speed.x > 0.0f) player->m_speed.x = 0.0f;
+			if (player->m_speed.x > 0.0f)
+			{
+				player->m_speed.x = 0.0f;
+				player->SetPositionX(m_AABB->GetAABBLeft() - player->GetAABBHalfSize().x);
+			}
 			break;
 		}
 		return true;
@@ -121,27 +161,39 @@ bool BallShooter::handleCollision(D3DXVECTOR2 pos, Player * player, collisionChe
 	return false;
 }
 
-BallShooter::Ball::Ball()
+BallShooter::Ball::Ball(bool flipped): m_isFlipped(flipped)
 {
-	m_circle.SetRadius(30.0f);
+	m_circle.SetRadius(20.0f);
 	m_circle.SetDraw(true);
 	m_speed = { 0.0f, 0.0f };
 	Projectile::SetDestroyed(true);
+	m_xSpeedBound = (flipped)? -350.0f : 350.0f;
 }
 
 void BallShooter::Ball::Update()
 {
 	m_position += m_speed * g_pTimeManager->GetDeltaTime();
-	m_speed.x -= 200.0f * g_pTimeManager->GetDeltaTime();
-	m_speed.x = max(m_speed.x, m_minXSpeed);
+	if (m_isFlipped)
+	{
+		m_speed.x += 200.0f * g_pTimeManager->GetDeltaTime();
+		m_speed.x = min(m_speed.x, m_xSpeedBound);
+		m_circle.SetPosition({ m_position.x, m_position.y });
+	}
+	else
+	{
+		m_speed.x -= 200.0f * g_pTimeManager->GetDeltaTime();
+		m_speed.x = max(m_speed.x, m_xSpeedBound);
+		m_circle.SetPosition({ m_position.x, m_position.y });
+	}
+	
 	m_speed.y -= GRAVITY * g_pTimeManager->GetDeltaTime();
-	m_circle.SetPosition(m_position);
 	m_circle.Update();
 }
 
 void BallShooter::Ball::Render()
 {
-	m_circle.Render();
+	if(!g_pKeyManager->IsToggleKey('D'))
+		m_circle.Render();
 }
 
 void BallShooter::Ball::Destory()
