@@ -7,6 +7,7 @@ class PrototypeScene : public iGameNode
 {
 	Map*						m_map;
 	Player*						m_player;
+	Player*						m_player2P;
 	vector<Rect*>				m_vecRect;
 
 	Sprite*						m_backgroundImage;

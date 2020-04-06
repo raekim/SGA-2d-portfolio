@@ -127,7 +127,7 @@ bool SpringPlatform::handleCollision(D3DXVECTOR2 pos, Player * player, collision
 			{
 				m_curState = STATE::Springly;
 				player->SetPositionY(m_AABB->GetAABBTop() + player->GetAABBHalfSize().y + 10);
-				player->m_speed.y = 1500.0f;
+				player->m_speed.y = player->IsDead()? 600.0f : 1500.0f;
 				player->Jump();
 			}
 			break;

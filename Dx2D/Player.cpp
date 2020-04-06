@@ -12,8 +12,9 @@ Player::~Player()
 {
 }
 
-void Player::Init()
+void Player::Init(wstring sheetKey)
 {
+	m_sheetKey = sheetKey;
 	m_AABBHalfSize = { 18.0f, 34.0f };
 	m_AABB = new AABB(m_AABBHalfSize);
 	m_AABB->Init();
@@ -55,7 +56,7 @@ void Player::InitAnimation()
 	clip = new Clip;
 	for (int i = 0; i < 3; ++i)
 	{
-		sprite = new Sprite(L"Chicken-Sheet", sheetX, sheetY, i);
+		sprite = new Sprite(m_sheetKey, sheetX, sheetY, i);
 		clip->AddFrame(sprite, 1 / 12.0f);
 	}
 	m_pAnimation->AddClip(ANIM_STATE::IDLE, clip);
@@ -64,7 +65,7 @@ void Player::InitAnimation()
 	clip = new Clip(PlayMode::Once);
 	for (int i = 0; i < 2; ++i)
 	{
-		sprite = new Sprite(L"Chicken-Sheet", sheetX, sheetY, i + 3);
+		sprite = new Sprite(m_sheetKey, sheetX, sheetY, i + 3);
 		clip->AddFrame(sprite, 1 / 20.0f);
 	}
 	m_pAnimation->AddClip(ANIM_STATE::FLIP_STAND, clip);
@@ -73,7 +74,7 @@ void Player::InitAnimation()
 	clip = new Clip;
 	for (int i = 0; i < 8; ++i)
 	{
-		sprite = new Sprite(L"Chicken-Sheet", sheetX, sheetY, i + 5);
+		sprite = new Sprite(m_sheetKey, sheetX, sheetY, i + 5);
 		clip->AddFrame(sprite, 1 / 12.0f);
 	}
 	m_pAnimation->AddClip(ANIM_STATE::WALK, clip);
@@ -82,7 +83,7 @@ void Player::InitAnimation()
 	clip = new Clip;
 	for (int i = 0; i < 3; ++i)
 	{
-		sprite = new Sprite(L"Chicken-Sheet", sheetX, sheetY, sheetX + i);
+		sprite = new Sprite(m_sheetKey, sheetX, sheetY, sheetX + i);
 		clip->AddFrame(sprite, 1 / 12.0f);
 	}
 	m_pAnimation->AddClip(ANIM_STATE::JUMP_GOING_UP, clip);
@@ -91,7 +92,7 @@ void Player::InitAnimation()
 	clip = new Clip(PlayMode::Once);
 	for (int i = 0; i < 2; ++i)
 	{
-		sprite = new Sprite(L"Chicken-Sheet", sheetX, sheetY, sheetX * 2 + i + 3);
+		sprite = new Sprite(m_sheetKey, sheetX, sheetY, sheetX * 2 + i + 3);
 		clip->AddFrame(sprite, 1 / 12.0f);
 	}
 	m_pAnimation->AddClip(ANIM_STATE::UP_TO_TOP, clip);
@@ -100,7 +101,7 @@ void Player::InitAnimation()
 	clip = new Clip;
 	for (int i = 0; i < 3; ++i)
 	{
-		sprite = new Sprite(L"Chicken-Sheet", sheetX, sheetY, sheetX + i + 3);
+		sprite = new Sprite(m_sheetKey, sheetX, sheetY, sheetX + i + 3);
 		clip->AddFrame(sprite, 1 / 12.0f);
 	}
 	m_pAnimation->AddClip(ANIM_STATE::JUMP_TOP, clip);
@@ -109,7 +110,7 @@ void Player::InitAnimation()
 	clip = new Clip(PlayMode::Once);
 	for (int i = 0; i < 2; ++i)
 	{
-		sprite = new Sprite(L"Chicken-Sheet", sheetX, sheetY, sheetX + i + 6);
+		sprite = new Sprite(m_sheetKey, sheetX, sheetY, sheetX + i + 6);
 		clip->AddFrame(sprite, 1 / 12.0f);
 	}
 	m_pAnimation->AddClip(ANIM_STATE::TOP_TO_DOWN, clip);
@@ -118,7 +119,7 @@ void Player::InitAnimation()
 	clip = new Clip();
 	for (int i = 0; i < 3; ++i)
 	{
-		sprite = new Sprite(L"Chicken-Sheet", sheetX, sheetY, sheetX*2 + i);
+		sprite = new Sprite(m_sheetKey, sheetX, sheetY, sheetX*2 + i);
 		clip->AddFrame(sprite, 1 / 12.0f);
 	}
 	m_pAnimation->AddClip(ANIM_STATE::JUMP_GOING_DOWN, clip);
@@ -127,14 +128,14 @@ void Player::InitAnimation()
 	clip = new Clip(PlayMode::Once);
 	for (int i = 0; i < 3; ++i)
 	{
-		sprite = new Sprite(L"Chicken-Sheet", sheetX, sheetY, sheetX + i + 8);
+		sprite = new Sprite(m_sheetKey, sheetX, sheetY, sheetX + i + 8);
 		clip->AddFrame(sprite, 1 / 12.0f);
 	}
 	m_pAnimation->AddClip(ANIM_STATE::LANDING_SOFT, clip);
 
 	//JUMP_TOP_FLIP
 	clip = new Clip(PlayMode::Once);
-	sprite = new Sprite(L"Chicken-Sheet", sheetX / 2, sheetY, sheetX / 2 + 6);
+	sprite = new Sprite(m_sheetKey, sheetX / 2, sheetY, sheetX / 2 + 6);
 	clip->AddFrame(sprite, 1 / 24.0f);
 	m_pAnimation->AddClip(ANIM_STATE::JUMP_TOP_FLIP, clip);
 
@@ -142,7 +143,7 @@ void Player::InitAnimation()
 	clip = new Clip;
 	for (int i = 0; i < 3; ++i)
 	{
-		sprite = new Sprite(L"Chicken-Sheet", sheetX, sheetY, sheetX * 2 + i + 5);
+		sprite = new Sprite(m_sheetKey, sheetX, sheetY, sheetX * 2 + i + 5);
 		clip->AddFrame(sprite, 1 / 12.0f);
 	}
 	m_pAnimation->AddClip(ANIM_STATE::WALLSLIDE, clip);
@@ -151,7 +152,7 @@ void Player::InitAnimation()
 	clip = new Clip(PlayMode::Once);
 	for (int i = 0; i < 2; ++i)
 	{
-		sprite = new Sprite(L"Chicken-Sheet", sheetX, sheetY, sheetX * 2 + i + 8);
+		sprite = new Sprite(m_sheetKey, sheetX, sheetY, sheetX * 2 + i + 8);
 		clip->AddFrame(sprite, 1 / 12.0f);
 	}
 	m_pAnimation->AddClip(ANIM_STATE::TO_WALLSLIDE_OPPOSITE_START, clip);
@@ -160,7 +161,7 @@ void Player::InitAnimation()
 	clip = new Clip(PlayMode::Once);
 	for (int i = 0; i < 2; ++i)
 	{
-		sprite = new Sprite(L"Chicken-Sheet", sheetX, sheetY, sheetX * 2 + i + 10);
+		sprite = new Sprite(m_sheetKey, sheetX, sheetY, sheetX * 2 + i + 10);
 		clip->AddFrame(sprite, 1 / 12.0f);
 	}
 	m_pAnimation->AddClip(ANIM_STATE::TOP_TO_WALLSLIDE, clip);
@@ -169,7 +170,7 @@ void Player::InitAnimation()
 	clip = new Clip(PlayMode::Once);
 	for (int i = 0; i < 3; ++i)
 	{
-		sprite = new Sprite(L"Chicken-Sheet", sheetX, sheetY, sheetX * 3 + i);
+		sprite = new Sprite(m_sheetKey, sheetX, sheetY, sheetX * 3 + i);
 		clip->AddFrame(sprite, 1 / 16.0f);
 	}
 	m_pAnimation->AddClip(ANIM_STATE::DEATH_SHOCK, clip);
@@ -178,7 +179,7 @@ void Player::InitAnimation()
 	clip = new Clip(PlayMode::Once);
 	for (int i = 0; i < 5; ++i)
 	{
-		sprite = new Sprite(L"Chicken-Sheet", sheetX / 2, sheetY, (sheetX/2) * 3 + i + 2);
+		sprite = new Sprite(m_sheetKey, sheetX / 2, sheetY, (sheetX/2) * 3 + i + 2);
 		clip->AddFrame(sprite, 1 / 12.0f);
 	}
 	m_pAnimation->AddClip(ANIM_STATE::DEAD, clip);
@@ -245,12 +246,12 @@ void Player::UpdateJump()
 	else
 	{
 		// 점프중에 왼쪽, 오른쪽 이동
-		if (g_pKeyManager->IsStayKeyDown(VK_LEFT) == g_pKeyManager->IsStayKeyDown(VK_RIGHT))
+		if (g_pKeyManager->IsStayKeyDown(m_leftMoveKey) == g_pKeyManager->IsStayKeyDown(m_rightMoveKey))
 		{
 			if (!m_isWallJumpingTowardLeft && !m_isWallJumpingTowardRight)
 				m_speed.x = 0.0f;
 		}
-		else if (g_pKeyManager->IsStayKeyDown(VK_LEFT))
+		else if (g_pKeyManager->IsStayKeyDown(m_leftMoveKey))
 		{
 			// 벽점프중
 			if (m_isWallJumpingTowardLeft || m_isWallJumpingTowardRight)
@@ -267,7 +268,7 @@ void Player::UpdateJump()
 				m_speed.x = m_walkSpeed;
 			}
 		}
-		else if (g_pKeyManager->IsStayKeyDown(VK_RIGHT))
+		else if (g_pKeyManager->IsStayKeyDown(m_rightMoveKey))
 		{
 			// 벽점프중
 			if (m_isWallJumpingTowardLeft || m_isWallJumpingTowardRight)
@@ -287,7 +288,7 @@ void Player::UpdateJump()
 
 		// 중력 적용
 		m_speed.y -= GRAVITY * g_pTimeManager->GetDeltaTime();	// 기본 중력 적용
-		m_pressingJumpingButton = g_pKeyManager->IsStayKeyDown(VK_SPACE) && m_pressingJumpingButton; // 처음 점프 시작 후 계속 점프 버튼을 누르고 있는가?
+		m_pressingJumpingButton = g_pKeyManager->IsStayKeyDown(m_jumpKey) && m_pressingJumpingButton; // 처음 점프 시작 후 계속 점프 버튼을 누르고 있는가?
 		if (!m_pressingJumpingButton || m_speed.y < 0)
 		{
 			m_speed.y -= 4.5f * GRAVITY * g_pTimeManager->GetDeltaTime();	// 떨어질 때 추가 중력 적용
@@ -298,7 +299,7 @@ void Player::UpdateJump()
 		}
 
 		// 벽점프
-		if (g_pKeyManager->IsOnceKeyDown(VK_SPACE) && m_isWallSliding)
+		if (g_pKeyManager->IsOnceKeyDown(m_jumpKey) && m_isWallSliding)
 		{
 			// 슬라이딩 중인 벽의 반대 방향으로 튕겨나간다
 			if (m_slidesLeftWall)
@@ -332,7 +333,7 @@ void Player::UpdateWalk()
 		m_speed = { m_walkSpeed, 0.0f };
 
 		// 점프
-		if (g_pKeyManager->IsOnceKeyDown(VK_SPACE))
+		if (g_pKeyManager->IsOnceKeyDown(m_jumpKey))
 		{
 			m_speed.y = m_jumpSpeed;
 			m_curState = STATE::Jump;
@@ -347,11 +348,11 @@ void Player::UpdateStand()
 	// show the appropriate sprite for the state.
 	//...
 	if (!m_onGround) m_curState = STATE::Jump;
-	if (g_pKeyManager->IsStayKeyDown(VK_LEFT) || g_pKeyManager->IsStayKeyDown(VK_RIGHT))
+	if (g_pKeyManager->IsStayKeyDown(m_leftMoveKey) || g_pKeyManager->IsStayKeyDown(m_rightMoveKey))
 	{
 		m_curState = STATE::Walk;
 	}
-	if (g_pKeyManager->IsOnceKeyDown(VK_SPACE))
+	if (g_pKeyManager->IsOnceKeyDown(m_jumpKey))
 	{
 		m_speed.y = m_jumpSpeed;
  		m_curState = STATE::Jump;
@@ -362,17 +363,17 @@ void Player::UpdateStand()
 void Player::UpdateWalkSpeed()
 {
 	// 왼쪽, 오른쪽 이동
-	if (g_pKeyManager->IsStayKeyDown(VK_LEFT) == g_pKeyManager->IsStayKeyDown(VK_RIGHT))
+	if (g_pKeyManager->IsStayKeyDown(m_leftMoveKey) == g_pKeyManager->IsStayKeyDown(m_rightMoveKey))
 	{
 		m_walkSpeed = 0.0f;
 	}
-	else if (g_pKeyManager->IsStayKeyDown(VK_LEFT))
+	else if (g_pKeyManager->IsStayKeyDown(m_leftMoveKey))
 	{
 		if (m_walkSpeed > 0.0f) m_walkSpeed = 0.0f;
 		m_walkSpeed -= m_maxWalkSpeed * 3.5f* g_pTimeManager->GetDeltaTime();
 		if (fabs(m_walkSpeed) > m_maxWalkSpeed) m_walkSpeed = -m_maxWalkSpeed;
 	}
-	else if (g_pKeyManager->IsStayKeyDown(VK_RIGHT))
+	else if (g_pKeyManager->IsStayKeyDown(m_rightMoveKey))
 	{
 		if (m_walkSpeed < 0.0f) m_walkSpeed = 0.0f;
 		m_walkSpeed += m_maxWalkSpeed * 3.5f* g_pTimeManager->GetDeltaTime();
@@ -400,8 +401,8 @@ void Player::UpdateWallSlideAndJump()
 	m_isWallSliding = (m_slidesLeftWall || m_slidesRightWall) && !m_onGround && !m_atCeiling && m_speed.y < 0.0f;
 
 	m_hasNoWalls = !m_pushesLeftWall && !m_pushesRightWall && !m_onGround && !m_atCeiling;
-	m_isWallJumpingTowardLeft = m_isWallJumpingTowardLeft && m_hasNoWalls && !g_pKeyManager->IsStayKeyDown(VK_LEFT);
-	m_isWallJumpingTowardRight = m_isWallJumpingTowardRight && m_hasNoWalls && !g_pKeyManager->IsStayKeyDown(VK_RIGHT);
+	m_isWallJumpingTowardLeft = m_isWallJumpingTowardLeft && m_hasNoWalls && !g_pKeyManager->IsStayKeyDown(m_leftMoveKey);
+	m_isWallJumpingTowardRight = m_isWallJumpingTowardRight && m_hasNoWalls && !g_pKeyManager->IsStayKeyDown(m_rightMoveKey);
 }
 
 void Player::CheckFourSides(vector<PlaceableObject*> objList)
@@ -471,8 +472,8 @@ bool Player::HasGround(PlaceableObject* other, D3DXVECTOR2 oldPosition, D3DXVECT
 bool Player::HasCeiling(PlaceableObject* other, D3DXVECTOR2 oldPosition, D3DXVECTOR2 position)
 {
 	// 캐릭터 머리 위를 검사
-	int newPixelY = position.y + m_AABB->GetHalfSize().y + 5;
-	int oldPixelY = min(newPixelY, oldPosition.y + m_AABB->GetHalfSize().y + 5);
+	int newPixelY = position.y + m_AABB->GetHalfSize().y + (m_isDead ? -40 : 5);
+	int oldPixelY = min(newPixelY, oldPosition.y + m_AABB->GetHalfSize().y + (m_isDead ? -40 : 5));
 	int startPixelX = position.x - m_AABB->GetHalfSize().x + 2;
 	int endPixelX = position.x + m_AABB->GetHalfSize().x - 2;
 
@@ -550,7 +551,7 @@ bool Player::IsFlipping()
 {
 	bool res;
 
-	return (m_facingRight && g_pKeyManager->IsStayKeyDown(VK_LEFT)) || (!m_facingRight && g_pKeyManager->IsStayKeyDown(VK_RIGHT));
+	return (m_facingRight && g_pKeyManager->IsStayKeyDown(m_leftMoveKey)) || (!m_facingRight && g_pKeyManager->IsStayKeyDown(m_rightMoveKey));
 }
 
 void Player::GetNextAnimationState()
@@ -842,6 +843,7 @@ void Player::Revive()
 
 void Player::Jump()
 {
+	if (m_isDead) return;
 	m_curState = STATE::Jump;
 	m_pressingJumpingButton = false;
 	m_animState = ANIM_STATE::JUMP_GOING_UP;

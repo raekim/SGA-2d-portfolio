@@ -79,6 +79,12 @@
     <Filter Include="Dx2D Framework\2. Manager\Shader">
       <UniqueIdentifier>{60863825-365f-45b5-bdf5-08085c8a7728}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Dx2D Framework\Scene\MapToolScene">
+      <UniqueIdentifier>{3802f3b8-cec4-4300-9aea-cbbfd475a023}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Dx2D Framework\Scene\GamePlayScene">
+      <UniqueIdentifier>{e2959961-db59-40e3-995f-5f34a410d0b6}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="targetver.h">
@@ -207,6 +213,12 @@
     <ClInclude Include="SpinWheel.h">
       <Filter>헤더 파일</Filter>
     </ClInclude>
+    <ClInclude Include="MapToolScene.h">
+      <Filter>Dx2D Framework\Scene\MapToolScene</Filter>
+    </ClInclude>
+    <ClInclude Include="GamePlayScene.h">
+      <Filter>헤더 파일</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="MainGame.cpp">
@@ -315,6 +327,12 @@
       <Filter>Dx2D Framework\Scene\Prototype\PlaceableObjects</Filter>
     </ClCompile>
     <ClCompile Include="SpinWheel.cpp">
+      <Filter>소스 파일</Filter>
+    </ClCompile>
+    <ClCompile Include="MapToolScene.cpp">
+      <Filter>Dx2D Framework\Scene\MapToolScene</Filter>
+    </ClCompile>
+    <ClCompile Include="GamePlayScene.cpp">
       <Filter>소스 파일</Filter>
     </ClCompile>
   </ItemGroup>

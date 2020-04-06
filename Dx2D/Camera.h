@@ -22,6 +22,12 @@ private:
 	D3DXVECTOR3			m_vLookAt;
 	D3DXVECTOR3			m_vUp;
 
+
+	// temp
+	float m_positionX, m_positionY, m_positionZ;
+	float m_rotationX, m_rotationY, m_rotationZ;
+	D3DXMATRIX m_viewMatrix;
+
 public:
 	Camera();
 	~Camera();

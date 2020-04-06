@@ -57,6 +57,10 @@ class Player
 	AABB*					m_AABB;
 	D3DXVECTOR2				m_AABBOffset;
 	D3DXVECTOR2				m_AABBHalfSize;
+	wstring					m_sheetKey;				// 애니메이션 시트 리소스 키값
+
+	// 컨트롤 정보
+	int m_jumpKey, m_leftMoveKey, m_rightMoveKey;
 
 	// Position States
 	bool m_pushedRightWall;
@@ -126,7 +130,7 @@ public:
 	Player();
 	~Player();
 
-	void Init();
+	void Init(wstring sheetKey);
 	void Update(vector<PlaceableObject*> obj);
 	void Render();
 	void Release();
@@ -139,4 +143,9 @@ public:
 	void Revive();
 	D3DXVECTOR2* GetPosition() { return &m_position; }
 	void Jump();
+	bool IsDead() { return m_isDead; }
+
+	void SetJumpKey(int key) { m_jumpKey = key; }
+	void SetLeftMoveKey(int key) { m_leftMoveKey = key; }
+	void SetRightMoveKey(int key) { m_rightMoveKey = key; }
 };

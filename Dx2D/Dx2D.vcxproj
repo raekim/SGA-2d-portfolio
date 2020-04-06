@@ -158,6 +158,7 @@
     <ClInclude Include="BallShooter.h" />
     <ClInclude Include="Camera.h" />
     <ClInclude Include="FileManager.h" />
+    <ClInclude Include="GamePlayScene.h" />
     <ClInclude Include="honeyPlatform.h" />
     <ClInclude Include="LoadingScene.h" />
     <ClInclude Include="LoadManager.h" />
@@ -171,6 +172,7 @@
     <ClInclude Include="KeyManager.h" />
     <ClInclude Include="MainGame.h" />
     <ClInclude Include="Map.h" />
+    <ClInclude Include="MapToolScene.h" />
     <ClInclude Include="PlaceableObject.h" />
     <ClInclude Include="Player.h" />
     <ClInclude Include="Primitive2DObejct.h">
@@ -206,6 +208,7 @@
     <ClCompile Include="BallShooter.cpp" />
     <ClCompile Include="Camera.cpp" />
     <ClCompile Include="FileManager.cpp" />
+    <ClCompile Include="GamePlayScene.cpp" />
     <ClCompile Include="honeyPlatform.cpp" />
     <ClCompile Include="LoadingScene.cpp" />
     <ClCompile Include="LoadManager.cpp" />
@@ -217,6 +220,7 @@
     <ClCompile Include="KeyManager.cpp" />
     <ClCompile Include="MainGame.cpp" />
     <ClCompile Include="Map.cpp" />
+    <ClCompile Include="MapToolScene.cpp" />
     <ClCompile Include="PlaceableObject.cpp" />
     <ClCompile Include="Player.cpp" />
     <ClCompile Include="Primitive2DObejct.cpp">

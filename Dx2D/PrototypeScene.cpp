@@ -23,8 +23,17 @@ void PrototypeScene::Init()
 	m_backgroundImage->Update();
 
 	m_player = new Player;
+	m_player2P = new Player;
 
-	m_player->Init();
+	m_player->Init(L"Chicken-Sheet");
+	m_player->SetJumpKey(VK_RCONTROL);
+	m_player->SetLeftMoveKey(VK_LEFT);
+	m_player->SetRightMoveKey(VK_RIGHT);
+
+	m_player2P->Init(L"Chicken-Sheet-2P");
+	m_player2P->SetJumpKey('Z');
+	m_player2P->SetLeftMoveKey('F');
+	m_player2P->SetRightMoveKey('H');
 
 	m_vecObjectList.push_back(new SimplePlatform({ 200.0f, 350.0f}, { 465.0f, 300.0f }));
 	m_vecObjectList.push_back(new SimplePlatform({ 447.0f, 380.0f }, { GAMESCREEN_X - 653, 300.0f }));
@@ -51,7 +60,7 @@ void PrototypeScene::Init()
 	for (auto obj : m_vecObjectList) obj->Init();
 
 	g_pCamera->SetMapSize(GAMESCREEN_X, GAMESCREEN_Y);
-	g_pCamera->SetTarget(m_player->GetPosition());
+	//g_pCamera->SetTarget(m_player->GetPosition());
 }
 
 void PrototypeScene::Update()
@@ -63,6 +72,7 @@ void PrototypeScene::Update()
 	for (auto obj : m_vecObjectList) obj->Update();
 
 	m_player->Update(m_vecObjectList);
+	m_player2P->Update(m_vecObjectList);
 
 	g_pCamera->Update();
 }
@@ -72,11 +82,13 @@ void PrototypeScene::Render()
 	m_backgroundImage->Render();
 	for (auto obj : m_vecObjectList) obj->Render();
 	m_player->Render();
+	m_player2P->Render();
 }
 
 void PrototypeScene::Release()
 {
 	m_player->Release();
+	m_player2P->Release();
 	for (auto obj : m_vecObjectList) obj->Release();
 	m_vecObjectList.clear();
 }
