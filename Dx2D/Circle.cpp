@@ -126,5 +126,6 @@ void Circle::Update()
 
 void Circle::Render()
 { 
-	Primitive2DObejct::Render();
+	if(!(g_pKeyManager->IsToggleKey('D')))
+		Primitive2DObejct::Render();
 }

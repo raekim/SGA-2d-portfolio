@@ -109,16 +109,14 @@ bool BallShooter::handleCollision(D3DXVECTOR2 pos, Player * player, collisionChe
 	{
 		Ball* pBall = *(it);
 		if (CircleCollision(pBall->m_circle.GetPosition(), pBall->m_circle.GetRadius(),
-			player->m_position, min(player->GetAABBHalfSize().x, player->GetAABBHalfSize().y)))
+			player->m_position, min(player->GetAABBHalfSize().x, player->GetAABBHalfSize().y)) ||
+			PointInCircle(pBall->m_circle.GetPosition(), pBall->m_circle.GetRadius(), pos))
 		{
-			if (PointInCircle(pBall->m_circle.GetPosition(), pBall->m_circle.GetRadius(), pos))
-			{
-				pBall->Destory();
-				//m_disabledBalls.push_back(pBall);
-				//m_enabledBalls.erase(it);
-				player->Die();
-				break;
-			}
+			pBall->Destory();
+			//m_disabledBalls.push_back(pBall);
+			//m_enabledBalls.erase(it);
+			player->Die();
+			break;
 		}
 	}
 

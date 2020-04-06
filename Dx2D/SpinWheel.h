@@ -15,6 +15,7 @@ class SpinWheel : public PlaceableObject
 	float					m_wheelRotationDelta;
 
 	AABB*					m_AABB;
+	Circle*					m_circle;
 	Sprite*					m_blockSprite;
 	Sprite*					m_barSprite;
 	Sprite*					m_wheelSprite;

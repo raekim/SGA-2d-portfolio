@@ -19,6 +19,8 @@ SpinWheel::SpinWheel(D3DXVECTOR2 pos) : m_position(pos)
 	m_barRotationDelta = 0;
 	m_wheelRotationDelta = 0;
 
+	m_circle = new Circle;
+	m_circle->SetRadius(20);
 }
 
 
@@ -50,6 +52,9 @@ void SpinWheel::Update()
 	if (m_barRotationDelta > m_barRoatationSecond) m_barRotationDelta = 0.0f;
 	m_wheelRotationDelta += g_pTimeManager->GetDeltaTime();
 	if (m_wheelRotationDelta > m_wheelRoatationSecond) m_wheelRotationDelta = 0.0f;
+
+	m_circle->SetPosition(m_position);
+	((Primitive2DObejct<Circle>*)m_circle)->RotateAroundPointAndUpdate({ 0, 0, m_barRotationAmount }, D3DXVECTOR2(0, 100));
 }
 
 void SpinWheel::Render()
@@ -58,14 +63,29 @@ void SpinWheel::Render()
 	m_AABB->Render();
 	m_barSprite->Render();
 	m_wheelSprite->Render();
+	m_circle->Render();
 }
 
 void SpinWheel::Release()
 {
+	SAFE_DELETE(m_circle);
+	SAFE_DELETE(m_AABB);
+	SAFE_DELETE(m_barSprite);
+	SAFE_DELETE(m_wheelSprite);
+	SAFE_DELETE(m_blockSprite);
 }
 
 bool SpinWheel::handleCollision(D3DXVECTOR2 pos, Player * player, collisionCheckDir dir)
 {
+	// 플레이어와 톱날이 충돌했다면 플레이어 사망
+	D3DXVECTOR2 circlePos = { m_circle->GetWMatrix()._41, m_circle->GetWMatrix()._42 };
+	if (CircleCollision(circlePos, m_circle->GetRadius(), player->m_position, min(player->GetAABBHalfSize().x, player->GetAABBHalfSize().y)) ||
+		PointInCircle(circlePos, m_circle->GetRadius(), pos))
+	{
+		player->Die();
+	}
+
+	// 블록 부분과 충돌
 	if (m_AABB->pointInAABB(pos))
 	{
 		switch (dir)
