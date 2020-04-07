@@ -49,7 +49,7 @@ void Player::InitAnimation()
 	Clip* clip;
 	Sprite* sprite;
 
-	int sheetY = 4;
+	int sheetY = 5;
 	int sheetX = 14;
 
 	// IDLE
@@ -191,6 +191,11 @@ void Player::Update(vector<PlaceableObject*> obj)
 {
 	if (!m_isDead)
 	{
+		if (m_position.y < -100)
+		{
+			Die();
+			return;
+		}
 		UpdateWalkSpeed();
 
 		switch (m_curState)
@@ -812,11 +817,11 @@ void Player::Die()
 	m_speed.x = 0.0f; 
 }
 
-void Player::Revive()
+void Player::Revive(D3DXVECTOR2 pos)
 {
 	m_isDead = false;
 
-	m_position = { 650.0f, 800.0f };
+	m_position = pos;
 	m_rotation = { 0.0f, 0.0f, 0.0f };
 	m_oldPosition = m_position;
 	m_pressingJumpingButton = false;

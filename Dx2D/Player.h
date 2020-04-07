@@ -140,7 +140,7 @@ public:
 	void SetPositionY(float val) { m_position.y = val; }
 	void SetPositionX(float val) { m_position.x = val; }
 	void Die();
-	void Revive();
+	void Revive(D3DXVECTOR2 pos);
 	D3DXVECTOR2* GetPosition() { return &m_position; }
 	void Jump();
 	bool IsDead() { return m_isDead; }

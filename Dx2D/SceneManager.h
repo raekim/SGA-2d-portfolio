@@ -13,7 +13,11 @@ enum class SCENE_KIND
 	MapTool,
 	SortTest,
 	RenderTextureTest,
+
+	// 포폴 게임 씬
 	Prototype,
+	PlayScene,
+
 	End
 };
 

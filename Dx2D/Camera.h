@@ -22,12 +22,7 @@ private:
 	D3DXVECTOR3			m_vLookAt;
 	D3DXVECTOR3			m_vUp;
 
-
-	// temp
-	float m_positionX, m_positionY, m_positionZ;
-	float m_rotationX, m_rotationY, m_rotationZ;
-	D3DXMATRIX m_viewMatrix;
-
+	float				m_eyeVal;
 public:
 	Camera();
 	~Camera();
@@ -45,4 +40,6 @@ public:
 	D3DXVECTOR2 GetMapSize() { return m_vMapSize; }
 
 	void SetRenderScale(float widht = WINSIZEX, float height = WINSIZEY);
+	void SetEyeVal(float val) { m_eyeVal = val; }
+	void SetPosition(D3DXVECTOR2 pos) { m_vPosition = pos; }
 };

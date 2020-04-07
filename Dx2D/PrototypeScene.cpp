@@ -75,17 +75,6 @@ void PrototypeScene::Update()
 	m_player2P->Update(m_vecObjectList);
 
 	g_pCamera->Update();
-
-	if (g_pKeyManager->IsOnceKeyDown('1'))
-	{
-		m_player->Revive();
-		return;
-	}
-	if (g_pKeyManager->IsOnceKeyDown('2'))
-	{
-		m_player2P->Revive();
-		return;
-	}
 }
 
 void PrototypeScene::Render()
@@ -98,8 +87,8 @@ void PrototypeScene::Render()
 
 void PrototypeScene::Release()
 {
-	m_player->Release();
-	m_player2P->Release();
+	SAFE_DELETE(m_player);
+	SAFE_DELETE(m_player2P);
 	for (auto obj : m_vecObjectList) obj->Release();
 	m_vecObjectList.clear();
 }

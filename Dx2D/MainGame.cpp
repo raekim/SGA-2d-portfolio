@@ -4,6 +4,7 @@
 #include "TitleScene.h"
 #include "RenderTextureTest.h"
 #include "PrototypeScene.h"
+#include "PlayScene.h"
 
 MainGame::MainGame()
 {
@@ -15,8 +16,9 @@ MainGame::MainGame()
 	g_pSceneManager->AddScene(SCENE_KIND::Title, new TitleScene);
 	g_pSceneManager->AddScene(SCENE_KIND::RenderTextureTest, new RenderTextureTest);
 	g_pSceneManager->AddScene(SCENE_KIND::Prototype, new PrototypeScene);
+	g_pSceneManager->AddScene(SCENE_KIND::PlayScene, new PlayScene);
 
-	g_pLoadManager->ChangeScene(SCENE_KIND::Prototype); // 씬 변경은 항상 로드 매니져를 거쳐서 진행
+	g_pLoadManager->ChangeScene(SCENE_KIND::PlayScene); // 씬 변경은 항상 로드 매니져를 거쳐서 진행
 }
 
 void MainGame::SetBlendStates()
