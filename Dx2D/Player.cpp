@@ -189,15 +189,6 @@ void Player::InitAnimation()
 
 void Player::Update(vector<PlaceableObject*> obj)
 {
-	if (g_pKeyManager->IsOnceKeyDown(VK_RETURN))
-	{
-		if (!m_isDead)
-			this->Die();
-		else
-			this->Revive();
-		return;
-	}
-
 	if (!m_isDead)
 	{
 		UpdateWalkSpeed();

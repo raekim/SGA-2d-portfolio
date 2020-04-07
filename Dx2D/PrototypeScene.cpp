@@ -60,7 +60,7 @@ void PrototypeScene::Init()
 	for (auto obj : m_vecObjectList) obj->Init();
 
 	g_pCamera->SetMapSize(GAMESCREEN_X, GAMESCREEN_Y);
-	//g_pCamera->SetTarget(m_player->GetPosition());
+	  g_pCamera->SetTarget(m_player->GetPosition());
 }
 
 void PrototypeScene::Update()
@@ -75,6 +75,17 @@ void PrototypeScene::Update()
 	m_player2P->Update(m_vecObjectList);
 
 	g_pCamera->Update();
+
+	if (g_pKeyManager->IsOnceKeyDown('1'))
+	{
+		m_player->Revive();
+		return;
+	}
+	if (g_pKeyManager->IsOnceKeyDown('2'))
+	{
+		m_player2P->Revive();
+		return;
+	}
 }
 
 void PrototypeScene::Render()
