@@ -3,9 +3,9 @@
 #include "Player.h"
 
 
-SpringPlatform::SpringPlatform(D3DXVECTOR2 pos)
+SpringPlatform::SpringPlatform()
 {
-	m_position = pos;
+	m_previewImage = new Sprite(L"springBoard-3", 1, 1, 0);
 }
 
 
@@ -156,4 +156,12 @@ bool SpringPlatform::handleCollision(D3DXVECTOR2 pos, Player * player, collision
 		return true;
 	}
 	return false;
+}
+
+void SpringPlatform::RenderPreviewImage()
+{
+	m_previewImage->SetSize(0.5f, 0.5f);
+	m_previewImage->SetPosition(m_position);
+	m_previewImage->Update();
+	m_previewImage->Render();
 }

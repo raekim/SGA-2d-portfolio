@@ -5,7 +5,10 @@
 
 BallShooter::BallShooter()
 {
-	SetPreviewImage(new Sprite(L"Object-Sheet-1", 6, 6, 1));
+	m_ballSprite = new Sprite(L"Object-Sheet-1", 6, 6, 2);
+	m_machineSprite = new Sprite(L"Object-Sheet-1", 6, 6, 1);
+	m_ballSprite->SetSize(0.9f, 0.9f);
+	m_machineSprite->SetSize(0.7f, 0.7f);
 }
 
 BallShooter::~BallShooter()
@@ -17,11 +20,7 @@ void BallShooter::Init()
 	m_shootDelay = 3.5f;
 	m_AABB = new AABB({ 25.0f, 25.0f });
 	m_AABB->Init();
-
-	m_ballSprite = new Sprite(L"Object-Sheet-1", 6, 6, 2);
-	m_machineSprite = new Sprite(L"Object-Sheet-1", 6, 6, 1);
-	m_ballSprite->SetSize(0.9f, 0.9f);
-	m_machineSprite->SetSize(0.7f, 0.7f);
+	
 	if (m_flipped) m_ballSprite->SetRotation(0, D3DX_PI, 0);
 
 	for (int i = 0; i < 5; ++i)
@@ -158,6 +157,18 @@ bool BallShooter::handleCollision(D3DXVECTOR2 pos, Player * player, collisionChe
 		return true;
 	}
 	return false;
+}
+
+void BallShooter::RenderPreviewImage()
+{
+	m_machineSprite->SetPosition(m_position);
+	m_machineSprite->SetSize(1,1);
+	float rotate = (m_flipped) ? D3DX_PI : 0;
+	m_machineSprite->SetRotation({ 0,rotate,0 });
+	m_machineSprite->Update();
+	m_machineSprite->Render();
+
+	m_machineSprite->SetSize(0.7f, 0.7f);
 }
 
 BallShooter::Ball::Ball(bool flipped): m_isFlipped(flipped)

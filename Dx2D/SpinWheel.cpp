@@ -2,9 +2,8 @@
 #include "SpinWheel.h"
 #include "Player.h"
 
-SpinWheel::SpinWheel(D3DXVECTOR2 pos)
+SpinWheel::SpinWheel()
 {
-	m_position = pos;
 	m_AABB = new AABB({ 25.0f, 25.0f });
 	m_AABB->Init();
 
@@ -123,4 +122,27 @@ bool SpinWheel::handleCollision(D3DXVECTOR2 pos, Player * player, collisionCheck
 		return true;
 	}
 	return false;
+}
+
+void SpinWheel::RenderPreviewImage()
+{
+	m_blockSprite->SetPosition(m_position);
+	m_barSprite->SetPosition(m_position + D3DXVECTOR2(-5, 40));
+	m_wheelSprite->SetPosition(m_position + D3DXVECTOR2(0,90));
+
+	m_blockSprite->Update();
+	m_barSprite->Update();
+	m_wheelSprite->Update();
+
+	m_blockSprite->SetSize(1,1);
+	m_blockSprite->Render();
+	m_barSprite->SetSize(0.8f, 0.8f);
+	m_barSprite->Render();
+	m_wheelSprite->SetSize(1,1);
+	m_wheelSprite->Render();
+
+	// 원래 사이즈로 돌아가기
+	m_blockSprite->SetSize(0.65f, 0.65f);
+	m_barSprite->SetSize(0.65f, 0.65f);
+	m_wheelSprite->SetSize(0.65f, 0.65f);
 }

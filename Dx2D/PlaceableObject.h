@@ -2,8 +2,6 @@
 class Player;
 class PlaceableObject
 {
-private:
-	Sprite*					m_previewImg;		// 맵툴모드에서 보이는 이미지
 public:
 	enum class collisionCheckDir
 	{
@@ -27,11 +25,9 @@ public:
 	virtual bool handleCollision(D3DXVECTOR2 pos, Player* player, collisionCheckDir dir) PURE;
 
 	void SetPosition(D3DXVECTOR2 pos) { m_position = pos; };
-	Sprite* const GetPreviewImage() { return m_previewImg; }
-	void SetPreviewImage(Sprite* img) { m_previewImg = img; }
 	void SetFlip(bool val) { m_flipped = val; }
 
 	// 프리뷰 이미지 관련
-	void RenderPreviewImage();
+	virtual void RenderPreviewImage() PURE;
 };
 

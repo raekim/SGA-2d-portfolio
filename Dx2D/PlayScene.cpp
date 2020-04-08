@@ -146,6 +146,26 @@ void PlayScene::Render()
 	}
 }
 
+PlaceableObject* GetRandomPlaceableObject()
+{
+	int rnd = rand() % 4;
+	switch (rnd)
+	{
+	case 0:
+		return new BallShooter;
+		break;
+	case 1:
+		return new honeyPlatform;
+		break;
+	case 2:
+		return new SpinWheel;
+		break;
+	case 3:
+		return new SpringPlatform;
+		break;
+	}
+}
+
 void PlayScene::SwitchToMapToolMode()
 {
 	// 맵툴 모드로 넘어간다
@@ -157,9 +177,9 @@ void PlayScene::SwitchToMapToolMode()
 	g_pCamera->SetPosition({ 0,0 });
 
 	// 커서 설정
-	m_cursor1P->SetObjectToPlace(new BallShooter());
+	m_cursor1P->SetObjectToPlace(GetRandomPlaceableObject());
 	m_cursor1P->ResetCursor({ 800,800 });
-	m_cursor2P->SetObjectToPlace(new BallShooter());
+	m_cursor2P->SetObjectToPlace(new SpringPlatform);
 	m_cursor2P->ResetCursor({ 800,1300 });
 }
 

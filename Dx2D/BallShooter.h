@@ -47,5 +47,6 @@ public:
 	virtual void Release() override;
 
 	virtual bool handleCollision(D3DXVECTOR2 pos, Player* player, collisionCheckDir dir) override;
+	virtual void RenderPreviewImage() override;
 };
 

@@ -35,26 +35,26 @@ void PrototypeScene::Init()
 	m_player2P->SetLeftMoveKey('F');
 	m_player2P->SetRightMoveKey('H');
 
-	m_vecObjectList.push_back(new SimplePlatform({ 200.0f, 350.0f}, { 465.0f, 300.0f }));
-	m_vecObjectList.push_back(new SimplePlatform({ 447.0f, 380.0f }, { GAMESCREEN_X - 653, 300.0f }));
-	m_vecObjectList.push_back(new honeyPlatform({ WINSIZEX*0.5f + 300.0f, WINSIZEY*0.5f - 200}, true));
-	m_vecObjectList.push_back(new honeyPlatform({ WINSIZEX*0.5f + 800.0f, WINSIZEY*0.5f + 200.0f }, false));
+	//m_vecObjectList.push_back(new SimplePlatform({ 200.0f, 350.0f}, { 465.0f, 300.0f }));
+	//m_vecObjectList.push_back(new SimplePlatform({ 447.0f, 380.0f }, { GAMESCREEN_X - 653, 300.0f }));
+	//m_vecObjectList.push_back(new honeyPlatform({ WINSIZEX*0.5f + 300.0f, WINSIZEY*0.5f - 200}, true));
+	//m_vecObjectList.push_back(new honeyPlatform({ WINSIZEX*0.5f + 800.0f, WINSIZEY*0.5f + 200.0f }, false));
 	
-	m_vecObjectList.push_back(new SimplePlatform(SimplePlatform::Platform_Type::SHORT_VERTICAL, { 500.0f, 800.0f }));
-	m_vecObjectList.push_back(new SimplePlatform(SimplePlatform::Platform_Type::SHORT_HORIZONTAL, {800.0f, 760.0f }));
-	m_vecObjectList.push_back(new SimplePlatform(SimplePlatform::Platform_Type::MID_VERTICAL, {1200.0f, 800.0f }));
-	m_vecObjectList.push_back(new SimplePlatform(SimplePlatform::Platform_Type::MID_HORIZONTAL, {1500.0f, 500.0f }));
-	m_vecObjectList.push_back(new SimplePlatform(SimplePlatform::Platform_Type::MID_HORIZONTAL, { 1800.0f, 400.0f }));
+	//m_vecObjectList.push_back(new SimplePlatform(SimplePlatform::Platform_Type::SHORT_VERTICAL, { 500.0f, 800.0f }));
+	//m_vecObjectList.push_back(new SimplePlatform(SimplePlatform::Platform_Type::SHORT_HORIZONTAL, {800.0f, 760.0f }));
+	//m_vecObjectList.push_back(new SimplePlatform(SimplePlatform::Platform_Type::MID_VERTICAL, {1200.0f, 800.0f }));
+	//m_vecObjectList.push_back(new SimplePlatform(SimplePlatform::Platform_Type::MID_HORIZONTAL, {1500.0f, 500.0f }));
+	//m_vecObjectList.push_back(new SimplePlatform(SimplePlatform::Platform_Type::MID_HORIZONTAL, { 1800.0f, 400.0f }));
 
 	//m_vecObjectList.push_back(new BallShooter({ WINSIZEX*0.5f, WINSIZEY - 200.0f }, false));
 	//m_vecObjectList.push_back(new BallShooter({ WINSIZEX*0.5f + 400, WINSIZEY - 300.0f }, true));
 
-	m_vecObjectList.push_back(new SpringPlatform({ 1700, 200 }));
-	m_vecObjectList.push_back(new SpringPlatform({ 1100, 200 }));
-	m_vecObjectList.push_back(new SpringPlatform({ 800, 300 }));
-
-	m_vecObjectList.push_back(new SpinWheel({ 1800, 600 }));
-	m_vecObjectList.push_back(new SpinWheel({ 2000, 900 }));
+	//m_vecObjectList.push_back(new SpringPlatform({ 1700, 200 }));
+	//m_vecObjectList.push_back(new SpringPlatform({ 1100, 200 }));
+	//m_vecObjectList.push_back(new SpringPlatform({ 800, 300 }));
+	//
+	//m_vecObjectList.push_back(new SpinWheel({ 1800, 600 }));
+	//m_vecObjectList.push_back(new SpinWheel({ 2000, 900 }));
 
 
 	for (auto obj : m_vecObjectList) obj->Init();

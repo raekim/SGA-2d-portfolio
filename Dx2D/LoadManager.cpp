@@ -95,6 +95,8 @@ void LoadManager::MakeAResourcesList()
 			m_vecResourceList.push_back(new tagTextureInfo(RESOURCE_TYPE::Image, L"City-Background", L"kim-rae-hyang-images/city-background-sky.png"));
 			m_vecResourceList.push_back(new tagTextureInfo(RESOURCE_TYPE::Image, L"City-Paper", L"kim-rae-hyang-images/city-background-paper.png"));
 			m_vecResourceList.push_back(new tagTextureInfo(RESOURCE_TYPE::Image, L"Object-Sheet-1", L"kim-rae-hyang-images/objects1-sheet.png"));
+			for (int i = 0; i < 6; ++i)
+				m_vecResourceList.push_back(new tagTextureInfo(RESOURCE_TYPE::Image, L"springBoard-" + to_wstring(i), L"kim-rae-hyang-images/SpringBoard.00" + to_wstring(i) + L".png"));
 			break;
 	//case SCENE_KIND::Title:
 	//	m_vecResourceList.push_back(new tagTextureInfo(RESOURCE_TYPE::Image, L"TitleBack", L"ChloeBennet.bmp"));

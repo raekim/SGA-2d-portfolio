@@ -117,3 +117,13 @@ bool SimplePlatform::handleCollision(D3DXVECTOR2 pos, Player * player, collision
 	}
 	return false;
 }
+
+void SimplePlatform::RenderPreviewImage()
+{
+	if (m_sprite)
+	{
+		m_sprite->SetPosition(m_position);
+		m_sprite->Update();
+		m_sprite->Render();
+	}
+}

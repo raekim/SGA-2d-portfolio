@@ -19,7 +19,7 @@ class SpinWheel : public PlaceableObject
 	Sprite*					m_barSprite;
 	Sprite*					m_wheelSprite;
 public:
-	SpinWheel(D3DXVECTOR2 pos);
+	SpinWheel();
 	~SpinWheel();
 
 	virtual void Init() override;
@@ -28,5 +28,6 @@ public:
 	virtual void Release() override;
 
 	virtual bool handleCollision(D3DXVECTOR2 pos, Player* player, collisionCheckDir dir) override;
+	virtual void RenderPreviewImage() override;
 };
 

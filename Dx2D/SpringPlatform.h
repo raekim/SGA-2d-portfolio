@@ -17,8 +17,9 @@ class SpringPlatform : public PlaceableObject
 	Animation<STATE>*		m_animation;
 	STATE					m_curState;
 	D3DXVECTOR2				m_AABBHalfSize[6];
+	Sprite*					m_previewImage;
 public:
-	SpringPlatform(D3DXVECTOR2 pos);
+	SpringPlatform();
 	~SpringPlatform();
 
 	virtual void Init() override;
@@ -27,5 +28,6 @@ public:
 	virtual void Release() override;
 
 	virtual bool handleCollision(D3DXVECTOR2 pos, Player* player, collisionCheckDir dir) override;
+	virtual void RenderPreviewImage() override;
 };
 
