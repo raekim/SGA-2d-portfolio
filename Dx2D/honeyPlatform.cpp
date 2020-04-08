@@ -2,8 +2,9 @@
 #include "honeyPlatform.h"
 #include "Player.h"
 
-honeyPlatform::honeyPlatform(D3DXVECTOR2 pos, bool flipped) : m_position(pos), m_oldPosition(pos)
+honeyPlatform::honeyPlatform(D3DXVECTOR2 pos, bool flipped) : m_oldPosition(pos)
 {
+	m_position = pos;
 	m_crateSprite = new Sprite(L"Object-Sheet-1", 6, 6, 7);
 	m_barSprite = new Sprite(L"Object-Sheet-1", 2, 2, 1);
 	m_isFlipped = flipped;

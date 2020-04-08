@@ -11,7 +11,6 @@ class SpringPlatform : public PlaceableObject
 		Springly,
 		Max
 	};
-	D3DXVECTOR2				m_position;
 	D3DXVECTOR3				m_rotation;
 	AABB*					m_AABB;
 	Animation<STATE>*		m_AABBSizeAnimation;

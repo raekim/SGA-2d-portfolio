@@ -4,7 +4,6 @@
 
 class SpinWheel : public PlaceableObject
 {
-	D3DXVECTOR2				m_position;
 	D3DXVECTOR3				m_wheelRotation;
 
 	float					m_barRotationAmount;

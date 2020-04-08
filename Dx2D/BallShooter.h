@@ -21,7 +21,6 @@ class BallShooter : public PlaceableObject
 		virtual bool Collide(void* other) override;			// 다른 오브젝트와의 충돌 감지
 	};
 
-	D3DXVECTOR2				m_position;
 	D3DXVECTOR3				m_rotation;
 	AABB*					m_AABB;
 	list<Ball*>				m_enabledBalls;				// 활성화되어 업데이트와 렌더 대상인 Ball들

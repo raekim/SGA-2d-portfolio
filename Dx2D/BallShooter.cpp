@@ -3,8 +3,9 @@
 #include "Player.h"
 #include "Primitive2DObejct.h"
 
-BallShooter::BallShooter(D3DXVECTOR2 pos, bool flipped) : m_position(pos), m_isFlipped(flipped)
+BallShooter::BallShooter(D3DXVECTOR2 pos, bool flipped) : m_isFlipped(flipped)
 {
+	m_position = pos;
 }
 
 BallShooter::~BallShooter()

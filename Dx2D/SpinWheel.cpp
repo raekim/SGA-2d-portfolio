@@ -2,8 +2,9 @@
 #include "SpinWheel.h"
 #include "Player.h"
 
-SpinWheel::SpinWheel(D3DXVECTOR2 pos) : m_position(pos)
+SpinWheel::SpinWheel(D3DXVECTOR2 pos)
 {
+	m_position = pos;
 	m_AABB = new AABB({ 25.0f, 25.0f });
 	m_AABB->Init();
 

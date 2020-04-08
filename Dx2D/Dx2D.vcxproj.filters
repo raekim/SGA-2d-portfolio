@@ -213,6 +213,9 @@
     <ClInclude Include="PlayScene.h">
       <Filter>Dx2D Framework\Scene\PlayScene</Filter>
     </ClInclude>
+    <ClInclude Include="PlayerCursor.h">
+      <Filter>Dx2D Framework\Scene\PlayScene</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="MainGame.cpp">
@@ -324,6 +327,9 @@
       <Filter>Dx2D Framework\Scene\Prototype\PlaceableObjects</Filter>
     </ClCompile>
     <ClCompile Include="PlayScene.cpp">
+      <Filter>Dx2D Framework\Scene\PlayScene</Filter>
+    </ClCompile>
+    <ClCompile Include="PlayerCursor.cpp">
       <Filter>Dx2D Framework\Scene\PlayScene</Filter>
     </ClCompile>
   </ItemGroup>

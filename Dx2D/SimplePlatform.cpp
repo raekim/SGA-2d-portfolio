@@ -44,6 +44,7 @@ SimplePlatform::SimplePlatform(Platform_Type type, D3DXVECTOR2 pos)
 
 SimplePlatform::~SimplePlatform()
 {
+	this->Release();
 }
 
 void SimplePlatform::Init()

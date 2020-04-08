@@ -6,7 +6,6 @@ class honeyPlatform : public PlaceableObject
 	D3DXVECTOR2				m_midPosition;		// 블록 이동의 두 기준점 사이 위치
 	D3DXVECTOR2				m_oldPosition;
 	D3DXVECTOR2				m_moveDelta;
-	D3DXVECTOR2				m_position;
 	D3DXVECTOR3				m_rotation;
 	AABB*					m_AABB;
 	D3DXVECTOR2				m_AABBOffset;
