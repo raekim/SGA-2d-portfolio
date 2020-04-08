@@ -56,7 +56,8 @@ bool KeyManager::IsStayKeyDown(int key)
 
 bool KeyManager::IsToggleKey(int key)
 {
-	if (GetAsyncKeyState(key) & 0x0001)
+	//if (GetAsyncKeyState(key) & 0x0001)
+	if (IsOnceKeyDown(key))
 	{
 		m_bitKeyToggle[key].flip();
 	}

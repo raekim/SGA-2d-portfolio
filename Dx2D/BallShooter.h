@@ -34,12 +34,11 @@ class BallShooter : public PlaceableObject
 	Sprite*					m_ballSprite;
 	Sprite*					m_machineSprite;
 
-	bool					m_isFlipped;				// 좌/우 반전 여부
 	D3DXVECTOR2				m_ballOffset;				// 공 이미지 offset
 	D3DXVECTOR2				m_ballRotationOffest;		// 공 회전 중심점 offset
 
 public:
-	BallShooter(D3DXVECTOR2 pos, bool flipped);
+	BallShooter();
 	~BallShooter();
 
 	virtual void Init() override;

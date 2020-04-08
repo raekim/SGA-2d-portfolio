@@ -1,6 +1,10 @@
 #include "stdafx.h"
 #include "PlayScene.h"
 #include "SimplePlatform.h"
+#include "honeyPlatform.h"
+#include "BallShooter.h"
+#include "SpringPlatform.h"
+#include "SpinWheel.h"
 
 PlayScene::PlayScene()
 {
@@ -37,6 +41,7 @@ void PlayScene::Init()
 	m_player1P->SetJumpKey(VK_SPACE);
 	m_player1P->SetLeftMoveKey(VK_LEFT);
 	m_player1P->SetRightMoveKey(VK_RIGHT);
+
 	m_player2P = new Player;
 	m_player2P->Init(L"Chicken-Sheet-2P");
 	m_player2P->SetJumpKey('Z');
@@ -51,6 +56,16 @@ void PlayScene::Init()
 	m_cursor1P->SetUpMoveKey(VK_UP);
 	m_cursor1P->SetDownMoveKey(VK_DOWN);
 	m_cursor1P->SetSelectKey(VK_SPACE);
+	m_cursor1P->SetFlipKey(VK_RSHIFT);
+
+	m_cursor2P = new PlayerCursor;
+	m_cursor2P->Init(new Sprite(L"Chicken-Sheet-2P", 7, 5, 7 * 4), new Sprite(L"Chicken-Sheet", 7, 5, 7 * 4 + 1));
+	m_cursor2P->SetLeftMoveKey('F');
+	m_cursor2P->SetRightMoveKey('H');
+	m_cursor2P->SetUpMoveKey('T');
+	m_cursor2P->SetDownMoveKey('G');
+	m_cursor2P->SetSelectKey('Z');
+	m_cursor2P->SetFlipKey(VK_LSHIFT);
 
 	// 맨 처음은 맵툴모드에서 시작
 	SwitchToMapToolMode();
@@ -68,12 +83,16 @@ void PlayScene::Update()
 	switch (m_curMode)
 	{
 		case MODE::MAPTOOL_MODE:
-			if (m_cursor1P->Update(m_placedObjects))
+			if (m_cursor1P->HasPlacedObject() && m_cursor2P->HasPlacedObject())
 			{
 				SwitchToPlayMode();
 				break;
 			}
-			for (auto obj : m_placedObjects) obj->Update();
+			else
+			{
+				m_cursor1P->Update(m_placedObjects);
+				m_cursor2P->Update(m_placedObjects);
+			}
 			break;
 		case MODE::PLAY_MODE:
 			// 플레이어가 모두 죽으면 맵툴모드로 전환
@@ -83,9 +102,13 @@ void PlayScene::Update()
 				break;
 			}
 			for (auto obj : m_mapBlocks) obj->Update();
-			m_player1P->Update(m_mapBlocks);
-			m_player2P->Update(m_mapBlocks);
 			for (auto obj : m_placedObjects) obj->Update();
+
+			vector<PlaceableObject*> updateTargetObjects;
+			for (auto obj : m_mapBlocks) updateTargetObjects.push_back(obj);
+			for (auto obj : m_placedObjects)  updateTargetObjects.push_back(obj);
+			m_player1P->Update(updateTargetObjects);
+			m_player2P->Update(updateTargetObjects);
 			break;
 	}
 
@@ -97,20 +120,27 @@ void PlayScene::Render()
 	switch (m_curMode)
 	{
 	case MODE::MAPTOOL_MODE:
+		// 맵 렌더
 		m_mapBackground->Render();
 		m_mapPaper->Render();
 		m_mapForeground->Render();
-		m_cursor1P->Render();
 
-		for (auto obj : m_placedObjects) obj->Render();
+		for (auto obj : m_placedObjects) obj->RenderPreviewImage();
+
+		// 커서 렌더
+		m_cursor1P->Render();
+		m_cursor2P->Render();
 		break;
 	case MODE::PLAY_MODE:
+		// 맵 렌더
 		m_mapBackground->Render();
 		m_mapForeground->Render();
 
+		// 캐릭터 렌더
 		m_player1P->Render();
 		m_player2P->Render();
 
+		// 장애물 렌더
 		for (auto obj : m_placedObjects) obj->Render();
 		break;
 	}
@@ -127,8 +157,10 @@ void PlayScene::SwitchToMapToolMode()
 	g_pCamera->SetPosition({ 0,0 });
 
 	// 커서 설정
-	m_cursor1P->SetCursorPosition({ 800,800 });
-	m_cursor1P->SetObjectToPlace(new SimplePlatform({ 25,25 }, { 0,0 }));
+	m_cursor1P->SetObjectToPlace(new BallShooter());
+	m_cursor1P->ResetCursor({ 800,800 });
+	m_cursor2P->SetObjectToPlace(new BallShooter());
+	m_cursor2P->ResetCursor({ 800,1300 });
 }
 
 void PlayScene::SwitchToPlayMode()
@@ -141,8 +173,8 @@ void PlayScene::SwitchToPlayMode()
 	g_pCamera->SetTarget(m_player1P->GetPosition());
 
 	// 캐릭터 설정
-	m_player1P->Revive({ 600.0f, 800.0f });
-	m_player2P->Revive({ 650.0f, 800.0f });
+	m_player1P->Revive({ 330.0f, 800.0f });
+	m_player2P->Revive({ 370.0f, 800.0f });
 }
 
 void PlayScene::Release()

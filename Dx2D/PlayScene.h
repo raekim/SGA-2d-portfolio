@@ -23,11 +23,10 @@ class PlayScene : public iGameNode
 	Sprite*						m_mapBackground;				// 맵 백그라운드 이미지
 	Sprite*						m_mapPaper;						// 맵툴모드에서 쓰이는 격자 종이 이미지
 	vector<PlaceableObject*>	m_mapBlocks;					// 맵 지형
-	PlaceableObject*			m_vecObjectList[28][32];		// 격자상에 놓인 오브젝트들
+	PlaceableObject*			m_vecObjectList[28][32];		// 격자상에 놓인 오브젝트들		[width][height]
 
 
-	vector<PlaceableObject*>	m_placedObjects;				// 맵 지형
-
+	vector<PlaceableObject*>	m_placedObjects;				// 맵 상에 놓여진 오브젝트들
 private:
 	void SwitchToMapToolMode();
 	void SwitchToPlayMode();

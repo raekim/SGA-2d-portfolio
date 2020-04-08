@@ -15,7 +15,7 @@ public:
 	};
 
 	D3DXVECTOR2				m_position;
-
+	bool					m_flipped;
 public:
 	PlaceableObject();
 	~PlaceableObject();
@@ -29,5 +29,9 @@ public:
 	void SetPosition(D3DXVECTOR2 pos) { m_position = pos; };
 	Sprite* const GetPreviewImage() { return m_previewImg; }
 	void SetPreviewImage(Sprite* img) { m_previewImg = img; }
+	void SetFlip(bool val) { m_flipped = val; }
+
+	// 프리뷰 이미지 관련
+	void RenderPreviewImage();
 };
 

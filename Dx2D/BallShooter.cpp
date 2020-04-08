@@ -3,9 +3,9 @@
 #include "Player.h"
 #include "Primitive2DObejct.h"
 
-BallShooter::BallShooter(D3DXVECTOR2 pos, bool flipped) : m_isFlipped(flipped)
+BallShooter::BallShooter()
 {
-	m_position = pos;
+	SetPreviewImage(new Sprite(L"Object-Sheet-1", 6, 6, 1));
 }
 
 BallShooter::~BallShooter()
@@ -22,12 +22,12 @@ void BallShooter::Init()
 	m_machineSprite = new Sprite(L"Object-Sheet-1", 6, 6, 1);
 	m_ballSprite->SetSize(0.9f, 0.9f);
 	m_machineSprite->SetSize(0.7f, 0.7f);
-	if (m_isFlipped) m_ballSprite->SetRotation(0, D3DX_PI, 0);
+	if (m_flipped) m_ballSprite->SetRotation(0, D3DX_PI, 0);
 
 	for (int i = 0; i < 5; ++i)
-		m_disabledBalls.emplace_back(new Ball(m_isFlipped));
+		m_disabledBalls.emplace_back(new Ball(m_flipped));
 
-	if (m_isFlipped)
+	if (m_flipped)
 	{
 		m_machineSprite->SetRotation(0, D3DX_PI, 0);
 		m_shootStartPoint = { m_position.x - 20.0f, m_position.y };
@@ -49,7 +49,7 @@ void BallShooter::Update()
 		// shoot ball
 		if (m_disabledBalls.size() <= 0)
 		{
-			m_disabledBalls.emplace_back(new Ball(m_isFlipped));
+			m_disabledBalls.emplace_back(new Ball(m_flipped));
 		}
 		Ball* pBall = m_disabledBalls.front(); m_disabledBalls.pop_front();
 		pBall->m_position = m_shootStartPoint;
@@ -87,7 +87,7 @@ void BallShooter::Render()
 	{
 		m_ballSprite->SetPosition({ pBall->m_position.x,  pBall->m_position.y + 4});
 		((Primitive2DObejct<Sprite>*)m_ballSprite)->RotateAroundPointAndUpdate(
-			{ 0, 0, tanhf(pBall->m_speed.y / pBall->m_speed.x) }, (m_isFlipped? D3DXVECTOR2(15, 0) : D3DXVECTOR2(-15, 0)));
+			{ 0, 0, tanhf(pBall->m_speed.y / pBall->m_speed.x) }, (m_flipped ? D3DXVECTOR2(15, 0) : D3DXVECTOR2(-15, 0)));
 		m_ballSprite->Render();
 		pBall->Render();
 	}
@@ -191,8 +191,7 @@ void BallShooter::Ball::Update()
 
 void BallShooter::Ball::Render()
 {
-	if(!g_pKeyManager->IsToggleKey('D'))
-		m_circle.Render();
+	m_circle.Render();
 }
 
 void BallShooter::Ball::Destory()

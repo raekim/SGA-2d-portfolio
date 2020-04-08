@@ -46,8 +46,8 @@ void PrototypeScene::Init()
 	m_vecObjectList.push_back(new SimplePlatform(SimplePlatform::Platform_Type::MID_HORIZONTAL, {1500.0f, 500.0f }));
 	m_vecObjectList.push_back(new SimplePlatform(SimplePlatform::Platform_Type::MID_HORIZONTAL, { 1800.0f, 400.0f }));
 
-	m_vecObjectList.push_back(new BallShooter({ WINSIZEX*0.5f, WINSIZEY - 200.0f }, false));
-	m_vecObjectList.push_back(new BallShooter({ WINSIZEX*0.5f + 400, WINSIZEY - 300.0f }, true));
+	//m_vecObjectList.push_back(new BallShooter({ WINSIZEX*0.5f, WINSIZEY - 200.0f }, false));
+	//m_vecObjectList.push_back(new BallShooter({ WINSIZEX*0.5f + 400, WINSIZEY - 300.0f }, true));
 
 	m_vecObjectList.push_back(new SpringPlatform({ 1700, 200 }));
 	m_vecObjectList.push_back(new SpringPlatform({ 1100, 200 }));
