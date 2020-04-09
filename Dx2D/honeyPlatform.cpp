@@ -6,7 +6,6 @@ honeyPlatform::honeyPlatform()
 {
 	m_crateSprite = new Sprite(L"Object-Sheet-1", 6, 6, 7);
 	m_barSprite = new Sprite(L"Object-Sheet-1", 2, 2, 1);
-
 	m_crateSprite->SetSize({ 0.65f, 0.65f });
 	m_barSprite->SetSize({ 0.6f, 0.6f });
 }
@@ -18,8 +17,8 @@ honeyPlatform::~honeyPlatform()
 
 void honeyPlatform::Init()
 {
-	m_AABB = new AABB({ 20.0f, 20.0f });
-	m_AABB->Init();
+	m_AABB = new AABB;
+	m_AABB->SetHalfSize({ 20.0f, 20.0f });
 
 	m_midPosition = m_position;
 
@@ -76,14 +75,13 @@ void honeyPlatform::Render()
 
 void honeyPlatform::Release()
 {
-	m_AABB->Release();
 	SAFE_DELETE(m_crateSprite);
 	SAFE_DELETE(m_barSprite);
 }
 
 bool honeyPlatform::handleCollision(D3DXVECTOR2 pos, Player * player, collisionCheckDir dir)
 {
-	if (m_AABB->pointInAABB(pos))
+	if (m_AABB->pointInCollider(pos))
 	{
 		switch (dir)
 		{

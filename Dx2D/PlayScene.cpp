@@ -179,7 +179,7 @@ void PlayScene::SwitchToMapToolMode()
 	// 커서 설정
 	m_cursor1P->SetObjectToPlace(GetRandomPlaceableObject());
 	m_cursor1P->ResetCursor({ 800,800 });
-	m_cursor2P->SetObjectToPlace(new SpringPlatform);
+	m_cursor2P->SetObjectToPlace(GetRandomPlaceableObject());
 	m_cursor2P->ResetCursor({ 800,1300 });
 }
 

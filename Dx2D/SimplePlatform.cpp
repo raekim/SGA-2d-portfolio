@@ -4,40 +4,40 @@
 
 SimplePlatform::SimplePlatform(D3DXVECTOR2 AABBHalfSize, D3DXVECTOR2 pos)
 {
+	m_AABB = new AABB;
+	m_AABB->SetHalfSize(AABBHalfSize);
 	m_sprite = NULL;
-	m_AABB = new AABB(AABBHalfSize);
-	m_AABB->Init();
 	m_position = pos;
 }
 
 SimplePlatform::SimplePlatform(Platform_Type type, D3DXVECTOR2 pos)
 {
+	m_AABB = new AABB;
 	switch (type)
 	{
 	case Platform_Type::SHORT_VERTICAL:
 		m_sprite = new Sprite(L"Object-Sheet-1", 6, 6, 0);
 		m_sprite->SetSize({ 0.7f, 0.7 });
 		m_sprite->SetRotation({ 0, 0, D3DX_PI/2 });
-		m_AABB = new AABB({ 15,60 });
+		m_AABB->SetHalfSize({ 15,60 });
 		break;
 	case Platform_Type::SHORT_HORIZONTAL:
 		m_sprite = new Sprite(L"Object-Sheet-1", 6, 6, 0);
 		m_sprite->SetSize({ 0.7f, 0.7 });
-		m_AABB = new AABB({ 60,15 });
+		m_AABB->SetHalfSize({ 60,15 });
 		break;
 	case Platform_Type::MID_VERTICAL:
 		m_sprite = new Sprite(L"Object-Sheet-1", 6, 3, 15);
 		m_sprite->SetSize({ 0.7f, 0.7f });
-		m_AABB = new AABB({ 23,91 });
+		m_AABB->SetHalfSize({ 23,91 });
 		break;
 	case Platform_Type::MID_HORIZONTAL:
 		m_sprite = new Sprite(L"Object-Sheet-1", 6, 3, 15);
 		m_sprite->SetSize({ 0.7f, 0.7f });
 		m_sprite->SetRotation({ 0, 0, D3DX_PI / 2 });
-		m_AABB = new AABB({ 91,23 });
+		m_AABB->SetHalfSize({ 91,23 });
 		break;
 	}
-	m_AABB->Init();
 	m_position = pos;
 }
 
@@ -80,7 +80,7 @@ void SimplePlatform::Release()
 
 bool SimplePlatform::handleCollision(D3DXVECTOR2 pos, Player * player, collisionCheckDir dir)
 {
-	if (m_AABB->pointInAABB(pos))
+	if (m_AABB->pointInCollider(pos))
 	{
 		switch (dir)
 		{

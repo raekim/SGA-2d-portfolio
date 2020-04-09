@@ -15,10 +15,10 @@ SpringPlatform::~SpringPlatform()
 
 void SpringPlatform::Init()
 {
-	m_AABB = new AABB({ 10,10 });
+	m_AABB = new AABB;
 	m_AABBSizeAnimation = new Animation<STATE>;
 	m_animation = new Animation<STATE>;
-	m_AABB->Init();
+	m_AABB->SetHalfSize({ 10,10 });
 
 	Clip* clip;
 	Sprite* sprite;
@@ -113,7 +113,7 @@ void SpringPlatform::Release()
 
 bool SpringPlatform::handleCollision(D3DXVECTOR2 pos, Player * player, collisionCheckDir dir)
 {
-	if (m_AABB->pointInAABB(pos))
+	if (m_AABB->pointInCollider(pos))
 	{
 		switch (dir)
 		{

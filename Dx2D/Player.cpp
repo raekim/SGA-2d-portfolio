@@ -16,8 +16,8 @@ void Player::Init(wstring sheetKey)
 {
 	m_sheetKey = sheetKey;
 	m_AABBHalfSize = { 18.0f, 34.0f };
-	m_AABB = new AABB(m_AABBHalfSize);
-	m_AABB->Init();
+	m_AABB = new AABB;
+	m_AABB->SetHalfSize(m_AABBHalfSize);
 
 	m_AABBOffset = { 0.0f, 0.0f };
 
@@ -806,7 +806,6 @@ void Player::Render()
 
 void Player::Release()
 {
-	m_AABB->Release();
 	SAFE_DELETE(m_AABB);
 	SAFE_DELETE(m_pAnimation);
 }

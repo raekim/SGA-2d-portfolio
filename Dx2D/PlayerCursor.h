@@ -2,9 +2,8 @@
 
 class PlaceableObject;
 class PlayerCursor
-{
-	// 컨트롤 정보
-	int					m_selectKey, m_leftMoveKey, m_rightMoveKey, m_upMoveKey, m_downMoveKey, m_flipKey;
+{	
+	int					m_selectKey, m_leftMoveKey, m_rightMoveKey, m_upMoveKey, m_downMoveKey, m_flipKey; // 컨트롤 정보
 	Sprite*				m_cursorDefaultImage;			// 커서 이미지
 	Sprite*				m_cursorOutOfBoundsImage;		// 아이템을 놓지 못하는 상태의 커서 이미지
 	D3DXVECTOR2			m_cursorPos;					// 커서 이미지의 위치
@@ -13,9 +12,9 @@ class PlayerCursor
 	float				m_cursorMoveMaxSpeed;
 	float				m_cursorMoveSpeed;
 
-	PlaceableObject*	m_objectToPlace;			// 현재 놓고자 하는 오브젝트
+	PlaceableObject*	m_objectToPlace;				// 현재 놓고자 하는 오브젝트
 	bool				m_isFlipped;
-	bool				m_placed;					// 오브젝트를 놓았는가?
+	bool				m_placed;						// 오브젝트를 놓았는가?
 
 	// 맵 정보
 	int					m_paperWidth;

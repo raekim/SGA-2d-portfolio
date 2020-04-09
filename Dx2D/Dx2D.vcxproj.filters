@@ -73,14 +73,20 @@
     <Filter Include="Dx2D Framework\Scene\Prototype">
       <UniqueIdentifier>{15a656fe-4dd4-4b3e-bd8e-39141293b49d}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Dx2D Framework\Scene\Prototype\PlaceableObjects">
-      <UniqueIdentifier>{9e53387a-45a4-4cbf-8a4e-6d02ad72c1c8}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Dx2D Framework\2. Manager\Shader">
       <UniqueIdentifier>{60863825-365f-45b5-bdf5-08085c8a7728}</UniqueIdentifier>
     </Filter>
     <Filter Include="Dx2D Framework\Scene\PlayScene">
       <UniqueIdentifier>{72c917fa-71e8-4dba-a406-5ea0f97d8883}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Dx2D Framework\Scene\Objects">
+      <UniqueIdentifier>{c393163a-7185-42ea-90b3-2ccc753b9cf8}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Dx2D Framework\Scene\Objects\PlaceableObjects">
+      <UniqueIdentifier>{9e53387a-45a4-4cbf-8a4e-6d02ad72c1c8}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Dx2D Framework\Scene\Objects\Collider">
+      <UniqueIdentifier>{b120cfca-5a43-4aa9-a255-c7377d1afeff}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -174,17 +180,11 @@
     <ClInclude Include="PrototypeScene.h">
       <Filter>Dx2D Framework\Scene\Prototype</Filter>
     </ClInclude>
-    <ClInclude Include="Player.h">
-      <Filter>Dx2D Framework\Scene\Prototype</Filter>
-    </ClInclude>
-    <ClInclude Include="AABB.h">
-      <Filter>Dx2D Framework\Scene\Prototype</Filter>
-    </ClInclude>
     <ClInclude Include="Map.h">
       <Filter>Dx2D Framework\Scene\Prototype</Filter>
     </ClInclude>
     <ClInclude Include="honeyPlatform.h">
-      <Filter>Dx2D Framework\Scene\Prototype\PlaceableObjects</Filter>
+      <Filter>Dx2D Framework\Scene\Objects\PlaceableObjects</Filter>
     </ClInclude>
     <ClInclude Include="ShaderManager.h">
       <Filter>Dx2D Framework\2. Manager\Shader</Filter>
@@ -193,28 +193,40 @@
       <Filter>Dx2D Framework\2. Manager\Shader</Filter>
     </ClInclude>
     <ClInclude Include="PlaceableObject.h">
-      <Filter>Dx2D Framework\Scene\Prototype\PlaceableObjects</Filter>
+      <Filter>Dx2D Framework\Scene\Objects\PlaceableObjects</Filter>
     </ClInclude>
     <ClInclude Include="SimplePlatform.h">
-      <Filter>Dx2D Framework\Scene\Prototype\PlaceableObjects</Filter>
+      <Filter>Dx2D Framework\Scene\Objects\PlaceableObjects</Filter>
     </ClInclude>
     <ClInclude Include="BallShooter.h">
-      <Filter>Dx2D Framework\Scene\Prototype\PlaceableObjects</Filter>
+      <Filter>Dx2D Framework\Scene\Objects\PlaceableObjects</Filter>
     </ClInclude>
     <ClInclude Include="Projectile.h">
-      <Filter>Dx2D Framework\Scene\Prototype\PlaceableObjects</Filter>
+      <Filter>Dx2D Framework\Scene\Objects\PlaceableObjects</Filter>
     </ClInclude>
     <ClInclude Include="SpringPlatform.h">
-      <Filter>Dx2D Framework\Scene\Prototype\PlaceableObjects</Filter>
+      <Filter>Dx2D Framework\Scene\Objects\PlaceableObjects</Filter>
     </ClInclude>
     <ClInclude Include="SpinWheel.h">
-      <Filter>Dx2D Framework\Scene\Prototype\PlaceableObjects</Filter>
+      <Filter>Dx2D Framework\Scene\Objects\PlaceableObjects</Filter>
     </ClInclude>
     <ClInclude Include="PlayScene.h">
       <Filter>Dx2D Framework\Scene\PlayScene</Filter>
     </ClInclude>
     <ClInclude Include="PlayerCursor.h">
       <Filter>Dx2D Framework\Scene\PlayScene</Filter>
+    </ClInclude>
+    <ClInclude Include="Player.h">
+      <Filter>Dx2D Framework\Scene\Objects</Filter>
+    </ClInclude>
+    <ClInclude Include="AABB.h">
+      <Filter>Dx2D Framework\Scene\Objects\Collider</Filter>
+    </ClInclude>
+    <ClInclude Include="CircleCollider.h">
+      <Filter>Dx2D Framework\Scene\Objects\Collider</Filter>
+    </ClInclude>
+    <ClInclude Include="Collider.h">
+      <Filter>Dx2D Framework\Scene\Objects\Collider</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -290,17 +302,11 @@
     <ClCompile Include="PrototypeScene.cpp">
       <Filter>Dx2D Framework\Scene\Prototype</Filter>
     </ClCompile>
-    <ClCompile Include="Player.cpp">
-      <Filter>Dx2D Framework\Scene\Prototype</Filter>
-    </ClCompile>
-    <ClCompile Include="AABB.cpp">
-      <Filter>Dx2D Framework\Scene\Prototype</Filter>
-    </ClCompile>
     <ClCompile Include="Map.cpp">
       <Filter>Dx2D Framework\Scene\Prototype</Filter>
     </ClCompile>
     <ClCompile Include="honeyPlatform.cpp">
-      <Filter>Dx2D Framework\Scene\Prototype\PlaceableObjects</Filter>
+      <Filter>Dx2D Framework\Scene\Objects\PlaceableObjects</Filter>
     </ClCompile>
     <ClCompile Include="ShaderManager.cpp">
       <Filter>Dx2D Framework\2. Manager\Shader</Filter>
@@ -309,28 +315,40 @@
       <Filter>Dx2D Framework\2. Manager\Shader</Filter>
     </ClCompile>
     <ClCompile Include="PlaceableObject.cpp">
-      <Filter>Dx2D Framework\Scene\Prototype\PlaceableObjects</Filter>
+      <Filter>Dx2D Framework\Scene\Objects\PlaceableObjects</Filter>
     </ClCompile>
     <ClCompile Include="SimplePlatform.cpp">
-      <Filter>Dx2D Framework\Scene\Prototype\PlaceableObjects</Filter>
+      <Filter>Dx2D Framework\Scene\Objects\PlaceableObjects</Filter>
     </ClCompile>
     <ClCompile Include="BallShooter.cpp">
-      <Filter>Dx2D Framework\Scene\Prototype\PlaceableObjects</Filter>
+      <Filter>Dx2D Framework\Scene\Objects\PlaceableObjects</Filter>
     </ClCompile>
     <ClCompile Include="Projectile.cpp">
-      <Filter>Dx2D Framework\Scene\Prototype\PlaceableObjects</Filter>
+      <Filter>Dx2D Framework\Scene\Objects\PlaceableObjects</Filter>
     </ClCompile>
     <ClCompile Include="SpringPlatform.cpp">
-      <Filter>Dx2D Framework\Scene\Prototype\PlaceableObjects</Filter>
+      <Filter>Dx2D Framework\Scene\Objects\PlaceableObjects</Filter>
     </ClCompile>
     <ClCompile Include="SpinWheel.cpp">
-      <Filter>Dx2D Framework\Scene\Prototype\PlaceableObjects</Filter>
+      <Filter>Dx2D Framework\Scene\Objects\PlaceableObjects</Filter>
     </ClCompile>
     <ClCompile Include="PlayScene.cpp">
       <Filter>Dx2D Framework\Scene\PlayScene</Filter>
     </ClCompile>
     <ClCompile Include="PlayerCursor.cpp">
       <Filter>Dx2D Framework\Scene\PlayScene</Filter>
+    </ClCompile>
+    <ClCompile Include="Player.cpp">
+      <Filter>Dx2D Framework\Scene\Objects</Filter>
+    </ClCompile>
+    <ClCompile Include="AABB.cpp">
+      <Filter>Dx2D Framework\Scene\Objects\Collider</Filter>
+    </ClCompile>
+    <ClCompile Include="CircleCollider.cpp">
+      <Filter>Dx2D Framework\Scene\Objects\Collider</Filter>
+    </ClCompile>
+    <ClCompile Include="Collider.cpp">
+      <Filter>Dx2D Framework\Scene\Objects\Collider</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

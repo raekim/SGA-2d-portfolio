@@ -18,8 +18,8 @@ BallShooter::~BallShooter()
 void BallShooter::Init()
 {
 	m_shootDelay = 3.5f;
-	m_AABB = new AABB({ 25.0f, 25.0f });
-	m_AABB->Init();
+	m_AABB = new AABB;
+	m_AABB->SetHalfSize({ 25.0f, 25.0f });
 	
 	if (m_flipped) m_ballSprite->SetRotation(0, D3DX_PI, 0);
 
@@ -108,20 +108,18 @@ bool BallShooter::handleCollision(D3DXVECTOR2 pos, Player * player, collisionChe
 	for (auto it = m_enabledBalls.begin(); it != m_enabledBalls.end(); ++it)
 	{
 		Ball* pBall = *(it);
-		if (CircleCollision(pBall->m_circle.GetPosition(), pBall->m_circle.GetRadius(),
+		if (CircleCollision(pBall->m_circle->GetCenter(), pBall->m_circle->GetHalfSize().x,
 			player->m_position, min(player->GetAABBHalfSize().x, player->GetAABBHalfSize().y)) ||
-			PointInCircle(pBall->m_circle.GetPosition(), pBall->m_circle.GetRadius(), pos))
+			pBall->m_circle->pointInCollider(pos))
 		{
 			pBall->Destory();
-			//m_disabledBalls.push_back(pBall);
-			//m_enabledBalls.erase(it);
 			player->Die();
 			break;
 		}
 	}
 
 	// shooter 본체와 충돌
-	if (m_AABB->pointInAABB(pos))
+	if (m_AABB->pointInCollider(pos))
 	{
 		switch (dir)
 		{
@@ -173,8 +171,8 @@ void BallShooter::RenderPreviewImage()
 
 BallShooter::Ball::Ball(bool flipped): m_isFlipped(flipped)
 {
-	m_circle.SetRadius(20.0f);
-	m_circle.SetDraw(true);
+	m_circle = new CircleCollider;
+	m_circle->SetHalfSize({ 20.0f, 20.0f });
 	m_speed = { 0.0f, 0.0f };
 	Projectile::SetDestroyed(true);
 	m_xSpeedBound = (flipped)? -350.0f : 350.0f;
@@ -187,22 +185,21 @@ void BallShooter::Ball::Update()
 	{
 		m_speed.x += 200.0f * g_pTimeManager->GetDeltaTime();
 		m_speed.x = min(m_speed.x, m_xSpeedBound);
-		m_circle.SetPosition({ m_position.x, m_position.y });
+		m_circle->SetCenter({ m_position.x, m_position.y });
 	}
 	else
 	{
 		m_speed.x -= 200.0f * g_pTimeManager->GetDeltaTime();
 		m_speed.x = max(m_speed.x, m_xSpeedBound);
-		m_circle.SetPosition({ m_position.x, m_position.y });
+		m_circle->SetCenter({ m_position.x, m_position.y });
 	}
 	
 	m_speed.y -= GRAVITY * g_pTimeManager->GetDeltaTime();
-	m_circle.Update();
 }
 
 void BallShooter::Ball::Render()
 {
-	m_circle.Render();
+	m_circle->Render();
 }
 
 void BallShooter::Ball::Destory()

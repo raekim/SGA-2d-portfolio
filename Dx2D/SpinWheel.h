@@ -1,6 +1,7 @@
 #pragma once
 #include "AABB.h"
 #include "PlaceableObject.h"
+class CircleCollider;
 
 class SpinWheel : public PlaceableObject
 {
@@ -14,7 +15,7 @@ class SpinWheel : public PlaceableObject
 	float					m_wheelRotationDelta;
 
 	AABB*					m_AABB;
-	Circle*					m_circle;
+	CircleCollider*			m_circle;
 	Sprite*					m_blockSprite;
 	Sprite*					m_barSprite;
 	Sprite*					m_wheelSprite;

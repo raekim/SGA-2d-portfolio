@@ -1,11 +1,12 @@
 #include "stdafx.h"
 #include "SpinWheel.h"
 #include "Player.h"
+#include "CircleCollider.h"
 
 SpinWheel::SpinWheel()
 {
-	m_AABB = new AABB({ 25.0f, 25.0f });
-	m_AABB->Init();
+	m_AABB = new AABB;
+	m_AABB->SetHalfSize({ 25.0f, 25.0f });
 
 	m_blockSprite = new Sprite(L"Object-Sheet-1", 6, 6, 14);
 	m_blockSprite->SetSize(0.65f, 0.65f);
@@ -19,8 +20,8 @@ SpinWheel::SpinWheel()
 	m_barRotationDelta = 0;
 	m_wheelRotationDelta = 0;
 
-	m_circle = new Circle;
-	m_circle->SetRadius(20);
+	m_circle = new CircleCollider;
+	m_circle->SetHalfSize({ 20.0f, 20.0f });
 }
 
 
@@ -53,7 +54,7 @@ void SpinWheel::Update()
 	m_wheelRotationDelta += g_pTimeManager->GetDeltaTime();
 	if (m_wheelRotationDelta > m_wheelRoatationSecond) m_wheelRotationDelta = 0.0f;
 
-	m_circle->SetPosition(m_position);
+	m_circle->SetCenter(m_position);
 	((Primitive2DObejct<Circle>*)m_circle)->RotateAroundPointAndUpdate({ 0, 0, m_barRotationAmount }, D3DXVECTOR2(0, 100));
 }
 
@@ -78,15 +79,16 @@ void SpinWheel::Release()
 bool SpinWheel::handleCollision(D3DXVECTOR2 pos, Player * player, collisionCheckDir dir)
 {
 	// 플레이어와 톱날이 충돌했다면 플레이어 사망
-	D3DXVECTOR2 circlePos = { m_circle->GetWMatrix()._41, m_circle->GetWMatrix()._42 };
-	if (CircleCollision(circlePos, m_circle->GetRadius(), player->m_position, min(player->GetAABBHalfSize().x, player->GetAABBHalfSize().y)) ||
-		PointInCircle(circlePos, m_circle->GetRadius(), pos))
+	// The x, y, and z components of the translation are stored in the ._41, ._42, and ._43 members of the matrix.
+	D3DXVECTOR2 circlePos = { m_circle->GetCircle()->GetWMatrix()._41, m_circle->GetCircle()->GetWMatrix()._42 };
+	if (CircleCollision(circlePos, m_circle->GetHalfSize().x, player->m_position, min(player->GetAABBHalfSize().x, player->GetAABBHalfSize().y)) ||
+		m_circle->pointInCollider(pos))
 	{
 		player->Die();
 	}
 
 	// 블록 부분과 충돌
-	if (m_AABB->pointInAABB(pos))
+	if (m_AABB->pointInCollider(pos))
 	{
 		switch (dir)
 		{

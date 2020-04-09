@@ -157,6 +157,8 @@
     <ClInclude Include="Animation.h" />
     <ClInclude Include="BallShooter.h" />
     <ClInclude Include="Camera.h" />
+    <ClInclude Include="CircleCollider.h" />
+    <ClInclude Include="Collider.h" />
     <ClInclude Include="FileManager.h" />
     <ClInclude Include="honeyPlatform.h" />
     <ClInclude Include="LoadingScene.h" />
@@ -207,6 +209,8 @@
     <ClCompile Include="Animation.cpp" />
     <ClCompile Include="BallShooter.cpp" />
     <ClCompile Include="Camera.cpp" />
+    <ClCompile Include="CircleCollider.cpp" />
+    <ClCompile Include="Collider.cpp" />
     <ClCompile Include="FileManager.cpp" />
     <ClCompile Include="honeyPlatform.cpp" />
     <ClCompile Include="LoadingScene.cpp" />

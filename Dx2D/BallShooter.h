@@ -2,12 +2,13 @@
 #include "AABB.h"
 #include "PlaceableObject.h"
 #include "Projectile.h"
+#include "CircleCollider.h"
 
 class BallShooter : public PlaceableObject
 {
 	struct Ball : public Projectile
 	{
-		Circle					m_circle;
+		CircleCollider*			m_circle;
 		D3DXVECTOR2				m_speed;
 		D3DXVECTOR2				m_position;
 		float					m_xSpeedBound; // 발사된 공의 x 스피드의 절대값이 점점 감소하다가 이 밑으로는 감소하지 않는 값
@@ -30,7 +31,6 @@ class BallShooter : public PlaceableObject
 	float					m_shootDelay;				// 연속 발사 소요시간
 	float					m_shootDelayCount;			// 연속 발사를 위해 카운트하는 시간
 
-	Circle*					m_tempBall;
 	Sprite*					m_ballSprite;
 	Sprite*					m_machineSprite;
 
