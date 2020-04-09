@@ -27,6 +27,7 @@ class PlayScene : public iGameNode
 
 
 	vector<PlaceableObject*>	m_placedObjects;				// 맵 상에 놓여진 오브젝트들
+	//vector<Collider*>			m_colliders[16][9];				// 게임화면을 16대 9로 분할 한 영역에 저장된 콜라이더들
 private:
 	void SwitchToMapToolMode();
 	void SwitchToPlayMode();

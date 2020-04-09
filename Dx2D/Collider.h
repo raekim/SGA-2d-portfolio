@@ -4,10 +4,9 @@ class Player;
 class Collider
 {
 protected:
-	D3DXVECTOR2		m_center;
-	Rect*			m_rect;			// AABB가 아닌 Collider의 경우 해당하는 도형에 외접하는 정사각형
-	D3DXVECTOR2		m_halfSize;
-	bool (*HandleCollision)(D3DXVECTOR2 pos, Player * player, PlaceableObject::collisionCheckDir dir);	// 콜라이더가 어떤 오브젝트에 속하냐에 따라 달라진다
+	D3DXVECTOR2			m_center;
+	Rect*				m_rect;			// AABB가 아닌 Collider의 경우 해당하는 도형에 외접하는 정사각형
+	D3DXVECTOR2			m_halfSize;
 	virtual void SetShapeHalfSize(D3DXVECTOR2 sz) PURE;
 	virtual void SetShapeCenter(D3DXVECTOR2 c) PURE;
 public:
@@ -36,8 +35,5 @@ public:
 	D3DXVECTOR2 GetRightBottomPoint() { return { m_center.x + m_halfSize.x,  m_center.y - m_halfSize.y }; }
 	D3DXVECTOR2 GetLeftTopPoint() { return { m_center.x - m_halfSize.x,  m_center.y + m_halfSize.y };}
 	D3DXVECTOR2 GetRightTopPoint() { return m_center + m_halfSize; }
-
-	// 플레이어와 충돌 검사
-	bool PlayerCollision(D3DXVECTOR2 pos, Player * player, PlaceableObject::collisionCheckDir dir) { return HandleCollision(pos, player, dir); }
 };
 

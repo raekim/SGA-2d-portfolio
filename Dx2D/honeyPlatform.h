@@ -23,7 +23,7 @@ public:
 	~honeyPlatform();
 
 	void Init();
-	void Update();
+	void Update(vector<PlaceableObject*> objList);
 	void Render();
 	void Release();
 

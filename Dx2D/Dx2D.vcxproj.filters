@@ -201,9 +201,6 @@
     <ClInclude Include="BallShooter.h">
       <Filter>Dx2D Framework\Scene\Objects\PlaceableObjects</Filter>
     </ClInclude>
-    <ClInclude Include="Projectile.h">
-      <Filter>Dx2D Framework\Scene\Objects\PlaceableObjects</Filter>
-    </ClInclude>
     <ClInclude Include="SpringPlatform.h">
       <Filter>Dx2D Framework\Scene\Objects\PlaceableObjects</Filter>
     </ClInclude>
@@ -321,9 +318,6 @@
       <Filter>Dx2D Framework\Scene\Objects\PlaceableObjects</Filter>
     </ClCompile>
     <ClCompile Include="BallShooter.cpp">
-      <Filter>Dx2D Framework\Scene\Objects\PlaceableObjects</Filter>
-    </ClCompile>
-    <ClCompile Include="Projectile.cpp">
       <Filter>Dx2D Framework\Scene\Objects\PlaceableObjects</Filter>
     </ClCompile>
     <ClCompile Include="SpringPlatform.cpp">

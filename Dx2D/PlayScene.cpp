@@ -101,14 +101,18 @@ void PlayScene::Update()
 				SwitchToMapToolMode();
 				break;
 			}
-			for (auto obj : m_mapBlocks) obj->Update();
-			for (auto obj : m_placedObjects) obj->Update();
 
-			vector<PlaceableObject*> updateTargetObjects;
-			for (auto obj : m_mapBlocks) updateTargetObjects.push_back(obj);
-			for (auto obj : m_placedObjects)  updateTargetObjects.push_back(obj);
-			m_player1P->Update(updateTargetObjects);
-			m_player2P->Update(updateTargetObjects);
+			// 충돌검사에 쓰일 콜라이더들 정보
+			// 화면을 16x9로 분할했을 때 각각의 벡터에는 해당 영역에 속하는 PlaceableObject들의 포인터들이 있다
+			vector<vector<PlaceableObject*>> objList(16, vector<PlaceableObject*>(9)); 
+
+			// 오브젝트들 각자를 업데이트하고 콜라이더정보를 정해진 벡터에 넣는다
+			for (auto obj : m_mapBlocks) obj->Update(objList);
+			for (auto obj : m_placedObjects) obj->Update(objList);
+
+			// 콜라이더 정보를 바탕으로 충돌처리
+			m_player1P->Update(objList);
+			m_player2P->Update(objList);
 			break;
 	}
 
@@ -145,17 +149,6 @@ void PlayScene::Render()
 		break;
 	}
 }
-
-//enum class Platform_Type
-//{
-//	SHORT_VERTICAL,
-//	SHORT_HORIZONTAL,
-//	MID_VERTICAL,
-//	MID_HORIZONTAL,
-//	LONG_VERTICAL,
-//	LONG_HORIZONTAL,
-//	Max
-//};
 
 PlaceableObject* GetRandomPlaceableObject()
 {

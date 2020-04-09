@@ -76,7 +76,7 @@ void SpringPlatform::Init()
 	m_curState = STATE::Idle;
 }
 
-void SpringPlatform::Update()
+void SpringPlatform::Update(vector<Collider*>& colliders)
 {
 	m_AABBSizeAnimation->Play(m_curState);
 	m_AABBSizeAnimation->SetPosition(m_position + m_positionOffset);

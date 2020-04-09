@@ -39,7 +39,7 @@ void BallShooter::Init()
 	}
 }
 
-void BallShooter::Update()
+void BallShooter::Update(vector<PlaceableObject*> objList[16])
 {
 	if (m_shootDelayCount >= m_shootDelay)
 	{
@@ -53,7 +53,7 @@ void BallShooter::Update()
 		Ball* pBall = m_disabledBalls.front(); m_disabledBalls.pop_front();
 		pBall->m_position = m_shootStartPoint;
 		pBall->m_speed = m_shootStartSpeed;
-		pBall->SetDestroyed(false);
+		//pBall->SetDestroyed(false);
 		m_enabledBalls.push_back(pBall);
 	}
 
@@ -65,7 +65,7 @@ void BallShooter::Update()
 		Ball* pBall = *(it);
 		// 게임 화면의 범위를 벗어났거나 파괴된 발사체에 대해서는 Update하지 않고 비활성화된 발사체들의 벡터에 저장한다
 		if (pBall->m_position.x < 0 || pBall->m_position.x > GAMESCREEN_X ||
-			pBall->m_position.y < 0 || pBall->m_position.y > GAMESCREEN_Y || pBall->IsDestroyed())
+			pBall->m_position.y < 0 || pBall->m_position.y > GAMESCREEN_Y )//|| pBall->IsDestroyed())
 		{
 			m_disabledBalls.push_back(pBall);
 			m_enabledBalls.erase(it);
@@ -117,44 +117,6 @@ bool BallShooter::handleCollision(D3DXVECTOR2 pos, Player * player, collisionChe
 			break;
 		}
 	}
-
-	// shooter 본체와 충돌
-	if (m_AABB->pointInCollider(pos))
-	{
-		switch (dir)
-		{
-		case collisionCheckDir::BOTTOM:
-			if (player->m_speed.y < 0.0f)
-			{
-				player->m_speed.y = 0.0f;
-				player->SetPositionY(m_AABB->GetAABBTop() + player->GetAABBHalfSize().y);
-			}
-			break;
-		case collisionCheckDir::CEILING:
-			if (player->m_speed.y > 0.0f)
-			{
-				player->m_speed.y = 0.0f;
-				player->SetPositionY(m_AABB->GetAABBBottom() - player->GetAABBHalfSize().y);
-			}
-			break;
-		case collisionCheckDir::LEFT_WALL:
-			if (player->m_speed.x < 0.0f)
-			{
-				player->m_speed.x = 0.0f;
-				player->SetPositionX(m_AABB->GetAABBRight() + player->GetAABBHalfSize().x);
-			}
-			break;
-		case collisionCheckDir::RIGHT_WALL:
-			if (player->m_speed.x > 0.0f)
-			{
-				player->m_speed.x = 0.0f;
-				player->SetPositionX(m_AABB->GetAABBLeft() - player->GetAABBHalfSize().x);
-			}
-			break;
-		}
-		return true;
-	}
-	return false;
 }
 
 void BallShooter::RenderPreviewImage()
@@ -174,7 +136,7 @@ BallShooter::Ball::Ball(bool flipped): m_isFlipped(flipped)
 	m_circle = new CircleCollider;
 	m_circle->SetHalfSize({ 20.0f, 20.0f });
 	m_speed = { 0.0f, 0.0f };
-	Projectile::SetDestroyed(true);
+	//Projectile::SetDestroyed(true);
 	m_xSpeedBound = (flipped)? -350.0f : 350.0f;
 }
 
@@ -204,7 +166,7 @@ void BallShooter::Ball::Render()
 
 void BallShooter::Ball::Destory()
 {
-	Projectile::SetDestroyed(true);
+	//Projectile::SetDestroyed(true);
 }
 
 bool BallShooter::Ball::Collide(void * other)

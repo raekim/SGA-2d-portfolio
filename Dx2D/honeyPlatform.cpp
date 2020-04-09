@@ -43,7 +43,7 @@ void honeyPlatform::Init()
 	}
 }
 
-void honeyPlatform::Update()
+void honeyPlatform::Update(vector<PlaceableObject*> objList)
 {
 	// 두 기준점 m_movingStartPoint, m_movingEndPoint 사이를 선형 보간을 사용하여 움직인다
 	m_cratePosition = LinearInterpolation(m_movingStartPoint, m_movingEndPoint, min(m_movingDelta / m_moveSecond, 1.0f));

@@ -56,7 +56,7 @@ void SimplePlatform::Init()
 	m_rotation = { 0.0f, 0.0f, 0.0f };
 }
 
-void SimplePlatform::Update()
+void SimplePlatform::Update(vector<Collider*>& colliders)
 {
 	m_AABB->SetCenter(m_position + m_positionOffset);
 	

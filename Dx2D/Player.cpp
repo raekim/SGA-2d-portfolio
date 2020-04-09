@@ -187,7 +187,7 @@ void Player::InitAnimation()
 	m_pAnimation->SetScale(0.25f, 0.25f);
 }
 
-void Player::Update(vector<PlaceableObject*> obj)
+void Player::Update(vector<vector<PlaceableObject*>>& objectList)
 {
 	if (!m_isDead)
 	{
@@ -217,7 +217,7 @@ void Player::Update(vector<PlaceableObject*> obj)
 		m_speed.y = max(m_speed.y, m_fallingSpeedBound);
 	}
 
-	UpdatePhysics(obj);
+	UpdatePhysics(objectList);
 	UpdateAnimation();
 
 	// 움직임 상태 정보 갱신
@@ -377,13 +377,13 @@ void Player::UpdateWalkSpeed()
 	}
 }
 
-void Player::UpdatePhysics(vector<PlaceableObject*> objList)
+void Player::UpdatePhysics(vector<vector<PlaceableObject*>>& objectList)
 {
 	// AABB 위치 업데이트
 	m_AABB->SetCenter(m_position + m_AABBOffset);
 
 	// 근처에 있는 오브젝트들에 대해 충돌검사
-	CheckFourSides(objList);
+	CheckFourSides(objectList);
 
 	UpdateWallSlideAndJump();
 
@@ -401,19 +401,39 @@ void Player::UpdateWallSlideAndJump()
 	m_isWallJumpingTowardRight = m_isWallJumpingTowardRight && m_hasNoWalls && !g_pKeyManager->IsStayKeyDown(m_rightMoveKey);
 }
 
-void Player::CheckFourSides(vector<PlaceableObject*> objList)
+// 꼭짓점 위치를 게임화면 분할 영역 인덱스로 바꾼다
+POINT FromPosToGameScreenIndex(D3DXVECTOR2 pos)
 {
+	POINT res;
+	res.x = (int)pos.x / 200;
+	res.y = (int)pos.y / 200;
+	return res;
+}
+
+void Player::CheckFourSides(vector<vector<PlaceableObject*>>& objectList)
+{
+	// 캐릭터가 속한 게임화면 분할 영역에 해당하는 오브젝트들을 알아낸다
+	vector<PlaceableObject*> objectsToCheck;
+
+	// 캐릭터 AABB의 네 꼭짓점 위치의 게임화면 분할 영역 인덱스를 알아낸다
+	POINT dotIdxPos[4];
+	dotIdxPos[0] = FromPosToGameScreenIndex(m_AABB->GetLeftTopPoint());
+	dotIdxPos[1] = FromPosToGameScreenIndex(m_AABB->GetRightTopPoint());
+	dotIdxPos[2] = FromPosToGameScreenIndex(m_AABB->GetLeftBottomPoint());
+	dotIdxPos[3] = FromPosToGameScreenIndex(m_AABB->GetRightBottomPoint());
+
+
 	// 캐릭터의 x 위치 업데이트 (가로축 충돌 판정을 위해)
 	if (!(m_animState == ANIM_STATE::DEATH_SHOCK))
 	{
 		m_position.x += m_speed.x * g_pTimeManager->GetDeltaTime();
 		m_pushesLeftWall = m_pushesRightWall = m_onGround = m_atCeiling = false;
 	}
-	for (auto obj : objList)
+	for (auto obj : objectsToCheck)
 	{
 		// 왼쪽 벽 충돌
 		m_pushesLeftWall |= m_speed.x <= 0.0f && HasLeftWall(obj, m_oldPosition + m_AABBOffset, m_position + m_AABBOffset);
-		
+	
 		// 오른쪽 벽 충돌
 		m_pushesRightWall |= m_speed.x >= 0.0f && HasRightWall(obj, m_oldPosition + m_AABBOffset, m_position + m_AABBOffset);
 	}
@@ -428,11 +448,11 @@ void Player::CheckFourSides(vector<PlaceableObject*> objList)
 		m_position.y += m_speed.y* g_pTimeManager->GetDeltaTime();
 	}
 
-	for (auto obj : objList)
+	for (auto obj : objectsToCheck)
 	{
 		// 아래쪽 벽 충돌
 		m_onGround |= HasGround(obj, m_oldPosition + m_AABBOffset, m_position + m_AABBOffset);
-
+	
 		// 위쪽 벽 충돌
 		m_atCeiling |= m_speed.y > 0 && HasCeiling(obj, m_oldPosition + m_AABBOffset, m_position + m_AABBOffset);
 	}
@@ -479,7 +499,7 @@ bool Player::HasCeiling(PlaceableObject* other, D3DXVECTOR2 oldPosition, D3DXVEC
 		// startPixelX부터 endPixelX지점을 잇는 선에 닿는 모든 AABB들을 검사한다
 		for (D3DXVECTOR2 checkPoint = D3DXVECTOR2(startPixelX, pixelY); ; checkPoint.x = min(checkPoint.x + 1, endPixelX))
 		{
-			if (other->handleCollision(checkPoint, this, PlaceableObject::collisionCheckDir::CEILING))
+			if (other->handleCollision(checkPoint, this, PlaceableObject::collisionCheckDir::BOTTOM))
 			{
 				return true;
 			}
@@ -505,7 +525,7 @@ bool Player::HasLeftWall(PlaceableObject* other, D3DXVECTOR2 oldPosition, D3DXVE
 		// startPixelY부터 endPixelY지점을 잇는 선에 닿는 모든 AABB들을 검사한다
 		for (D3DXVECTOR2 checkPoint = D3DXVECTOR2(pixelX, startPixelY); ; checkPoint.y = min(checkPoint.y + 1, endPixelY))
 		{
-			if (other->handleCollision(checkPoint, this, PlaceableObject::collisionCheckDir::LEFT_WALL))
+			if (other->handleCollision(checkPoint, this, PlaceableObject::collisionCheckDir::BOTTOM))
 			{
 				return true;
 			}
@@ -531,7 +551,7 @@ bool Player::HasRightWall(PlaceableObject* other, D3DXVECTOR2 oldPosition, D3DXV
 		// startPixelY부터 endPixelY지점을 잇는 선에 닿는 모든 AABB들을 검사한다
 		for (D3DXVECTOR2 checkPoint = D3DXVECTOR2(pixelX, startPixelY); ; checkPoint.y = min(checkPoint.y + 1, endPixelY))
 		{
-			if (other->handleCollision(checkPoint, this, PlaceableObject::collisionCheckDir::RIGHT_WALL))
+			if (other->handleCollision(checkPoint, this, PlaceableObject::collisionCheckDir::BOTTOM))
 			{
 				return true;
 			}

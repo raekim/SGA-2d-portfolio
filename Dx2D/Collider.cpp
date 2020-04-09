@@ -29,3 +29,4 @@ void Collider::SetCenter(D3DXVECTOR2 c)
 
 	SetShapeCenter(c);
 }
+

@@ -2,6 +2,7 @@
 #include "AABB.h"
 class Map;
 class PlaceableObject;
+class Collider;
 class Player
 {
 	Map*		m_map;
@@ -107,9 +108,9 @@ private:
 	void UpdateJump();
 	void UpdateWalk();
 	void UpdateStand();
-	void UpdatePhysics(vector<PlaceableObject*> objList);
+	void UpdatePhysics(vector<vector<PlaceableObject*>>&);
 	void UpdateWallSlideAndJump();
-	void CheckFourSides(vector<PlaceableObject*> objList);
+	void CheckFourSides(vector<vector<PlaceableObject*>>&);
 	void UpdateAnimation();
 
 	// 상,하,좌,우 오브젝트 충돌
@@ -131,7 +132,7 @@ public:
 	~Player();
 
 	void Init(wstring sheetKey);
-	void Update(vector<PlaceableObject*> obj);
+	void Update(vector<vector<PlaceableObject*>>& objectList);
 	void Render();
 	void Release();
 

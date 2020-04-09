@@ -33,7 +33,7 @@ void SpinWheel::Init()
 {
 }
 
-void SpinWheel::Update()
+void SpinWheel::Update(vector<Collider*>& colliders)
 {
 	m_AABB->SetCenter(m_position);
 
