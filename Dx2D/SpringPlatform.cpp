@@ -6,6 +6,7 @@
 SpringPlatform::SpringPlatform()
 {
 	m_previewImage = new Sprite(L"springBoard-3", 1, 1, 0);
+	m_positionOffset = { 0,30 };
 }
 
 
@@ -78,13 +79,13 @@ void SpringPlatform::Init()
 void SpringPlatform::Update()
 {
 	m_AABBSizeAnimation->Play(m_curState);
-	m_AABBSizeAnimation->SetPosition(m_position);
+	m_AABBSizeAnimation->SetPosition(m_position + m_positionOffset);
 	m_AABBSizeAnimation->Update();
 
 	m_animation->Play(m_curState);
-	m_animation->SetPosition(m_position);
+	m_animation->SetPosition(m_position + m_positionOffset);
 	m_animation->Update();
-	m_AABB->SetCenter({ m_position.x, m_position.y - (m_animation->GetWidth()*0.5f - m_AABBSizeAnimation->GetHeight()*0.5f) + 5 });
+	m_AABB->SetCenter({ m_position.x + m_positionOffset.x, m_position.y + m_positionOffset.y - (m_animation->GetWidth()*0.5f - m_AABBSizeAnimation->GetHeight()*0.5f) + 5 });
 	m_AABB->SetHalfSize({ m_AABBSizeAnimation->GetWidth()*0.5f, m_AABBSizeAnimation->GetHeight()*0.5f });
 
 	switch (m_curState)
@@ -161,7 +162,7 @@ bool SpringPlatform::handleCollision(D3DXVECTOR2 pos, Player * player, collision
 void SpringPlatform::RenderPreviewImage()
 {
 	m_previewImage->SetSize(0.5f, 0.5f);
-	m_previewImage->SetPosition(m_position);
+	m_previewImage->SetPosition(m_position + D3DXVECTOR2(3, 7));
 	m_previewImage->Update();
 	m_previewImage->Render();
 }

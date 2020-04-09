@@ -10,8 +10,9 @@ SimplePlatform::SimplePlatform(D3DXVECTOR2 AABBHalfSize, D3DXVECTOR2 pos)
 	m_position = pos;
 }
 
-SimplePlatform::SimplePlatform(Platform_Type type, D3DXVECTOR2 pos)
+SimplePlatform::SimplePlatform(Platform_Type type)
 {
+	m_positionOffset = { 0,0 };
 	m_AABB = new AABB;
 	switch (type)
 	{
@@ -20,25 +21,28 @@ SimplePlatform::SimplePlatform(Platform_Type type, D3DXVECTOR2 pos)
 		m_sprite->SetSize({ 0.7f, 0.7 });
 		m_sprite->SetRotation({ 0, 0, D3DX_PI/2 });
 		m_AABB->SetHalfSize({ 15,60 });
+		m_positionOffset = { 0, 36 };
 		break;
 	case Platform_Type::SHORT_HORIZONTAL:
 		m_sprite = new Sprite(L"Object-Sheet-1", 6, 6, 0);
 		m_sprite->SetSize({ 0.7f, 0.7 });
 		m_AABB->SetHalfSize({ 60,15 });
+		m_positionOffset = { 35, 10 };
 		break;
 	case Platform_Type::MID_VERTICAL:
 		m_sprite = new Sprite(L"Object-Sheet-1", 6, 3, 15);
 		m_sprite->SetSize({ 0.7f, 0.7f });
 		m_AABB->SetHalfSize({ 23,91 });
+		m_positionOffset = { 0, 6 };
 		break;
 	case Platform_Type::MID_HORIZONTAL:
 		m_sprite = new Sprite(L"Object-Sheet-1", 6, 3, 15);
 		m_sprite->SetSize({ 0.7f, 0.7f });
 		m_sprite->SetRotation({ 0, 0, D3DX_PI / 2 });
 		m_AABB->SetHalfSize({ 91,23 });
+		m_positionOffset = { 5, 8 };
 		break;
 	}
-	m_position = pos;
 }
 
 
@@ -54,11 +58,11 @@ void SimplePlatform::Init()
 
 void SimplePlatform::Update()
 {
-	m_AABB->SetCenter(m_position);
+	m_AABB->SetCenter(m_position + m_positionOffset);
 	
 	if (m_sprite)
 	{
-		m_sprite->SetPosition(m_position);
+		m_sprite->SetPosition(m_position + m_positionOffset);
 		m_sprite->Update();
 	}
 }
@@ -122,7 +126,7 @@ void SimplePlatform::RenderPreviewImage()
 {
 	if (m_sprite)
 	{
-		m_sprite->SetPosition(m_position);
+		m_sprite->SetPosition(m_position + m_positionOffset);
 		m_sprite->Update();
 		m_sprite->Render();
 	}

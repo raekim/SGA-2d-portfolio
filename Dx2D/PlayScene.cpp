@@ -136,33 +136,47 @@ void PlayScene::Render()
 		m_mapBackground->Render();
 		m_mapForeground->Render();
 
+		// Àå¾Ö¹° ·»´õ
+		for (auto obj : m_placedObjects) obj->Render();
+
 		// Ä³¸¯ÅÍ ·»´õ
 		m_player1P->Render();
 		m_player2P->Render();
-
-		// Àå¾Ö¹° ·»´õ
-		for (auto obj : m_placedObjects) obj->Render();
 		break;
 	}
 }
 
+//enum class Platform_Type
+//{
+//	SHORT_VERTICAL,
+//	SHORT_HORIZONTAL,
+//	MID_VERTICAL,
+//	MID_HORIZONTAL,
+//	LONG_VERTICAL,
+//	LONG_HORIZONTAL,
+//	Max
+//};
+
 PlaceableObject* GetRandomPlaceableObject()
 {
-	int rnd = rand() % 4;
+	int rnd = rand() % 5;
 	switch (rnd)
 	{
 	case 0:
 		return new BallShooter;
-		break;
 	case 1:
 		return new honeyPlatform;
-		break;
 	case 2:
 		return new SpinWheel;
-		break;
 	case 3:
 		return new SpringPlatform;
-		break;
+	case 4:
+	{
+		int rnd = rand() % (int)SimplePlatform::Platform_Type::Max;
+		return new SimplePlatform(static_cast<SimplePlatform::Platform_Type>(rnd));
+	}
+	default:
+		return NULL;
 	}
 }
 

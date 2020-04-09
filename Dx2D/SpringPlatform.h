@@ -18,6 +18,7 @@ class SpringPlatform : public PlaceableObject
 	STATE					m_curState;
 	D3DXVECTOR2				m_AABBHalfSize[6];
 	Sprite*					m_previewImage;
+	D3DXVECTOR2				m_positionOffset;
 public:
 	SpringPlatform();
 	~SpringPlatform();

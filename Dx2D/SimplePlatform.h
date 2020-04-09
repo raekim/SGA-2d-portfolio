@@ -7,7 +7,7 @@ class SimplePlatform : public PlaceableObject
 	D3DXVECTOR3				m_rotation;
 	AABB*					m_AABB;
 	Sprite*					m_sprite;
-
+	D3DXVECTOR2				m_positionOffset;
 public:
 	enum class Platform_Type
 	{
@@ -16,12 +16,13 @@ public:
 		MID_VERTICAL,
 		MID_HORIZONTAL,
 		LONG_VERTICAL,
-		LONG_HORIZONTAL
+		LONG_HORIZONTAL,
+		Max
 	};
 public:
 	SimplePlatform() {};
 	SimplePlatform(D3DXVECTOR2 AABBHalfSize, D3DXVECTOR2 pos);
-	SimplePlatform(Platform_Type type, D3DXVECTOR2 pos);
+	SimplePlatform(Platform_Type type);
 	~SimplePlatform();
 
 	virtual void Init() override;
