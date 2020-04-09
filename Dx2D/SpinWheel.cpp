@@ -55,7 +55,7 @@ void SpinWheel::Update()
 	if (m_wheelRotationDelta > m_wheelRoatationSecond) m_wheelRotationDelta = 0.0f;
 
 	m_circle->SetCenter(m_position);
-	((Primitive2DObejct<Circle>*)m_circle)->RotateAroundPointAndUpdate({ 0, 0, m_barRotationAmount }, D3DXVECTOR2(0, 100));
+	((Primitive2DObejct<Circle>*)m_circle->GetCircle())->RotateAroundPointAndUpdate({ 0, 0, m_barRotationAmount }, D3DXVECTOR2(0, 100));
 }
 
 void SpinWheel::Render()
