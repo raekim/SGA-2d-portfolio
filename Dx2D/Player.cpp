@@ -401,27 +401,25 @@ void Player::UpdateWallSlideAndJump()
 	m_isWallJumpingTowardRight = m_isWallJumpingTowardRight && m_hasNoWalls && !g_pKeyManager->IsStayKeyDown(m_rightMoveKey);
 }
 
-// 꼭짓점 위치를 게임화면 분할 영역 인덱스로 바꾼다
-POINT FromPosToGameScreenIndex(D3DXVECTOR2 pos)
-{
-	POINT res;
-	res.x = (int)pos.x / 200;
-	res.y = (int)pos.y / 200;
-	return res;
-}
-
 void Player::CheckFourSides(vector<vector<PlaceableObject*>>& objectList)
 {
 	// 캐릭터가 속한 게임화면 분할 영역에 해당하는 오브젝트들을 알아낸다
 	vector<PlaceableObject*> objectsToCheck;
 
-	// 캐릭터 AABB의 네 꼭짓점 위치의 게임화면 분할 영역 인덱스를 알아낸다
-	POINT dotIdxPos[4];
-	dotIdxPos[0] = FromPosToGameScreenIndex(m_AABB->GetLeftTopPoint());
-	dotIdxPos[1] = FromPosToGameScreenIndex(m_AABB->GetRightTopPoint());
-	dotIdxPos[2] = FromPosToGameScreenIndex(m_AABB->GetLeftBottomPoint());
-	dotIdxPos[3] = FromPosToGameScreenIndex(m_AABB->GetRightBottomPoint());
+	POINT points[2];
+	points[0] = FromPosToGameScreenIndex(m_AABB->GetLeftTopPoint());
+	points[1] = FromPosToGameScreenIndex(m_AABB->GetRightBottomPoint());
+	int startY = points[0].y, EndY = points[1].y;
+	int startX = points[0].x, EndX = points[1].x;
 
+	for (int y = startY; y >= EndY; --y)
+	{
+		for (int x = startX; x <= EndX; ++x)
+		{
+			auto objs = objectList[y*GAMESCREEN_X_RATIO + x];
+			for (auto obj : objs)objectsToCheck.push_back(obj);
+		}
+	}
 
 	// 캐릭터의 x 위치 업데이트 (가로축 충돌 판정을 위해)
 	if (!(m_animState == ANIM_STATE::DEATH_SHOCK))
@@ -451,12 +449,11 @@ void Player::CheckFourSides(vector<vector<PlaceableObject*>>& objectList)
 	for (auto obj : objectsToCheck)
 	{
 		// 아래쪽 벽 충돌
-		m_onGround |= HasGround(obj, m_oldPosition + m_AABBOffset, m_position + m_AABBOffset);
+		m_onGround |= m_speed.y <= 0 && HasGround(obj, m_oldPosition + m_AABBOffset, m_position + m_AABBOffset);
 	
 		// 위쪽 벽 충돌
 		m_atCeiling |= m_speed.y > 0 && HasCeiling(obj, m_oldPosition + m_AABBOffset, m_position + m_AABBOffset);
 	}
-	m_onGround &= m_speed.y <= 0;
 }
 
 bool Player::HasGround(PlaceableObject* other, D3DXVECTOR2 oldPosition, D3DXVECTOR2 position)
@@ -464,8 +461,8 @@ bool Player::HasGround(PlaceableObject* other, D3DXVECTOR2 oldPosition, D3DXVECT
 	// 캐릭터 발 밑을 검사
 	int newPixelY = position.y - m_AABB->GetHalfSize().y - 5;
 	int oldPixelY = max(newPixelY, oldPosition.y - m_AABB->GetHalfSize().y - 5);
-	int startPixelX = position.x - m_AABB->GetHalfSize().x + 13;
-	int endPixelX = position.x + m_AABB->GetHalfSize().x - 13;
+	int startPixelX = position.x - m_AABB->GetHalfSize().x + 5;
+	int endPixelX = position.x + m_AABB->GetHalfSize().x - 5;
 
 	// 위에서 아래로 검사
 	for (int pixelY = oldPixelY; pixelY >= newPixelY; --pixelY)
@@ -499,7 +496,7 @@ bool Player::HasCeiling(PlaceableObject* other, D3DXVECTOR2 oldPosition, D3DXVEC
 		// startPixelX부터 endPixelX지점을 잇는 선에 닿는 모든 AABB들을 검사한다
 		for (D3DXVECTOR2 checkPoint = D3DXVECTOR2(startPixelX, pixelY); ; checkPoint.x = min(checkPoint.x + 1, endPixelX))
 		{
-			if (other->handleCollision(checkPoint, this, PlaceableObject::collisionCheckDir::BOTTOM))
+			if (other->handleCollision(checkPoint, this, PlaceableObject::collisionCheckDir::CEILING))
 			{
 				return true;
 			}
@@ -525,7 +522,7 @@ bool Player::HasLeftWall(PlaceableObject* other, D3DXVECTOR2 oldPosition, D3DXVE
 		// startPixelY부터 endPixelY지점을 잇는 선에 닿는 모든 AABB들을 검사한다
 		for (D3DXVECTOR2 checkPoint = D3DXVECTOR2(pixelX, startPixelY); ; checkPoint.y = min(checkPoint.y + 1, endPixelY))
 		{
-			if (other->handleCollision(checkPoint, this, PlaceableObject::collisionCheckDir::BOTTOM))
+			if (other->handleCollision(checkPoint, this, PlaceableObject::collisionCheckDir::LEFT_WALL))
 			{
 				return true;
 			}
@@ -551,7 +548,7 @@ bool Player::HasRightWall(PlaceableObject* other, D3DXVECTOR2 oldPosition, D3DXV
 		// startPixelY부터 endPixelY지점을 잇는 선에 닿는 모든 AABB들을 검사한다
 		for (D3DXVECTOR2 checkPoint = D3DXVECTOR2(pixelX, startPixelY); ; checkPoint.y = min(checkPoint.y + 1, endPixelY))
 		{
-			if (other->handleCollision(checkPoint, this, PlaceableObject::collisionCheckDir::BOTTOM))
+			if (other->handleCollision(checkPoint, this, PlaceableObject::collisionCheckDir::RIGHT_WALL))
 			{
 				return true;
 			}

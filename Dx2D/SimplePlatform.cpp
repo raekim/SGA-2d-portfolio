@@ -56,7 +56,7 @@ void SimplePlatform::Init()
 	m_rotation = { 0.0f, 0.0f, 0.0f };
 }
 
-void SimplePlatform::Update(vector<Collider*>& colliders)
+void SimplePlatform::Update(vector<vector<PlaceableObject*>>& objList)
 {
 	m_AABB->SetCenter(m_position + m_positionOffset);
 	
@@ -64,6 +64,22 @@ void SimplePlatform::Update(vector<Collider*>& colliders)
 	{
 		m_sprite->SetPosition(m_position + m_positionOffset);
 		m_sprite->Update();
+	}
+
+	// 전체 게임 화면을 16x9로 나눈 영역 중 해당하는 곳들에 이 오브젝트 포인터를 저장
+	POINT points[2];
+	points[0] = FromPosToGameScreenIndex(m_AABB->GetLeftTopPoint());
+	points[1] = FromPosToGameScreenIndex(m_AABB->GetRightBottomPoint());
+
+	int startY = points[0].y, EndY = points[1].y;
+	int startX = points[0].x, EndX = points[1].x;
+
+	for (int y = startY; y >= EndY; --y)
+	{
+		for (int x = startX; x <= EndX; ++x)
+		{
+			objList[y*GAMESCREEN_X_RATIO + x].push_back(this);
+		}
 	}
 }
 

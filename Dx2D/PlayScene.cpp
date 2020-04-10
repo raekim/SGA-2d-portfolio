@@ -104,7 +104,7 @@ void PlayScene::Update()
 
 			// 충돌검사에 쓰일 콜라이더들 정보
 			// 화면을 16x9로 분할했을 때 각각의 벡터에는 해당 영역에 속하는 PlaceableObject들의 포인터들이 있다
-			vector<vector<PlaceableObject*>> objList(16, vector<PlaceableObject*>(9)); 
+			vector<vector<PlaceableObject*>> objList(GAMESCREEN_X_RATIO*GAMESCREEN_Y_RATIO); 
 
 			// 오브젝트들 각자를 업데이트하고 콜라이더정보를 정해진 벡터에 넣는다
 			for (auto obj : m_mapBlocks) obj->Update(objList);
@@ -152,25 +152,28 @@ void PlayScene::Render()
 
 PlaceableObject* GetRandomPlaceableObject()
 {
-	int rnd = rand() % 5;
-	switch (rnd)
-	{
-	case 0:
-		return new BallShooter;
-	case 1:
-		return new honeyPlatform;
-	case 2:
-		return new SpinWheel;
-	case 3:
-		return new SpringPlatform;
-	case 4:
-	{
-		int rnd = rand() % (int)SimplePlatform::Platform_Type::Max;
-		return new SimplePlatform(static_cast<SimplePlatform::Platform_Type>(rnd));
-	}
-	default:
-		return NULL;
-	}
+	int rnd = rand() % (int)SimplePlatform::Platform_Type::Max;
+	return new SimplePlatform(static_cast<SimplePlatform::Platform_Type>(rnd));
+
+	//int rnd = rand() % 5;
+	//switch (rnd)
+	//{
+	//case 0:
+	//	return new BallShooter;
+	//case 1:
+	//	return new honeyPlatform;
+	//case 2:
+	//	return new SpinWheel;
+	//case 3:
+	//	return new SpringPlatform;
+	//case 4:
+	//{
+	//	int rnd = rand() % (int)SimplePlatform::Platform_Type::Max;
+	//	return new SimplePlatform(static_cast<SimplePlatform::Platform_Type>(rnd));
+	//}
+	//default:
+	//	return NULL;
+	//}
 }
 
 void PlayScene::SwitchToMapToolMode()

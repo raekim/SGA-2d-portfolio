@@ -20,7 +20,7 @@ public:
 	~PlaceableObject();
 
 	virtual void Init() PURE;
-	virtual void Update(vector<vector<PlaceableObject*>> objList) PURE;
+	virtual void Update(vector<vector<PlaceableObject*>>& objList) PURE;
 	virtual void Render() PURE;
 	virtual void Release() PURE;
 	virtual bool handleCollision(D3DXVECTOR2 pos, Player* player, collisionCheckDir dir) PURE;

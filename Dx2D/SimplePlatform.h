@@ -15,8 +15,6 @@ public:
 		SHORT_HORIZONTAL,
 		MID_VERTICAL,
 		MID_HORIZONTAL,
-		LONG_VERTICAL,
-		LONG_HORIZONTAL,
 		Max
 	};
 public:
@@ -26,7 +24,7 @@ public:
 	~SimplePlatform();
 
 	virtual void Init() override;
-	virtual void Update(vector<Collider*>& colliders) override;
+	virtual void Update(vector<vector<PlaceableObject*>>& objList) override;
 	virtual void Render() override;
 	virtual void Release() override;
 

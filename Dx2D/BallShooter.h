@@ -41,7 +41,7 @@ public:
 	~BallShooter();
 
 	virtual void Init() override;
-	virtual void Update(vector<PlaceableObject*> objList[16]) override;
+	virtual void Update(vector<vector<PlaceableObject*>>& objList) override;
 	virtual void Render() override;
 	virtual void Release() override;
 

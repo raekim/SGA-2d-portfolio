@@ -69,10 +69,10 @@ void PrototypeScene::Update()
 	{
 		PostQuitMessage(0); // WM_QUIT 메시지 발생
 	}
-	for (auto obj : m_vecObjectList) obj->Update();
+	//for (auto obj : m_vecObjectList) obj->Update();
 
-	m_player->Update(m_vecObjectList);
-	m_player2P->Update(m_vecObjectList);
+	//m_player->Update(m_vecObjectList);
+	//m_player2P->Update(m_vecObjectList);
 
 	g_pCamera->Update();
 }

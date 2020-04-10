@@ -39,7 +39,7 @@ void BallShooter::Init()
 	}
 }
 
-void BallShooter::Update(vector<PlaceableObject*> objList[16])
+void BallShooter::Update(vector<vector<PlaceableObject*>>& objList)
 {
 	if (m_shootDelayCount >= m_shootDelay)
 	{

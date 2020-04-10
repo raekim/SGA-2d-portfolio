@@ -1,5 +1,23 @@
 #pragma once
 /* Utility */
+
+// 꼭짓점 위치를 게임화면 분할 영역 인덱스로 바꾼다
+inline POINT FromPosToGameScreenIndex(D3DXVECTOR2 pos)
+{
+	POINT res;
+	// x좌표 변환
+	if (pos.x < 0) res.x = 0;
+	else if (pos.x > GAMESCREEN_X) res.x = GAMESCREEN_X_RATIO - 1;
+	else res.x = (int)pos.x / (GAMESCREEN_X / GAMESCREEN_X_RATIO);
+
+	// y좌표 변환
+	if (pos.y < 0) res.y = 0;
+	else if (pos.y > GAMESCREEN_Y) res.y = GAMESCREEN_Y_RATIO - 1;
+	else res.y = (int)pos.y / (GAMESCREEN_Y / GAMESCREEN_Y_RATIO);
+
+	return res;
+}
+
 inline bool PointInCircle(D3DXVECTOR2 p1, float r1, D3DXVECTOR2 point)
 {
 	float distX = p1.x - point.x;

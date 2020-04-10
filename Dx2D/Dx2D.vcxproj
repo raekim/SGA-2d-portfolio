@@ -155,12 +155,10 @@
   <ItemGroup>
     <ClInclude Include="AABB.h" />
     <ClInclude Include="Animation.h" />
-    <ClInclude Include="BallShooter.h" />
     <ClInclude Include="Camera.h" />
     <ClInclude Include="CircleCollider.h" />
     <ClInclude Include="Collider.h" />
     <ClInclude Include="FileManager.h" />
-    <ClInclude Include="honeyPlatform.h" />
     <ClInclude Include="LoadingScene.h" />
     <ClInclude Include="LoadManager.h" />
     <ClInclude Include="Clip.h" />
@@ -191,8 +189,6 @@
     <ClInclude Include="SimplePlatform.h" />
     <ClInclude Include="SingletonBase.h" />
     <ClInclude Include="SoundManager.h" />
-    <ClInclude Include="SpinWheel.h" />
-    <ClInclude Include="SpringPlatform.h" />
     <ClInclude Include="Sprite.h" />
     <ClInclude Include="stdafx.h" />
     <ClInclude Include="targetver.h" />
@@ -206,12 +202,10 @@
   <ItemGroup>
     <ClCompile Include="AABB.cpp" />
     <ClCompile Include="Animation.cpp" />
-    <ClCompile Include="BallShooter.cpp" />
     <ClCompile Include="Camera.cpp" />
     <ClCompile Include="CircleCollider.cpp" />
     <ClCompile Include="Collider.cpp" />
     <ClCompile Include="FileManager.cpp" />
-    <ClCompile Include="honeyPlatform.cpp" />
     <ClCompile Include="LoadingScene.cpp" />
     <ClCompile Include="LoadManager.cpp" />
     <ClCompile Include="Clip.cpp" />
@@ -238,8 +232,6 @@
     <ClCompile Include="ShaderManager.cpp" />
     <ClCompile Include="SimplePlatform.cpp" />
     <ClCompile Include="SoundManager.cpp" />
-    <ClCompile Include="SpinWheel.cpp" />
-    <ClCompile Include="SpringPlatform.cpp" />
     <ClCompile Include="Sprite.cpp" />
     <ClCompile Include="stdafx.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>

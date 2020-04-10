@@ -108,9 +108,9 @@ private:
 	void UpdateJump();
 	void UpdateWalk();
 	void UpdateStand();
-	void UpdatePhysics(vector<vector<PlaceableObject*>>&);
+	void UpdatePhysics(vector<vector<PlaceableObject*>>& objectList);
 	void UpdateWallSlideAndJump();
-	void CheckFourSides(vector<vector<PlaceableObject*>>&);
+	void CheckFourSides(vector<vector<PlaceableObject*>>& objectList);
 	void UpdateAnimation();
 
 	// 상,하,좌,우 오브젝트 충돌
