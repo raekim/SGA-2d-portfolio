@@ -34,6 +34,7 @@ void PlayScene::Init()
 	m_mapBlocks.push_back(new SimplePlatform({ 447.0f, 380.0f }, { GAMESCREEN_X - 653, 300.0f }));
 
 	g_pCamera->SetMapSize(GAMESCREEN_X, GAMESCREEN_Y);
+	g_pCamera->SetTarget(NULL);
 
 	// 플레이어 생성
 	m_player1P = new Player;
@@ -114,6 +115,34 @@ void PlayScene::Update()
 			m_player1P->Update(objList);
 			m_player2P->Update(objList);
 
+			// 1P와 2P의 상태를 바탕으로 카메라 처리
+			if (m_player1P->IsDead())
+			{
+				// 1P가 죽은 경우 카메라는 2P를 따라간다
+				g_pCamera->SetTarget(m_player2P->GetPosition());
+				g_pCamera->SetEyeVal(-1.0f);
+			}
+			else if(m_player2P->IsDead())
+			{
+				// 2P가 죽은 경우 카메라는 1P를 따라간다
+				g_pCamera->SetTarget(m_player1P->GetPosition());
+				g_pCamera->SetEyeVal(-1.0f);
+			}
+			else
+			{
+				// 1P, 2P 모두가 살아있는 경우 카메라는 둘의 중간 위치로 설정한다
+				m_camPos.x = fabs(m_player1P->GetPosition()->x + m_player2P->GetPosition()->x) / 2;
+				m_camPos.y = fabs(m_player1P->GetPosition()->y + m_player2P->GetPosition()->y) / 2;
+				g_pCamera->SetTarget(&m_camPos);
+
+				float eyeVal;
+				D3DXVECTOR2 distVec = *(m_player1P->GetPosition()) - *(m_player2P->GetPosition());
+				float dist = D3DXVec2Length(&distVec);
+				dist = min(dist, GAMESCREEN_X);
+				eyeVal = LinearInterpolation(-1.0f, -1.666f, dist / GAMESCREEN_X);
+
+				g_pCamera->SetEyeVal(eyeVal);
+			}
 			break;
 	}
 
@@ -153,6 +182,11 @@ void PlayScene::Render()
 
 PlaceableObject* GetRandomPlaceableObject()
 {
+	{
+		int rnd = rand() % (int)SimplePlatform::Platform_Type::Max;
+		return new SimplePlatform(static_cast<SimplePlatform::Platform_Type>(rnd));
+	}
+
 	int rnd = rand() % 6;
 	
 	switch (rnd)
@@ -180,9 +214,10 @@ void PlayScene::SwitchToMapToolMode()
 	m_curMode = MODE::MAPTOOL_MODE;
 
 	// 카메라 시점 설정
-	g_pCamera->SetEyeVal(-1.666f);
 	g_pCamera->SetTarget(NULL);
 	g_pCamera->SetPosition({ 0,0 });
+	g_pCamera->SetEyeVal(-1.666f);
+	g_pCamera->Update();
 
 	// 커서 설정
 	m_cursor1P->SetObjectToPlace(GetRandomPlaceableObject());
@@ -197,8 +232,10 @@ void PlayScene::SwitchToPlayMode()
 	m_curMode = MODE::PLAY_MODE;
 
 	// 카메라 시점 설정
+	g_pCamera->SetTarget(NULL);
 	g_pCamera->SetEyeVal(-1.0f);
-	g_pCamera->SetTarget(m_player1P->GetPosition());
+	g_pCamera->SetPosition({ 330.0f, 300.0f });
+	g_pCamera->Update();
 
 	// 캐릭터 설정
 	m_player1P->Revive({ 330.0f, 800.0f });

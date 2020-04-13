@@ -26,6 +26,9 @@ class PlayScene : public iGameNode
 	PlaceableObject*			m_vecObjectList[28][32];		// 격자상에 놓인 오브젝트들		[width][height]
 
 	vector<PlaceableObject*>	m_placedObjects;				// 맵 상에 놓여진 오브젝트들
+
+	// 카메라 관련
+	D3DXVECTOR2					m_camPos;
 private:
 	void SwitchToMapToolMode();
 	void SwitchToPlayMode();

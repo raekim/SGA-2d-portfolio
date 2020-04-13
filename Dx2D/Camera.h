@@ -5,7 +5,7 @@
 
 class Camera : public SingletonBase<Camera>
 {
-#define MOVESPEED 500
+#define MOVESPEED 100//500
 
 private:
 	ID3D11Buffer*		m_pViewProjBuffer;	// 뷰, 프로젝션 매트릭스 버퍼

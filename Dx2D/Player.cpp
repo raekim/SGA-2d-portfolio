@@ -835,6 +835,7 @@ void Player::Die()
 	{
 		m_isDead = true;
 		m_speed.x = 0.0f;
+
 	}
 }
 
