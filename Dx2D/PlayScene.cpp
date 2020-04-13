@@ -39,7 +39,7 @@ void PlayScene::Init()
 	// 플레이어 생성
 	m_player1P = new Player;
 	m_player1P->Init(L"Chicken-Sheet");
-	m_player1P->SetJumpKey(VK_SPACE);
+	m_player1P->SetJumpKey(VK_RCONTROL);
 	m_player1P->SetLeftMoveKey(VK_LEFT);
 	m_player1P->SetRightMoveKey(VK_RIGHT);
 
@@ -56,7 +56,7 @@ void PlayScene::Init()
 	m_cursor1P->SetRightMoveKey(VK_RIGHT);
 	m_cursor1P->SetUpMoveKey(VK_UP);
 	m_cursor1P->SetDownMoveKey(VK_DOWN);
-	m_cursor1P->SetSelectKey(VK_SPACE);
+	m_cursor1P->SetSelectKey(VK_RCONTROL);
 	m_cursor1P->SetFlipKey(VK_RSHIFT);
 
 	m_cursor2P = new PlayerCursor;
@@ -182,11 +182,6 @@ void PlayScene::Render()
 
 PlaceableObject* GetRandomPlaceableObject()
 {
-	{
-		int rnd = rand() % (int)SimplePlatform::Platform_Type::Max;
-		return new SimplePlatform(static_cast<SimplePlatform::Platform_Type>(rnd));
-	}
-
 	int rnd = rand() % 6;
 	
 	switch (rnd)
