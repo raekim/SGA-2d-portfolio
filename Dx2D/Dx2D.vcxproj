@@ -161,6 +161,7 @@
     <ClInclude Include="CircleCollider.h" />
     <ClInclude Include="Collider.h" />
     <ClInclude Include="FileManager.h" />
+    <ClInclude Include="GoalFlag.h" />
     <ClInclude Include="honeyPlatform.h" />
     <ClInclude Include="LoadingScene.h" />
     <ClInclude Include="LoadManager.h" />
@@ -213,6 +214,7 @@
     <ClCompile Include="CircleCollider.cpp" />
     <ClCompile Include="Collider.cpp" />
     <ClCompile Include="FileManager.cpp" />
+    <ClCompile Include="GoalFlag.cpp" />
     <ClCompile Include="honeyPlatform.cpp" />
     <ClCompile Include="LoadingScene.cpp" />
     <ClCompile Include="LoadManager.cpp" />

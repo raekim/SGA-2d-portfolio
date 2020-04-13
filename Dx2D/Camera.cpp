@@ -55,6 +55,11 @@ void Camera::Init()
 	m_vMapSize.x = WINSIZEX;
 	m_vMapSize.y = WINSIZEY;
 
+	m_positionRangeX = { 0, m_vMapSize.x - WINSIZEX };
+	m_positionRangeY = { 0, m_vMapSize.y - WINSIZEY };
+
+	m_eyeVal = -1;
+
 	m_pTarget = NULL;
 }
 
@@ -76,15 +81,25 @@ void Camera::Update()
 		m_vPosition = *m_pTarget - m_vFocus;
 	}
 
-	if (m_vPosition.x <= 0)
-		m_vPosition.x = 0;
-	else if (m_vPosition.x > m_vMapSize.x - WINSIZEX)
-		m_vPosition.x = m_vMapSize.x - WINSIZEX;
+	//if (m_vPosition.x <= 0)
+	//	m_vPosition.x = 0;
+	//else if (m_vPosition.x > m_vMapSize.x - WINSIZEX)
+	//	m_vPosition.x = m_vMapSize.x - WINSIZEX;
+	//
+	//if (m_vPosition.y <= 0)
+	//	m_vPosition.y = 0;
+	//else if (m_vPosition.y > m_vMapSize.y - WINSIZEY)
+	//	m_vPosition.y = m_vMapSize.y - WINSIZEY;
 
-	if (m_vPosition.y <= 0)
-		m_vPosition.y = 0;
-	else if (m_vPosition.y > m_vMapSize.y - WINSIZEY)
-		m_vPosition.y = m_vMapSize.y - WINSIZEY;
+	if (m_vPosition.x <= m_positionRangeX.x)
+		m_vPosition.x = m_positionRangeX.x;
+	else if (m_vPosition.x > m_positionRangeX.y)
+		m_vPosition.x = m_positionRangeX.y;
+	
+	if (m_vPosition.y <= m_positionRangeY.x)
+		m_vPosition.y = m_positionRangeY.x;
+	else if (m_vPosition.y > m_positionRangeY.y)
+		m_vPosition.y = m_positionRangeY.y;
 
 	// 뷰 매트릭스 셋팅
 	//m_vEye = D3DXVECTOR3(m_vPosition.x, m_vPosition.y, -1);

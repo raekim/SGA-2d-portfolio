@@ -70,6 +70,10 @@ void PlayScene::Init()
 
 	// 맨 처음은 맵툴모드에서 시작
 	SwitchToMapToolMode();
+
+	m_goalFlag = new GoalFlag;
+	m_goalFlag->Init();
+	m_goalFlag->SetPosition({ GAMESCREEN_X - 800, GAMESCREEN_Y*0.5f - 150 });
 }
 
 void PlayScene::Update()
@@ -111,6 +115,8 @@ void PlayScene::Update()
 			for (auto obj : m_mapBlocks) obj->Update(objList);
 			for (auto obj : m_placedObjects) obj->Update(objList);
 
+			m_goalFlag->Update(objList);
+
 			// 콜라이더 정보를 바탕으로 충돌처리
 			m_player1P->Update(objList);
 			m_player2P->Update(objList);
@@ -120,12 +126,14 @@ void PlayScene::Update()
 			{
 				// 1P가 죽은 경우 카메라는 2P를 따라간다
 				g_pCamera->SetTarget(m_player2P->GetPosition());
+				g_pCamera->SetPositionRange({ 0, GAMESCREEN_X - WINSIZEX }, { 0, GAMESCREEN_Y - WINSIZEY });
 				g_pCamera->SetEyeVal(-1.0f);
 			}
 			else if(m_player2P->IsDead())
 			{
 				// 2P가 죽은 경우 카메라는 1P를 따라간다
 				g_pCamera->SetTarget(m_player1P->GetPosition());
+				g_pCamera->SetPositionRange({ 0, GAMESCREEN_X - WINSIZEX }, { 0, GAMESCREEN_Y - WINSIZEY });
 				g_pCamera->SetEyeVal(-1.0f);
 			}
 			else
@@ -139,8 +147,11 @@ void PlayScene::Update()
 				D3DXVECTOR2 distVec = *(m_player1P->GetPosition()) - *(m_player2P->GetPosition());
 				float dist = D3DXVec2Length(&distVec);
 				dist = min(dist, GAMESCREEN_X);
-				eyeVal = LinearInterpolation(-1.0f, -1.666f, dist / GAMESCREEN_X);
-
+				eyeVal = LinearInterpolation(-0.9f, -1.666f, dist / GAMESCREEN_X);
+				g_pCamera->SetPositionRange(
+					D3DXVECTOR2( 0, (FLOAT)LinearInterpolation(GAMESCREEN_X - WINSIZEX, 0, (eyeVal + 1) / -0.666f) ),
+					D3DXVECTOR2( 0, (FLOAT)LinearInterpolation(GAMESCREEN_Y - WINSIZEY, 0, (eyeVal + 1) / -0.666f) )
+				);
 				g_pCamera->SetEyeVal(eyeVal);
 			}
 			break;
@@ -168,6 +179,7 @@ void PlayScene::Render()
 	case MODE::PLAY_MODE:
 		// 맵 렌더
 		m_mapBackground->Render();
+		m_goalFlag->Render();
 		m_mapForeground->Render();
 
 		// 장애물 렌더
@@ -182,6 +194,12 @@ void PlayScene::Render()
 
 PlaceableObject* GetRandomPlaceableObject()
 {
+	{
+		int rnd = rand() % (int)SimplePlatform::Platform_Type::Max;
+		return new SimplePlatform(static_cast<SimplePlatform::Platform_Type>(rnd));
+	}
+
+
 	int rnd = rand() % 6;
 	
 	switch (rnd)
@@ -212,6 +230,7 @@ void PlayScene::SwitchToMapToolMode()
 	g_pCamera->SetTarget(NULL);
 	g_pCamera->SetPosition({ 0,0 });
 	g_pCamera->SetEyeVal(-1.666f);
+	g_pCamera->SetPositionRange({ 0, GAMESCREEN_X - WINSIZEX }, { 0, GAMESCREEN_Y - WINSIZEY });
 	g_pCamera->Update();
 
 	// 커서 설정
@@ -246,4 +265,6 @@ void PlayScene::Release()
 	SAFE_DELETE(m_player1P);
 	SAFE_DELETE(m_player2P);
 	SAFE_DELETE(m_cursor1P);
+
+	m_goalFlag->Release();
 }
