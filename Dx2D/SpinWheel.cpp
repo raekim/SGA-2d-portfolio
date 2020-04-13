@@ -6,7 +6,7 @@
 SpinWheel::SpinWheel()
 {
 	m_AABB = new AABB;
-	m_AABB->SetHalfSize({ 25.0f, 25.0f });
+	m_AABB->SetHalfSize({ 21.0f, 21.0f });
 
 	m_blockSprite = new Sprite(L"Object-Sheet-1", 6, 6, 14);
 	m_blockSprite->SetSize(0.65f, 0.65f);
@@ -33,7 +33,7 @@ void SpinWheel::Init()
 {
 }
 
-void SpinWheel::Update(vector<Collider*>& colliders)
+void SpinWheel::Update(vector<vector<PlaceableObject*>>& objList)
 {
 	m_AABB->SetCenter(m_position);
 
@@ -56,6 +56,10 @@ void SpinWheel::Update(vector<Collider*>& colliders)
 
 	m_circle->SetCenter(m_position);
 	((Primitive2DObejct<Circle>*)m_circle->GetCircle())->RotateAroundPointAndUpdate({ 0, 0, m_barRotationAmount }, D3DXVECTOR2(0, 100));
+	m_circle->SetCenter({ m_circle->GetCircle()->GetWMatrix()._41, m_circle->GetCircle()->GetWMatrix()._42 });
+
+	PlaceableObject::RegisterObjectCollider(m_AABB, objList);
+	PlaceableObject::RegisterObjectCollider(m_circle, objList);
 }
 
 void SpinWheel::Render()
@@ -80,11 +84,12 @@ bool SpinWheel::handleCollision(D3DXVECTOR2 pos, Player * player, collisionCheck
 {
 	// 플레이어와 톱날이 충돌했다면 플레이어 사망
 	// The x, y, and z components of the translation are stored in the ._41, ._42, and ._43 members of the matrix.
-	D3DXVECTOR2 circlePos = { m_circle->GetCircle()->GetWMatrix()._41, m_circle->GetCircle()->GetWMatrix()._42 };
-	if (CircleCollision(circlePos, m_circle->GetHalfSize().x, player->m_position, min(player->GetAABBHalfSize().x, player->GetAABBHalfSize().y)) ||
+	//D3DXVECTOR2 circlePos = { m_circle->GetCircle()->GetWMatrix()._41, m_circle->GetCircle()->GetWMatrix()._42 };
+	if (CircleCollision(m_circle->GetCenter(), m_circle->GetHalfSize().x, player->m_position, min(player->GetAABBHalfSize().x, player->GetAABBHalfSize().y)) ||
 		m_circle->pointInCollider(pos))
 	{
 		player->Die();
+		return false;	// 벽 충돌이 아닌 톱날 충돌이므로 false 반환
 	}
 
 	// 블록 부분과 충돌

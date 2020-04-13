@@ -15,6 +15,7 @@ public:
 
 	D3DXVECTOR2				m_position;
 	bool					m_flipped;
+	Collider*				m_collider;
 public:
 	PlaceableObject();
 	~PlaceableObject();
@@ -25,6 +26,7 @@ public:
 	virtual void Release() PURE;
 	virtual bool handleCollision(D3DXVECTOR2 pos, Player* player, collisionCheckDir dir) PURE;
 
+	void RegisterObjectCollider(Collider* collider, vector<vector<PlaceableObject*>>& objList);
 	void SetPosition(D3DXVECTOR2 pos) { m_position = pos; };
 	void SetFlip(bool val) { m_flipped = val; }
 

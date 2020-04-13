@@ -113,6 +113,7 @@ void PlayScene::Update()
 			// 콜라이더 정보를 바탕으로 충돌처리
 			m_player1P->Update(objList);
 			m_player2P->Update(objList);
+
 			break;
 	}
 
@@ -152,28 +153,25 @@ void PlayScene::Render()
 
 PlaceableObject* GetRandomPlaceableObject()
 {
-	int rnd = rand() % (int)SimplePlatform::Platform_Type::Max;
-	return new SimplePlatform(static_cast<SimplePlatform::Platform_Type>(rnd));
-
-	//int rnd = rand() % 5;
-	//switch (rnd)
-	//{
-	//case 0:
-	//	return new BallShooter;
-	//case 1:
-	//	return new honeyPlatform;
-	//case 2:
-	//	return new SpinWheel;
-	//case 3:
-	//	return new SpringPlatform;
-	//case 4:
-	//{
-	//	int rnd = rand() % (int)SimplePlatform::Platform_Type::Max;
-	//	return new SimplePlatform(static_cast<SimplePlatform::Platform_Type>(rnd));
-	//}
-	//default:
-	//	return NULL;
-	//}
+	int rnd = rand() % 6;
+	
+	switch (rnd)
+	{
+	case 0:
+	case 1:
+	{
+		int rnd = rand() % (int)SimplePlatform::Platform_Type::Max;
+		return new SimplePlatform(static_cast<SimplePlatform::Platform_Type>(rnd));
+	}
+	case 2:
+		return new honeyPlatform;
+	case 3:
+		return new SpinWheel;
+	case 4:
+		return new SpringPlatform;
+	case 5:
+		return new BallShooter;
+	}
 }
 
 void PlayScene::SwitchToMapToolMode()

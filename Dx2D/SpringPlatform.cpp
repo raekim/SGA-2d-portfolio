@@ -76,7 +76,7 @@ void SpringPlatform::Init()
 	m_curState = STATE::Idle;
 }
 
-void SpringPlatform::Update(vector<Collider*>& colliders)
+void SpringPlatform::Update(vector<vector<PlaceableObject*>>& objList)
 {
 	m_AABBSizeAnimation->Play(m_curState);
 	m_AABBSizeAnimation->SetPosition(m_position + m_positionOffset);
@@ -97,6 +97,8 @@ void SpringPlatform::Update(vector<Collider*>& colliders)
 		}
 		break;
 	}
+
+	PlaceableObject::RegisterObjectCollider(m_AABB, objList);
 }
 
 void SpringPlatform::Render()
@@ -127,8 +129,8 @@ bool SpringPlatform::handleCollision(D3DXVECTOR2 pos, Player * player, collision
 			if (m_curState == STATE::Idle)
 			{
 				m_curState = STATE::Springly;
-				player->SetPositionY(m_AABB->GetAABBTop() + player->GetAABBHalfSize().y + 10);
-				player->m_speed.y = player->IsDead()? 600.0f : 1500.0f;
+				player->SetPositionY(m_AABB->GetAABBTop() + player->GetAABBHalfSize().y + 15);
+				player->m_speed.y = player->IsDead()? 600.0f : 1300.0f;
 				player->Jump();
 			}
 			break;

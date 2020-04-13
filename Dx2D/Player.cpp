@@ -234,7 +234,7 @@ void Player::Update(vector<vector<PlaceableObject*>>& objectList)
 
 void Player::UpdateJump()
 {
-	if (m_onGround)
+	if (m_onGround && floorf(m_speed.y <= 0.0f))
 	{
 		m_speed.y = 0.0f;
 		m_curState = STATE::Stand;
@@ -404,7 +404,7 @@ void Player::UpdateWallSlideAndJump()
 void Player::CheckFourSides(vector<vector<PlaceableObject*>>& objectList)
 {
 	// 캐릭터가 속한 게임화면 분할 영역에 해당하는 오브젝트들을 알아낸다
-	vector<PlaceableObject*> objectsToCheck;
+	set<PlaceableObject*> objectsToCheck;
 
 	POINT points[2];
 	points[0] = FromPosToGameScreenIndex(m_AABB->GetLeftTopPoint());
@@ -417,7 +417,7 @@ void Player::CheckFourSides(vector<vector<PlaceableObject*>>& objectList)
 		for (int x = startX; x <= EndX; ++x)
 		{
 			auto objs = objectList[y*GAMESCREEN_X_RATIO + x];
-			for (auto obj : objs)objectsToCheck.push_back(obj);
+			for (auto obj : objs)objectsToCheck.insert(obj);
 		}
 	}
 
@@ -430,10 +430,10 @@ void Player::CheckFourSides(vector<vector<PlaceableObject*>>& objectList)
 	for (auto obj : objectsToCheck)
 	{
 		// 왼쪽 벽 충돌
-		m_pushesLeftWall |= m_speed.x <= 0.0f && HasLeftWall(obj, m_oldPosition + m_AABBOffset, m_position + m_AABBOffset);
+		m_pushesLeftWall |= floorf(m_speed.x) <= 0.0f && HasLeftWall(obj, m_oldPosition + m_AABBOffset, m_position + m_AABBOffset);
 	
 		// 오른쪽 벽 충돌
-		m_pushesRightWall |= m_speed.x >= 0.0f && HasRightWall(obj, m_oldPosition + m_AABBOffset, m_position + m_AABBOffset);
+		m_pushesRightWall |= floorf(m_speed.x) >= 0.0f && HasRightWall(obj, m_oldPosition + m_AABBOffset, m_position + m_AABBOffset);
 	}
 
 	m_slidesLeftWall = m_pushesLeftWall && m_speed.x == 0.0f;
@@ -449,18 +449,20 @@ void Player::CheckFourSides(vector<vector<PlaceableObject*>>& objectList)
 	for (auto obj : objectsToCheck)
 	{
 		// 아래쪽 벽 충돌
-		m_onGround |= m_speed.y <= 0 && HasGround(obj, m_oldPosition + m_AABBOffset, m_position + m_AABBOffset);
+		m_onGround |= floorf(m_speed.y) <= 0 && HasGround(obj, m_oldPosition + m_AABBOffset, m_position + m_AABBOffset);
 	
 		// 위쪽 벽 충돌
-		m_atCeiling |= m_speed.y > 0 && HasCeiling(obj, m_oldPosition + m_AABBOffset, m_position + m_AABBOffset);
+		m_atCeiling |= floorf(m_speed.y) >= 0 && HasCeiling(obj, m_oldPosition + m_AABBOffset, m_position + m_AABBOffset);
 	}
+
+
 }
 
 bool Player::HasGround(PlaceableObject* other, D3DXVECTOR2 oldPosition, D3DXVECTOR2 position)
 {
 	// 캐릭터 발 밑을 검사
-	int newPixelY = position.y - m_AABB->GetHalfSize().y - 5;
-	int oldPixelY = max(newPixelY, oldPosition.y - m_AABB->GetHalfSize().y - 5);
+	int newPixelY = position.y - m_AABB->GetHalfSize().y - 8;
+	int oldPixelY = max(newPixelY, oldPosition.y - m_AABB->GetHalfSize().y - 8);
 	int startPixelX = position.x - m_AABB->GetHalfSize().x + 5;
 	int endPixelX = position.x + m_AABB->GetHalfSize().x - 5;
 
@@ -511,8 +513,8 @@ bool Player::HasCeiling(PlaceableObject* other, D3DXVECTOR2 oldPosition, D3DXVEC
 bool Player::HasLeftWall(PlaceableObject* other, D3DXVECTOR2 oldPosition, D3DXVECTOR2 position)
 {
 	// 캐릭터 왼쪽을 검사
-	int newPixelX = position.x - m_AABB->GetHalfSize().x - 2;
-	int oldPixelX = max(newPixelX, oldPosition.x - m_AABB->GetHalfSize().x - 2);
+	int newPixelX = position.x - m_AABB->GetHalfSize().x - 5;
+	int oldPixelX = max(newPixelX, oldPosition.x - m_AABB->GetHalfSize().x - 5);
 	int startPixelY = position.y - m_AABB->GetHalfSize().y + 8;
 	int endPixelY = position.y + m_AABB->GetHalfSize().y - 8;
 
@@ -537,8 +539,8 @@ bool Player::HasLeftWall(PlaceableObject* other, D3DXVECTOR2 oldPosition, D3DXVE
 bool Player::HasRightWall(PlaceableObject* other, D3DXVECTOR2 oldPosition, D3DXVECTOR2 position)
 {
 	// 캐릭터 오른쪽을 검사
-	int newPixelX = position.x + m_AABB->GetHalfSize().x + 2;
-	int oldPixelX = min(newPixelX, oldPosition.x + m_AABB->GetHalfSize().x + 2);
+	int newPixelX = position.x + m_AABB->GetHalfSize().x + 5;
+	int oldPixelX = min(newPixelX, oldPosition.x + m_AABB->GetHalfSize().x + 5);
 	int startPixelY = position.y - m_AABB->GetHalfSize().y + 8;
 	int endPixelY = position.y + m_AABB->GetHalfSize().y - 8;
 
@@ -601,7 +603,7 @@ void Player::GetNextAnimationState()
 		{
 			m_animState = ANIM_STATE::JUMP_GOING_UP;
 		}
-		if (m_speed.y < 0.0f)
+		if (floorf(m_speed.y) < 0.0f && !m_onGround)
 		{
 			m_animState = ANIM_STATE::JUMP_TOP;
 		}
@@ -715,7 +717,7 @@ void Player::GetNextAnimationState()
 		}
 		break;
 	case ANIM_STATE::LANDING_SOFT:
-		if (m_speed.y != 0.0f || m_speed.x != 0.0f)
+		if (floorf(m_speed.y) != 0.0f || floorf(m_speed.x) != 0.0f)
 		{
 			m_animState = ANIM_STATE::IDLE;
 			GetNextAnimationState();
@@ -829,8 +831,11 @@ void Player::Release()
 
 void Player::Die()
 {
-	m_isDead = true; 
-	m_speed.x = 0.0f; 
+	if (!m_isDead)
+	{
+		m_isDead = true;
+		m_speed.x = 0.0f;
+	}
 }
 
 void Player::Revive(D3DXVECTOR2 pos)

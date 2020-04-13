@@ -12,38 +12,21 @@ PlaceableObject::~PlaceableObject()
 {
 }
 
-//bool PlaceableObject::SimpleRectPlayerCollisionFunc(D3DXVECTOR2 colliderHalfSize, D3DXVECTOR2 colliderCenter, D3DXVECTOR2 pos, Player * player, PlaceableObject::collisionCheckDir dir, bool& colliderEnabled)
-//{
-//	switch (dir)
-//	{
-//	case PlaceableObject::collisionCheckDir::BOTTOM:
-//		if (player->m_speed.y < 0.0f)
-//		{
-//			player->m_speed.y = 0.0f;
-//			player->SetPositionY(m_AABB->GetAABBTop() + player->GetAABBHalfSize().y);
-//		}
-//		break;
-//	case PlaceableObject::collisionCheckDir::CEILING:
-//		if (player->m_speed.y > 0.0f)
-//		{
-//			player->m_speed.y = 0.0f;
-//			player->SetPositionY(m_AABB->GetAABBBottom() - player->GetAABBHalfSize().y);
-//		}
-//		break;
-//	case PlaceableObject::collisionCheckDir::LEFT_WALL:
-//		if (player->m_speed.x < 0.0f)
-//		{
-//			player->m_speed.x = 0.0f;
-//			player->SetPositionX(m_AABB->GetAABBRight() + player->GetAABBHalfSize().x);
-//		}
-//		break;
-//	case PlaceableObject::collisionCheckDir::RIGHT_WALL:
-//		if (player->m_speed.x > 0.0f)
-//		{
-//			player->m_speed.x = 0.0f;
-//			player->SetPositionX(m_AABB->GetAABBLeft() - player->GetAABBHalfSize().x);
-//		}
-//		break;
-//	}
-//	return true;
-//}
+void PlaceableObject::RegisterObjectCollider(Collider* collider, vector<vector<PlaceableObject*>>& objList)
+{
+	// 전체 게임 화면을 나눈 영역 중 해당하는 곳들에 이 오브젝트 포인터를 저장
+	POINT points[2];
+	points[0] = FromPosToGameScreenIndex(collider->GetLeftTopPoint());
+	points[1] = FromPosToGameScreenIndex(collider->GetRightBottomPoint());
+
+	int startY = points[0].y, EndY = points[1].y;
+	int startX = points[0].x, EndX = points[1].x;
+
+	for (int y = startY; y >= EndY; --y)
+	{
+		for (int x = startX; x <= EndX; ++x)
+		{
+			objList[y*GAMESCREEN_X_RATIO + x].push_back(this);
+		}
+	}
+}

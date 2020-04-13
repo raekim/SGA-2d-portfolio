@@ -8,7 +8,6 @@ class honeyPlatform : public PlaceableObject
 	D3DXVECTOR2				m_oldPosition;
 	D3DXVECTOR2				m_moveDelta;
 	D3DXVECTOR3				m_rotation;
-	AABB*					m_AABB;
 	D3DXVECTOR2				m_AABBOffset;
 	Sprite*					m_crateSprite;		// 블록 이미지
 	Sprite*					m_barSprite;		// 블록이 매달려서 움직이는 선 이미지
@@ -23,7 +22,7 @@ public:
 	~honeyPlatform();
 
 	void Init();
-	void Update(vector<PlaceableObject*> objList);
+	void Update(vector<vector<PlaceableObject*>>& objList);
 	void Render();
 	void Release();
 

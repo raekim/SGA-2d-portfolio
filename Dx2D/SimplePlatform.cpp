@@ -4,8 +4,8 @@
 
 SimplePlatform::SimplePlatform(D3DXVECTOR2 AABBHalfSize, D3DXVECTOR2 pos)
 {
-	m_AABB = new AABB;
-	m_AABB->SetHalfSize(AABBHalfSize);
+	m_collider = new AABB;
+	m_collider->SetHalfSize(AABBHalfSize);
 	m_sprite = NULL;
 	m_position = pos;
 }
@@ -13,33 +13,33 @@ SimplePlatform::SimplePlatform(D3DXVECTOR2 AABBHalfSize, D3DXVECTOR2 pos)
 SimplePlatform::SimplePlatform(Platform_Type type)
 {
 	m_positionOffset = { 0,0 };
-	m_AABB = new AABB;
+	m_collider = new AABB;
 	switch (type)
 	{
 	case Platform_Type::SHORT_VERTICAL:
 		m_sprite = new Sprite(L"Object-Sheet-1", 6, 6, 0);
 		m_sprite->SetSize({ 0.7f, 0.7 });
 		m_sprite->SetRotation({ 0, 0, D3DX_PI/2 });
-		m_AABB->SetHalfSize({ 15,60 });
+		m_collider->SetHalfSize({ 15,60 });
 		m_positionOffset = { 0, 36 };
 		break;
 	case Platform_Type::SHORT_HORIZONTAL:
 		m_sprite = new Sprite(L"Object-Sheet-1", 6, 6, 0);
 		m_sprite->SetSize({ 0.7f, 0.7 });
-		m_AABB->SetHalfSize({ 60,15 });
+		m_collider->SetHalfSize({ 60,15 });
 		m_positionOffset = { 35, 10 };
 		break;
 	case Platform_Type::MID_VERTICAL:
 		m_sprite = new Sprite(L"Object-Sheet-1", 6, 3, 15);
 		m_sprite->SetSize({ 0.7f, 0.7f });
-		m_AABB->SetHalfSize({ 23,91 });
+		m_collider->SetHalfSize({ 23,91 });
 		m_positionOffset = { 0, 6 };
 		break;
 	case Platform_Type::MID_HORIZONTAL:
 		m_sprite = new Sprite(L"Object-Sheet-1", 6, 3, 15);
 		m_sprite->SetSize({ 0.7f, 0.7f });
 		m_sprite->SetRotation({ 0, 0, D3DX_PI / 2 });
-		m_AABB->SetHalfSize({ 91,23 });
+		m_collider->SetHalfSize({ 91,23 });
 		m_positionOffset = { 5, 8 };
 		break;
 	}
@@ -58,29 +58,15 @@ void SimplePlatform::Init()
 
 void SimplePlatform::Update(vector<vector<PlaceableObject*>>& objList)
 {
-	m_AABB->SetCenter(m_position + m_positionOffset);
-	
+	m_collider->SetCenter(m_position + m_positionOffset);
+
 	if (m_sprite)
 	{
 		m_sprite->SetPosition(m_position + m_positionOffset);
 		m_sprite->Update();
 	}
 
-	// 전체 게임 화면을 16x9로 나눈 영역 중 해당하는 곳들에 이 오브젝트 포인터를 저장
-	POINT points[2];
-	points[0] = FromPosToGameScreenIndex(m_AABB->GetLeftTopPoint());
-	points[1] = FromPosToGameScreenIndex(m_AABB->GetRightBottomPoint());
-
-	int startY = points[0].y, EndY = points[1].y;
-	int startX = points[0].x, EndX = points[1].x;
-
-	for (int y = startY; y >= EndY; --y)
-	{
-		for (int x = startX; x <= EndX; ++x)
-		{
-			objList[y*GAMESCREEN_X_RATIO + x].push_back(this);
-		}
-	}
+	PlaceableObject::RegisterObjectCollider(m_collider, objList);
 }
 
 void SimplePlatform::Render()
@@ -89,25 +75,24 @@ void SimplePlatform::Render()
 	{
 		m_sprite->Render();
 	}
-	m_AABB->Render();
+	m_collider->Render();
 }
 
 void SimplePlatform::Release()
 {
-	SAFE_DELETE(m_AABB);
 	SAFE_DELETE(m_sprite);
 }
 
 bool SimplePlatform::handleCollision(D3DXVECTOR2 pos, Player * player, collisionCheckDir dir)
 {
-	if (m_AABB->pointInCollider(pos))
+	if (m_collider->pointInCollider(pos))
 	{
 		switch (dir)
 		{
 		case collisionCheckDir::BOTTOM:
 			if (player->m_speed.y < 0.0f)
 			{
-				player->SetPositionY(m_AABB->GetAABBTop() + player->GetAABBHalfSize().y);
+				player->SetPositionY(((AABB*)m_collider)->GetAABBTop() + player->GetAABBHalfSize().y);
 				player->m_speed.y = 0.0f;
 			}
 			break;
@@ -115,13 +100,13 @@ bool SimplePlatform::handleCollision(D3DXVECTOR2 pos, Player * player, collision
 			if (player->m_speed.y > 0.0f)
 			{
 				player->m_speed.y = 0.0f;
-				player->SetPositionY(m_AABB->GetAABBBottom() - player->GetAABBHalfSize().y);
+				player->SetPositionY(((AABB*)m_collider)->GetAABBBottom() - player->GetAABBHalfSize().y);
 			}
 			break;
 		case collisionCheckDir::LEFT_WALL:
 			if (player->m_speed.x < 0.0f)
 			{
-				player->SetPositionX(m_AABB->GetAABBRight() + player->GetAABBHalfSize().x);
+				player->SetPositionX(((AABB*)m_collider)->GetAABBRight() + player->GetAABBHalfSize().x);
 				player->m_speed.x = 0.0f;
 			}
 			break;
@@ -129,7 +114,7 @@ bool SimplePlatform::handleCollision(D3DXVECTOR2 pos, Player * player, collision
 			if (player->m_speed.x > 0.0f)
 			{
 				player->m_speed.x = 0.0f;
-				player->SetPositionX(m_AABB->GetAABBLeft() - player->GetAABBHalfSize().x);
+				player->SetPositionX(((AABB*)m_collider)->GetAABBLeft() - player->GetAABBHalfSize().x);
 			}
 			break;
 		}

@@ -5,7 +5,7 @@
 class SimplePlatform : public PlaceableObject
 {
 	D3DXVECTOR3				m_rotation;
-	AABB*					m_AABB;
+	//AABB*					m_AABB;
 	Sprite*					m_sprite;
 	D3DXVECTOR2				m_positionOffset;
 public:
