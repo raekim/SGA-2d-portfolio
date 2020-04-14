@@ -45,6 +45,10 @@ bool PlayerCursor::Update(vector<PlaceableObject*>& objList)
 	if (m_placed) return m_placed;
 
 	MoveCursor();
+	
+	// 현재 위치에 오브젝트를 놓을 수 있나 검사
+	auto placeIndex = m_map->PosToIndex(m_objectPos);
+	bool canPlaceObjectOnCurPos = m_objectToPlace->CanPlaceObject(placeIndex.second, placeIndex.first, m_map);
 
 	// 오브젝트 flip 하기
 	if (g_pKeyManager->IsOnceKeyDown(m_flipKey))
@@ -54,12 +58,25 @@ bool PlayerCursor::Update(vector<PlaceableObject*>& objList)
 	}
 
 	// 오브젝트 놓기
-	if (g_pKeyManager->IsOnceKeyDown(m_selectKey))
+	if (canPlaceObjectOnCurPos)
 	{
-		m_objectToPlace->SetFlip(m_isFlipped);
-		m_objectToPlace->Init();
-		objList.push_back(m_objectToPlace);
-		m_placed = true;
+		// 오브젝트를 놓을 수 있는 상황
+		m_objectToPlace->SetPreviewImageColor({ 1,1,1,1 });
+		
+		// select 키를 누르면 현재 위치에 오브젝트를 놓는다
+		if (g_pKeyManager->IsOnceKeyDown(m_selectKey))
+		{
+			m_objectToPlace->PlaceObject(placeIndex.second, placeIndex.first, m_map);
+			m_objectToPlace->SetFlip(m_isFlipped);
+			m_objectToPlace->Init();
+			objList.push_back(m_objectToPlace);
+			m_placed = true;
+		}
+	}
+	else
+	{
+		// 오브젝트를 놓을 수 없는 상황
+		m_objectToPlace->SetPreviewImageColor({ 1,0,0,1 });
 	}
 	return m_placed;
 }

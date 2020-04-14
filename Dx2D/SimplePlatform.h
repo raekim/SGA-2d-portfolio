@@ -30,5 +30,9 @@ public:
 
 	virtual bool handleCollision(D3DXVECTOR2 pos, Player* player, collisionCheckDir dir) override;
 	virtual void RenderPreviewImage();
+
+	virtual void SetPreviewImageColor(D3DXCOLOR color) override;
+	virtual bool CanPlaceObject(int w, int h, Map* map) override;
+	virtual void PlaceObject(int w, int h, Map* map) override;
 };
 

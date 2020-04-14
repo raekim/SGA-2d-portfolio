@@ -1,6 +1,7 @@
 #include "stdafx.h"
 #include "honeyPlatform.h"
 #include "Player.h"
+#include "Map.h"
 
 honeyPlatform::honeyPlatform()
 {
@@ -41,6 +42,7 @@ void honeyPlatform::Init()
 		m_barSprite->SetPosition(m_midPosition + D3DXVECTOR2(7.0f, 0.0f));
 		m_barSprite->Update();
 	}
+	m_crateOffset = D3DXVECTOR2(0, 13);
 }
 
 void honeyPlatform::Update(vector<vector<PlaceableObject*>>& objList)
@@ -61,7 +63,7 @@ void honeyPlatform::Update(vector<vector<PlaceableObject*>>& objList)
 	m_oldPosition = m_cratePosition;
 	m_movingDelta += g_pTimeManager->GetDeltaTime();
 
-	m_crateSprite->SetPosition(m_cratePosition);
+	m_crateSprite->SetPosition(m_cratePosition + m_crateOffset);
 	m_crateSprite->Update();
 
 	PlaceableObject::RegisterObjectCollider(m_collider, objList);
@@ -79,6 +81,25 @@ void honeyPlatform::Release()
 {
 	SAFE_DELETE(m_crateSprite);
 	SAFE_DELETE(m_barSprite);
+}
+
+bool honeyPlatform::CanPlaceObject(int h, int w, Map* map)
+{
+	return !(map->GetCellStatus(h , w));
+}
+
+void honeyPlatform::PlaceObject(int h, int w, Map* map)
+{
+	map->SetCellStatus(h, w, true);
+}
+
+void honeyPlatform::SetPreviewImageColor(D3DXCOLOR color)
+{
+	m_barSprite->SetColor(color);
+	m_barSprite->Update();
+
+	m_crateSprite->SetColor(color);
+	m_crateSprite->Update();
 }
 
 bool honeyPlatform::handleCollision(D3DXVECTOR2 pos, Player * player, collisionCheckDir dir)
@@ -136,9 +157,7 @@ void honeyPlatform::RenderPreviewImage()
 	m_barSprite->Render();
 
 	// ºí·Ï ·»´õ
-	m_crateSprite->SetSize({ 0.8f, 0.8f });
-	m_crateSprite->SetPosition(m_position);
+	m_crateSprite->SetPosition(m_position + D3DXVECTOR2(0,13));
 	m_crateSprite->Update();
 	m_crateSprite->Render();
-	m_crateSprite->SetSize({ 0.65f, 0.65f });
 }

@@ -24,5 +24,8 @@ public:
 
 	// 프리뷰 이미지 관련
 	virtual void RenderPreviewImage() override;
+	virtual void SetPreviewImageColor(D3DXCOLOR color) override {};
+	virtual bool CanPlaceObject(int h, int w, Map* map) override { return false; }
+	virtual void PlaceObject(int h, int w, Map* map) override {};
 };
 

@@ -28,6 +28,10 @@ void PlayScene::Init()
 	m_player2P->SetLeftMoveKey('F');
 	m_player2P->SetRightMoveKey('H');
 
+	// 맵 생성
+	m_map = new Map;
+	m_map->Init();
+
 	// 플레이어 커서 생성
 	m_cursor1P = new PlayerCursor;
 	m_cursor1P->Init(new Sprite(L"Chicken-Sheet", CHICKEN_SHEET_X/2, CHICKEN_SHEET_Y, (CHICKEN_SHEET_X / 2) * 5 + 5), new Sprite(L"Chicken-Sheet", CHICKEN_SHEET_X / 2, CHICKEN_SHEET_Y, (CHICKEN_SHEET_X / 2) *5 + 6));
@@ -37,6 +41,7 @@ void PlayScene::Init()
 	m_cursor1P->SetDownMoveKey(VK_DOWN);
 	m_cursor1P->SetSelectKey(VK_RCONTROL);
 	m_cursor1P->SetFlipKey(VK_RSHIFT);
+	m_cursor1P->SetMap(m_map);
 
 	m_cursor2P = new PlayerCursor;
 	m_cursor2P->Init(new Sprite(L"Chicken-Sheet-2P", CHICKEN_SHEET_X / 2, CHICKEN_SHEET_Y, (CHICKEN_SHEET_X / 2) * 5 + 5), new Sprite(L"Chicken-Sheet", CHICKEN_SHEET_X / 2, CHICKEN_SHEET_Y, (CHICKEN_SHEET_X / 2) * 5 + 6));
@@ -46,6 +51,7 @@ void PlayScene::Init()
 	m_cursor2P->SetDownMoveKey('G');
 	m_cursor2P->SetSelectKey('Z');
 	m_cursor2P->SetFlipKey(VK_LSHIFT);
+	m_cursor2P->SetMap(m_map);
 
 	// 맨 처음은 맵툴모드에서 시작
 	SwitchToMapToolMode();
@@ -104,9 +110,7 @@ void PlayScene::UpdatePlayMode()
 	vector<vector<PlaceableObject*>> objList(GAMESCREEN_X_RATIO*GAMESCREEN_Y_RATIO);
 
 	// 맵 상의 오브젝트들을 업데이트하고 콜라이더 정보를 정해진 벡터에 넣는다
-	for (auto obj : m_mapBlocks) obj->Update(objList);
-	for (auto obj : m_map->GetPlacedObjects()) obj->Update(objList);
-	m_goalFlag->Update(objList);
+	m_map->Update(objList);
 
 	// 콜라이더 정보를 바탕으로 충돌처리
 	m_player1P->Update(objList);
@@ -157,25 +161,16 @@ void PlayScene::Render()
 	switch (m_curMode)
 	{
 	case MODE::MAPTOOL_MODE:
-		// 맵 렌더
-		m_mapBackground->Render();
-		m_mapPaper->Render();
-		m_mapForeground->Render();
-
-		for (auto obj : m_placedObjects) obj->RenderPreviewImage();
+		// 맵툴모드 맵 렌더
+		m_map->RenderMapToolMode();
 
 		// 커서 렌더
 		m_cursor1P->Render();
 		m_cursor2P->Render();
 		break;
 	case MODE::PLAY_MODE:
-		// 맵 렌더
-		m_mapBackground->Render();
-		m_goalFlag->Render();
-		m_mapForeground->Render();
-
-		// 장애물 렌더
-		for (auto obj : m_placedObjects) obj->Render();
+		// 플레이 모드 맵 렌더
+		m_map->RenderPlayMode();
 
 		// 캐릭터 렌더
 		m_player1P->Render();
@@ -186,31 +181,26 @@ void PlayScene::Render()
 
 PlaceableObject* GetRandomPlaceableObject()
 {
-	{
-		int rnd = rand() % (int)SimplePlatform::Platform_Type::Max;
-		return new SimplePlatform(static_cast<SimplePlatform::Platform_Type>(rnd));
-	}
-
-
+	return new honeyPlatform;
 	int rnd = rand() % 6;
 	
-	switch (rnd)
-	{
-	case 0:
-	case 1:
-	{
-		int rnd = rand() % (int)SimplePlatform::Platform_Type::Max;
-		return new SimplePlatform(static_cast<SimplePlatform::Platform_Type>(rnd));
-	}
-	case 2:
-		return new honeyPlatform;
-	case 3:
-		return new SpinWheel;
-	case 4:
-		return new SpringPlatform;
-	case 5:
-		return new BallShooter;
-	}
+	//switch (rnd)
+	//{
+	//case 0:
+	//case 1:
+	//{
+	//	int rnd = rand() % (int)SimplePlatform::Platform_Type::Max;
+	//	return new SimplePlatform(static_cast<SimplePlatform::Platform_Type>(rnd));
+	//}
+	//case 2:
+	//	return new honeyPlatform; // applied cannot-place
+	//case 3:
+	//	return new SpinWheel;
+	//case 4:
+	//	return new SpringPlatform;
+	//case 5:
+	//	return new BallShooter;
+	//}
 }
 
 void PlayScene::SwitchToMapToolMode()
@@ -251,13 +241,7 @@ void PlayScene::SwitchToPlayMode()
 
 void PlayScene::Release()
 {
-	SAFE_DELETE(m_mapBackground);
-	SAFE_DELETE(m_mapPaper);
-	SAFE_DELETE(m_mapForeground);
-
 	SAFE_DELETE(m_player1P);
 	SAFE_DELETE(m_player2P);
 	SAFE_DELETE(m_cursor1P);
-
-	m_goalFlag->Release();
 }

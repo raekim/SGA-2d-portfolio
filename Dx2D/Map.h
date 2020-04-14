@@ -22,10 +22,13 @@ public:
 	~Map();
 
 	void Init();
-	void Update()
+	void Update(vector<vector<PlaceableObject*>>& objList);
+	void RenderPlayMode();			// ÇÃ·¹ÀÌ¸ðµå ¸Ê ·»´õ
+	void RenderMapToolMode();		// ¸ÊÅø¸ðµå ¸Ê ·»´õ
+	void Release();
 
-	bool GetCellStatus(int w, int h);
-	void SetCellStatus(int w, int h, bool val);
+	bool GetCellStatus(int h, int w);
+	void SetCellStatus(int h, int w, bool val);
 	pair<int, int> PosToIndex(D3DXVECTOR2 pos);
 	D3DXVECTOR2 IndexToPos(pair<int, int> index);
 

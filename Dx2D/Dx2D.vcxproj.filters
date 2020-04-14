@@ -186,9 +186,6 @@
     <ClInclude Include="Shader.h">
       <Filter>Dx2D Framework\2. Manager\Shader</Filter>
     </ClInclude>
-    <ClInclude Include="SimplePlatform.h">
-      <Filter>Dx2D Framework\Scene\Objects\PlaceableObjects</Filter>
-    </ClInclude>
     <ClInclude Include="PlayScene.h">
       <Filter>Dx2D Framework\Scene\PlayScene</Filter>
     </ClInclude>
@@ -213,26 +210,17 @@
     <ClInclude Include="honeyPlatform.h">
       <Filter>Dx2D Framework\Scene\Objects\PlaceableObjects</Filter>
     </ClInclude>
-    <ClInclude Include="SpinWheel.h">
-      <Filter>Dx2D Framework\Scene\Objects\PlaceableObjects</Filter>
-    </ClInclude>
-    <ClInclude Include="SpringPlatform.h">
-      <Filter>Dx2D Framework\Scene\Objects\PlaceableObjects</Filter>
-    </ClInclude>
-    <ClInclude Include="BallShooter.h">
-      <Filter>Dx2D Framework\Scene\Objects\PlaceableObjects</Filter>
-    </ClInclude>
-    <ClInclude Include="GoalFlag.h">
-      <Filter>Dx2D Framework\Scene\PlayScene</Filter>
-    </ClInclude>
-    <ClInclude Include="Ball.h">
-      <Filter>Dx2D Framework\Scene\Objects\PlaceableObjects</Filter>
-    </ClInclude>
     <ClInclude Include="PlaceableObject.h">
       <Filter>Dx2D Framework\Scene\Objects\PlaceableObjects\Base</Filter>
     </ClInclude>
     <ClInclude Include="Map.h">
       <Filter>Dx2D Framework\Scene\PlayScene</Filter>
+    </ClInclude>
+    <ClInclude Include="SimplePlatform.h">
+      <Filter>Dx2D Framework\Scene\Objects\PlaceableObjects</Filter>
+    </ClInclude>
+    <ClInclude Include="GoalFlag.h">
+      <Filter>Dx2D Framework\Scene\Objects\PlaceableObjects</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -311,9 +299,6 @@
     <ClCompile Include="Shader.cpp">
       <Filter>Dx2D Framework\2. Manager\Shader</Filter>
     </ClCompile>
-    <ClCompile Include="SimplePlatform.cpp">
-      <Filter>Dx2D Framework\Scene\Objects\PlaceableObjects</Filter>
-    </ClCompile>
     <ClCompile Include="PlayScene.cpp">
       <Filter>Dx2D Framework\Scene\PlayScene</Filter>
     </ClCompile>
@@ -338,26 +323,17 @@
     <ClCompile Include="honeyPlatform.cpp">
       <Filter>Dx2D Framework\Scene\Objects\PlaceableObjects</Filter>
     </ClCompile>
-    <ClCompile Include="SpinWheel.cpp">
-      <Filter>Dx2D Framework\Scene\Objects\PlaceableObjects</Filter>
-    </ClCompile>
-    <ClCompile Include="SpringPlatform.cpp">
-      <Filter>Dx2D Framework\Scene\Objects\PlaceableObjects</Filter>
-    </ClCompile>
-    <ClCompile Include="BallShooter.cpp">
-      <Filter>Dx2D Framework\Scene\Objects\PlaceableObjects</Filter>
-    </ClCompile>
-    <ClCompile Include="GoalFlag.cpp">
-      <Filter>Dx2D Framework\Scene\PlayScene</Filter>
-    </ClCompile>
-    <ClCompile Include="Ball.cpp">
-      <Filter>Dx2D Framework\Scene\Objects\PlaceableObjects</Filter>
-    </ClCompile>
     <ClCompile Include="PlaceableObject.cpp">
       <Filter>Dx2D Framework\Scene\Objects\PlaceableObjects\Base</Filter>
     </ClCompile>
     <ClCompile Include="Map.cpp">
       <Filter>Dx2D Framework\Scene\PlayScene</Filter>
+    </ClCompile>
+    <ClCompile Include="SimplePlatform.cpp">
+      <Filter>Dx2D Framework\Scene\Objects\PlaceableObjects</Filter>
+    </ClCompile>
+    <ClCompile Include="GoalFlag.cpp">
+      <Filter>Dx2D Framework\Scene\Objects\PlaceableObjects</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

@@ -132,3 +132,16 @@ void SimplePlatform::RenderPreviewImage()
 		m_sprite->Render();
 	}
 }
+
+void SimplePlatform::SetPreviewImageColor(D3DXCOLOR color)
+{
+}
+
+bool SimplePlatform::CanPlaceObject(int w, int h, Map * map)
+{
+	return false;
+}
+
+void SimplePlatform::PlaceObject(int w, int h, Map * map)
+{
+}
