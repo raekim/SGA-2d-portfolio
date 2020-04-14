@@ -1,6 +1,7 @@
 #pragma once
 
 class PlaceableObject;
+class Map;
 class PlayerCursor
 {	
 	int					m_selectKey, m_leftMoveKey, m_rightMoveKey, m_upMoveKey, m_downMoveKey, m_flipKey; // 컨트롤 정보
@@ -16,15 +17,9 @@ class PlayerCursor
 	bool				m_isFlipped;
 	bool				m_placed;						// 오브젝트를 놓았는가?
 
-	// 맵 정보
-	int					m_paperWidth;
-	int					m_paperHeight;
-	float				m_cellSize;
-	int					m_zeroHeightPoint, m_zeroWidthPoint;	// 격자칸의 0,0 (맨 왼쪽 아래 부분) 위치
+	Map*				m_map;
 private:
 	void MoveCursor();
-	pair<int, int> PosToIndex(D3DXVECTOR2 pos);
-	D3DXVECTOR2 IndexToPos(pair<int, int> index);
 public:
 	PlayerCursor();
 	~PlayerCursor();
@@ -41,6 +36,7 @@ public:
 	void SetDownMoveKey(int key) { m_downMoveKey = key; }
 	void SetSelectKey(int key) { m_selectKey = key; }
 	void SetFlipKey(int key) { m_flipKey = key; }
+	void SetMap(Map* map) { m_map = map; }
 
 	void SetCursorPosition(D3DXVECTOR2 pos);
 	void SetObjectToPlace(PlaceableObject* obj) { m_objectToPlace = obj; }

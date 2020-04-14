@@ -1,11 +1,9 @@
 #pragma once
 #include "AABB.h"
-class Map;
 class PlaceableObject;
 class Collider;
 class Player
 {
-	Map*		m_map;
 	enum class STATE
 	{
 		Stand,

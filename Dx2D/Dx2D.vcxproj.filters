@@ -180,9 +180,6 @@
     <ClInclude Include="RenderTextureTest.h">
       <Filter>Dx2D Framework\4. GameClasses\5. RenderTexture</Filter>
     </ClInclude>
-    <ClInclude Include="Map.h">
-      <Filter>Dx2D Framework\Scene\Prototype</Filter>
-    </ClInclude>
     <ClInclude Include="ShaderManager.h">
       <Filter>Dx2D Framework\2. Manager\Shader</Filter>
     </ClInclude>
@@ -233,6 +230,9 @@
     </ClInclude>
     <ClInclude Include="PlaceableObject.h">
       <Filter>Dx2D Framework\Scene\Objects\PlaceableObjects\Base</Filter>
+    </ClInclude>
+    <ClInclude Include="Map.h">
+      <Filter>Dx2D Framework\Scene\PlayScene</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -305,9 +305,6 @@
     <ClCompile Include="RenderTextureTest.cpp">
       <Filter>Dx2D Framework\4. GameClasses\5. RenderTexture</Filter>
     </ClCompile>
-    <ClCompile Include="Map.cpp">
-      <Filter>Dx2D Framework\Scene\Prototype</Filter>
-    </ClCompile>
     <ClCompile Include="ShaderManager.cpp">
       <Filter>Dx2D Framework\2. Manager\Shader</Filter>
     </ClCompile>
@@ -358,6 +355,9 @@
     </ClCompile>
     <ClCompile Include="PlaceableObject.cpp">
       <Filter>Dx2D Framework\Scene\Objects\PlaceableObjects\Base</Filter>
+    </ClCompile>
+    <ClCompile Include="Map.cpp">
+      <Filter>Dx2D Framework\Scene\PlayScene</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

@@ -1,50 +1,34 @@
 #pragma once
-
-#define MAP_WIDTH 16		// 가로 타일 갯수
-#define MAP_HEIGHT 9		// 세로 타일 갯수
-#define TILE_SIZE 120		// 정사각형 타일의 한 변 길이
-
-enum class TileType
+class PlaceableObject;
+class GoalFlag;
+class Map
 {
-	Empty,
-	Block,
-	// 충돌 타입 뿐만 아니라 타일의 외관에 따라서도 enum 종류 추가
-	// ...
-	Max
-};
+	int							m_paperWidth;							// 오브젝트를 놓을 수 있는 종이의 가로칸 수
+	int							m_paperHeight;							// 오브젝트를 놓을 수 있는 종이의 세로칸 수
+	float						m_cellSize;								// 종이의 한 칸 가로(세로)길이
+	int							m_zeroHeightPoint, m_zeroWidthPoint;	// 격자칸의 0,0 (맨 왼쪽 아래 부분) 위치
 
-class Map : public iGameNode
-{
-	Rect*			m_rect;					// 맵을 그릴 임시 사각형
-	TileType		m_Tiles[MAP_WIDTH][MAP_HEIGHT];
-	vector<Sprite*> m_TilesSprites;
+	Sprite*						m_mapForeground;						// 맵 포어그라운드 이미지
+	Sprite*						m_mapBackground;						// 맵 백그라운드 이미지
+	Sprite*						m_mapPaper;								// 맵툴모드에서 쓰이는 격자 종이 이미지
+	vector<PlaceableObject*>	m_mapBlocks;							// 맵 지형
+
+	vector<PlaceableObject*>	m_placedObjects;						// 맵 상에 놓여진 오브젝트들
+	GoalFlag*					m_goalFlag;								// 골인 지점 깃발
+
+	vector<vector<bool>>*		m_vecPaperCellMark;						// 오브젝트를 놓을 수 있는 종이의 어떤 칸에 오브젝트가 놓여있나 표시. (m_paperHeight)x(m_paperWidth) 크기임
 public:
 	Map();
 	~Map();
 
-	virtual void Init() override;
-	virtual void Update() override;
-	virtual void Render() override;
-	virtual void Release() override;
+	void Init();
+	void Update()
 
-	// D3DXVECTOR2 타입의 좌표를 타일맵 인덱스로 변환하는 함수
-	POINT GetTilePointAtWorldPoint(D3DXVECTOR2 worldPoint);
-	int GetTileXAtWorldPoint(D3DXVECTOR2 worldPoint);
-	int GetTileYAtWorldPoint(D3DXVECTOR2 worldPoint);
+	bool GetCellStatus(int w, int h);
+	void SetCellStatus(int w, int h, bool val);
+	pair<int, int> PosToIndex(D3DXVECTOR2 pos);
+	D3DXVECTOR2 IndexToPos(pair<int, int> index);
 
-	// 특정 인덱스의 타일맵을 D3DXVECTOR2 타입의 좌표로 변환하는 함수 (타일 정 중앙의 좌표 반환)
-	D3DXVECTOR2 GetWorldPointAtTile(int x, int y);
-	D3DXVECTOR2 GetWorldPointAtTile(POINT point);
-
-	// 특정 인덱스의 타일맵의 모서리 위치를 반환하는 함수
-	float GetTileTop(POINT point) { return GetWorldPointAtTile(point).y + TILE_SIZE*0.5f; }			// 타일의 위 y좌표
-	float GetTileBottom(POINT point) { return GetWorldPointAtTile(point).y - TILE_SIZE * 0.5f; }	// 타일의 아래 y좌표
-	float GetTileLeft(POINT point) { return GetWorldPointAtTile(point).x - TILE_SIZE * 0.5f; }		// 타일의 왼쪽 x좌표
-	float GetTileRight(POINT point) { return GetWorldPointAtTile(point).x + TILE_SIZE * 0.5f; }		// 타일의 오른쪽 x좌표
-
-	bool IsObstacle(int x, int y);
-	bool IsEmpty(int x, int y);
-	bool IsGround(int x, int y);
-	TileType GetTileType(int x, int y);
+	vector<PlaceableObject*>& GetPlacedObjects() { return m_placedObjects; }
 };
 

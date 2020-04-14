@@ -1,6 +1,7 @@
 #include "stdafx.h"
 #include "Map.h"
-
+#include "SimplePlatform.h"
+#include "GoalFlag.h"
 
 Map::Map()
 {
@@ -13,122 +14,81 @@ Map::~Map()
 
 void Map::Init()
 {
-	m_rect = new Rect;
-	m_rect->Init();
-	m_rect->SetSize({ 120.0f, 120.0f });
-	m_rect->SetDraw(true);
-	m_rect->SetColor({ 0,0,1,1 });
+	m_paperWidth = 2049;
+	m_paperHeight = 1800;
+	m_cellSize = 64.0f;
 
-	for (int x = 0; x < MAP_WIDTH; ++x)
-	{
-		for (int y = 0; y < MAP_HEIGHT; ++y)
-		{
-			m_Tiles[x][y] = TileType::Empty;
-		}
-	}
+	// (m_paperHeight)x(m_paperWidth) 크기의 2차원 bool 벡터 생성
+	m_vecPaperCellMark = new vector<vector<bool>>(m_paperHeight, vector<bool>(m_paperWidth, false));
 
-	for (int x = 0; x < MAP_WIDTH; ++x)
-	{
-		m_Tiles[x][0] = TileType::Block;
-	}
+	// 오브젝트 종이 기준으로 (0,0)지점 (왼쪽 아래) 위치 초기화
+	m_zeroWidthPoint = (GAMESCREEN_X - m_paperWidth)*0.5f + m_cellSize * 0.5f;
+	m_zeroHeightPoint = (GAMESCREEN_Y - m_paperHeight)*0.5f + m_cellSize * 0.5f;
 
-	m_Tiles[9][2] = TileType::Block;
-	m_Tiles[9][3] = TileType::Block;
-	m_Tiles[9][4] = TileType::Block;
-	m_Tiles[9][5] = TileType::Block;
-	m_Tiles[9][6] = TileType::Block;
+	// 배경 이미지 불러오기
+	m_mapForeground = new Sprite(L"City-Foreground", 1, 1, 0);
+	m_mapBackground = new Sprite(L"City-Background", 1, 1, 0);
+	m_mapPaper = new Sprite(L"City-Paper", 1, 1, 0);
 
+	m_mapForeground->SetPosition(GAMESCREEN_X*0.5f, GAMESCREEN_Y*0.5f);
+	m_mapBackground->SetPosition(GAMESCREEN_X*0.5f, GAMESCREEN_Y*0.5f);
+	m_mapPaper->SetPosition(GAMESCREEN_X*0.5f, GAMESCREEN_Y*0.5f);
+	m_mapForeground->Update();
+	m_mapBackground->Update();
+	m_mapPaper->Update();
 
+	// 맵 지형 설정
+	m_mapBlocks.push_back(new SimplePlatform({ 200.0f, 350.0f }, { 465.0f, 300.0f }));
+	m_mapBlocks.push_back(new SimplePlatform({ 447.0f, 380.0f }, { GAMESCREEN_X - 653, 300.0f }));
+
+	// 골인깃발 설정
+	m_goalFlag = new GoalFlag;
+	m_goalFlag->Init();
+	m_goalFlag->SetPosition({ GAMESCREEN_X - 550, GAMESCREEN_Y*0.5f - 150 });
 }
 
-void Map::Update()
+bool Map::GetCellStatus(int w, int h)
 {
+	if (w < 0 || w >= m_paperWidth) return false;
+	if (h < 0 || h >= m_paperHeight) return false;
+
+	return (*m_vecPaperCellMark)[h][w];
 }
 
-void Map::Render()
+void Map::SetCellStatus(int w, int h, bool val)
 {
-	for (int x = 0; x < MAP_WIDTH; ++x)
-	{
-		for (int y = 0; y < MAP_HEIGHT; ++y)
-		{
-			if (m_Tiles[x][y] == TileType::Block)
-			{
-				m_rect->SetPosition(GetWorldPointAtTile(x, y));
-				m_rect->Update();
-				m_rect->Render();
-			}
-		}
-	}
+	if (w < 0 || w >= m_paperWidth) return;
+	if (h < 0 || h >= m_paperHeight) return;
+
+	(*m_vecPaperCellMark)[h][w] = val;
 }
 
-void Map::Release()
+pair<int, int> Map::PosToIndex(D3DXVECTOR2 pos)
 {
-	SAFE_DELETE(m_rect);
+	pair<int, int> res;
+
+	// 오브젝트 배치 가능한 영역 안으로 clamp
+	pos.x = min(pos.x, (GAMESCREEN_X + m_paperWidth)*0.5f);
+	pos.x = max(pos.x, (GAMESCREEN_X - m_paperWidth)*0.5f);
+	pos.y = min(pos.y, (GAMESCREEN_Y + m_paperHeight)*0.5f);
+	pos.y = max(pos.y, (GAMESCREEN_Y - m_paperHeight)*0.5f);
+
+	pos.x -= m_zeroWidthPoint;
+	pos.y -= m_zeroHeightPoint;
+
+	// 위치를 인덱스로 변환
+	res.first = pos.x / m_cellSize;
+	res.second = pos.y / m_cellSize;
+
+	return res;
 }
 
-POINT Map::GetTilePointAtWorldPoint(D3DXVECTOR2 worldPoint)
+D3DXVECTOR2 Map::IndexToPos(pair<int, int> index)
 {
-	return { (int)worldPoint.x / TILE_SIZE, (int)worldPoint.y / TILE_SIZE };
-}
+	D3DXVECTOR2 res;
 
-int Map::GetTileXAtWorldPoint(D3DXVECTOR2 worldPoint)
-{
-	return (int)worldPoint.x / TILE_SIZE;
-}
+	res.x = m_zeroWidthPoint + m_cellSize * index.first;
+	res.y = m_zeroHeightPoint + m_cellSize * index.second;
 
-int Map::GetTileYAtWorldPoint(D3DXVECTOR2 worldPoint)
-{
-	return (int)worldPoint.y / TILE_SIZE;
-}
-
-D3DXVECTOR2 Map::GetWorldPointAtTile(int x, int y)
-{
-	return { x*TILE_SIZE + TILE_SIZE * 0.5f, y*TILE_SIZE + TILE_SIZE * 0.5f };
-}
-
-D3DXVECTOR2 Map::GetWorldPointAtTile(POINT point)
-{
-	return{ point.x*TILE_SIZE + TILE_SIZE*0.5f, point.y*TILE_SIZE + TILE_SIZE*0.5f };
-}
-
-bool Map::IsObstacle(int x, int y)
-{
-	if (x < 0 || x >= MAP_WIDTH ||
-		y < 0 || y >= MAP_HEIGHT)
-	{
-		//return true;
-		return false;
-	}
-	return (m_Tiles[x][y] == TileType::Block);
-}
-
-bool Map::IsEmpty(int x, int y)
-{
-	if (x < 0 || x >= MAP_WIDTH ||
-		y < 0 || y >= MAP_HEIGHT)
-	{
-		return false;
-	}
-	return (m_Tiles[x][y] == TileType::Empty);
-}
-
-bool Map::IsGround(int x, int y)
-{
-	if (x < 0 || x >= MAP_WIDTH ||
-		y < 0 || y >= MAP_HEIGHT)
-	{
-		return false;
-	}
-	return (m_Tiles[x][y] == TileType::Block);
-}
-
-TileType Map::GetTileType(int x, int y)
-{
-	// 인덱스가 범위를 벗어나면 블록으로 본다
-	if (x < 0 || x >= MAP_WIDTH ||
-		y < 0 || y >= MAP_HEIGHT)
-	{
-		return TileType::Block;
-	}
-	return m_Tiles[x][y];
+	return res;
 }

@@ -1,10 +1,5 @@
 #include "stdafx.h"
 #include "PlayScene.h"
-#include "SimplePlatform.h"
-#include "honeyPlatform.h"
-#include "BallShooter.h"
-#include "SpringPlatform.h"
-#include "SpinWheel.h"
 
 PlayScene::PlayScene()
 {
@@ -17,22 +12,6 @@ PlayScene::~PlayScene()
 
 void PlayScene::Init()
 {
-	// 배경 이미지 불러오기
-	m_mapForeground = new Sprite(L"City-Foreground", 1, 1, 0);
-	m_mapBackground = new Sprite(L"City-Background", 1, 1, 0);
-	m_mapPaper = new Sprite(L"City-Paper", 1, 1, 0);
-
-	m_mapForeground->SetPosition(GAMESCREEN_X*0.5f, GAMESCREEN_Y*0.5f);
-	m_mapBackground->SetPosition(GAMESCREEN_X*0.5f, GAMESCREEN_Y*0.5f);
-	m_mapPaper->SetPosition(GAMESCREEN_X*0.5f, GAMESCREEN_Y*0.5f);
-	m_mapForeground->Update();
-	m_mapBackground->Update();
-	m_mapPaper->Update();
-
-	// 맵 지형 설정
-	m_mapBlocks.push_back(new SimplePlatform({ 200.0f, 350.0f }, { 465.0f, 300.0f }));
-	m_mapBlocks.push_back(new SimplePlatform({ 447.0f, 380.0f }, { GAMESCREEN_X - 653, 300.0f }));
-
 	g_pCamera->SetMapSize(GAMESCREEN_X, GAMESCREEN_Y);
 	g_pCamera->SetTarget(NULL);
 
@@ -71,10 +50,6 @@ void PlayScene::Init()
 	// 맨 처음은 맵툴모드에서 시작
 	SwitchToMapToolMode();
 
-	m_goalFlag = new GoalFlag;
-	m_goalFlag->Init();
-	m_goalFlag->SetPosition({ GAMESCREEN_X - 550, GAMESCREEN_Y*0.5f - 150 });
-
 	m_mapToolModeTransitionDelay = 3.0f;
 }
 
@@ -97,8 +72,8 @@ void PlayScene::Update()
 			}
 			else
 			{
-				m_cursor1P->Update(m_placedObjects);
-				m_cursor2P->Update(m_placedObjects);
+				m_cursor1P->Update(m_map->GetPlacedObjects());
+				m_cursor2P->Update(m_map->GetPlacedObjects());
 			}
 			break;
 		case MODE::PLAY_MODE:
@@ -128,9 +103,9 @@ void PlayScene::UpdatePlayMode()
 	// 화면을 16x9로 분할했을 때 각각의 벡터에는 해당 영역에 속하는 PlaceableObject들의 포인터들이 있다
 	vector<vector<PlaceableObject*>> objList(GAMESCREEN_X_RATIO*GAMESCREEN_Y_RATIO);
 
-	// 오브젝트들 각자를 업데이트하고 콜라이더정보를 정해진 벡터에 넣는다
+	// 맵 상의 오브젝트들을 업데이트하고 콜라이더 정보를 정해진 벡터에 넣는다
 	for (auto obj : m_mapBlocks) obj->Update(objList);
-	for (auto obj : m_placedObjects) obj->Update(objList);
+	for (auto obj : m_map->GetPlacedObjects()) obj->Update(objList);
 	m_goalFlag->Update(objList);
 
 	// 콜라이더 정보를 바탕으로 충돌처리

@@ -2,6 +2,7 @@
 #include "PlayerCursor.h"
 #include "PlaceableObject.h"
 #include "SimplePlatform.h"
+#include "Map.h"
 
 PlayerCursor::PlayerCursor()
 {
@@ -24,7 +25,7 @@ void PlayerCursor::ResetCursor(D3DXVECTOR2 pos)
 	m_cursorDefaultImage->Update();
 	
 	// 오브젝트 프리뷰 이미지 위치 설정
-	m_objectToPlace->SetPosition(IndexToPos(PosToIndex(m_objectPos)));
+	m_objectToPlace->SetPosition(m_map->IndexToPos(m_map->PosToIndex(m_objectPos)));
 	m_objectToPlace->SetFlip(m_isFlipped);
 }
 
@@ -36,12 +37,6 @@ void PlayerCursor::Init(Sprite * cursorDefaultImg, Sprite * cursorOutOfBoundsImg
 	m_cursorMoveMaxSpeed = 500.0f;
 	m_cursorMoveSpeed = 0.0f;
 
-	m_paperWidth = 2049;
-	m_paperHeight = 1800;
-	m_cellSize = 64.0f;
-
-	m_zeroWidthPoint = (GAMESCREEN_X - m_paperWidth)*0.5f + m_cellSize * 0.5f;
-	m_zeroHeightPoint = (GAMESCREEN_Y - m_paperHeight)*0.5f + m_cellSize * 0.5f;
 	m_isFlipped = false;
 }
 
@@ -111,7 +106,7 @@ void PlayerCursor::MoveCursor()
 	m_cursorDefaultImage->Update();
 
 	// 오브젝트 위치 설정
-	m_objectToPlace->SetPosition(IndexToPos(PosToIndex(m_objectPos)));
+	m_objectToPlace->SetPosition(m_map->IndexToPos(m_map->PosToIndex(m_objectPos)));
 }
 
 void PlayerCursor::Render()
@@ -134,33 +129,3 @@ void PlayerCursor::SetCursorPosition(D3DXVECTOR2 pos)
 	m_cursorPos = pos;
 	m_objectPos = m_cursorPos + D3DXVECTOR2(200, 40);
 }				 
-
-pair<int, int> PlayerCursor::PosToIndex(D3DXVECTOR2 pos)
-{
-	pair<int, int> res;
-
-	// 오브젝트 배치 가능한 영역 안으로 clamp
-	pos.x = min(pos.x, (GAMESCREEN_X + m_paperWidth)*0.5f);
-	pos.x = max(pos.x, (GAMESCREEN_X - m_paperWidth)*0.5f);
-	pos.y = min(pos.y, (GAMESCREEN_Y + m_paperHeight)*0.5f);
-	pos.y = max(pos.y, (GAMESCREEN_Y - m_paperHeight)*0.5f);
-
-	pos.x -= m_zeroWidthPoint;
-	pos.y -= m_zeroHeightPoint;
-
-	// 위치를 인덱스로 변환
-	res.first = pos.x / m_cellSize;
-	res.second = pos.y / m_cellSize;
-
-	return res;
-}
-
-D3DXVECTOR2 PlayerCursor::IndexToPos(pair<int, int> index)
-{
-	D3DXVECTOR2 res;
-
-	res.x = m_zeroWidthPoint + m_cellSize * index.first;
-	res.y = m_zeroHeightPoint + m_cellSize * index.second;
-
-	return res;
-}
