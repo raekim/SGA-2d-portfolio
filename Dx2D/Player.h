@@ -40,6 +40,9 @@ class Player
 		// 사망 관련
 		DEATH_SHOCK,
 		DEAD,
+
+		// 승리
+		VICTORY,
 		Max
 	};
 
@@ -99,6 +102,8 @@ class Player
 	bool m_isWallJumpingTowardLeft;			// 왼쪽으로 튕겨나가는 벽점프 중
 	bool m_isWallJumpingTowardRight;		// 오른쪽으로 튕겨나가는 벽점프 중
 
+	bool m_isDead;
+	bool m_isVictory;						// 골인지점에 도달
 private:
 	// Init 관련 함수
 	void InitAnimation();
@@ -121,8 +126,6 @@ private:
 
 	bool IsFlipping();			// 현재 왼쪽을 보고 있는데 오른쪽을 보려고 하는가? (또는 그 반대)
 	void GetNextAnimationState();
-
-	bool m_isDead;
 public:
 		D3DXVECTOR2				m_speed;
 		D3DXVECTOR2				m_extSpeed;
@@ -135,18 +138,21 @@ public:
 	void Update(vector<vector<PlaceableObject*>>& objectList);
 	void Render();
 	void Release();
-
+	
+	void Die();
+	void Victory();
+	void Revive(D3DXVECTOR2 pos);
+	void Jump();
+	
+	void SetJumpKey(int key) { m_jumpKey = key; }
+	void SetLeftMoveKey(int key) { m_leftMoveKey = key; }
+	void SetRightMoveKey(int key) { m_rightMoveKey = key; }
+	D3DXVECTOR2* GetPosition() { return &m_position; }
+	bool IsDead() { return m_isDead; }
+	bool IsGameOver() { return m_isDead || m_isVictory; }
 	D3DXVECTOR2 GetAABBHalfSize() { return m_AABB->GetHalfSize(); }
 	void SetPosition(D3DXVECTOR2 pos) { m_position = pos; }
 	void SetPositionY(float val) { m_position.y = val; }
 	void SetPositionX(float val) { m_position.x = val; }
-	void Die();
-	void Revive(D3DXVECTOR2 pos);
-	D3DXVECTOR2* GetPosition() { return &m_position; }
-	void Jump();
-	bool IsDead() { return m_isDead; }
-
-	void SetJumpKey(int key) { m_jumpKey = key; }
-	void SetLeftMoveKey(int key) { m_leftMoveKey = key; }
-	void SetRightMoveKey(int key) { m_rightMoveKey = key; }
+	AABB* GetAABBPtr() { return m_AABB; }
 };

@@ -40,7 +40,7 @@ void Player::Init(wstring sheetKey)
 	m_animState = ANIM_STATE::IDLE;
 	m_curState = STATE::Stand;
 }
-
+ 
 void Player::InitAnimation()
 {
 	// 애니메이션 추가
@@ -49,14 +49,11 @@ void Player::InitAnimation()
 	Clip* clip;
 	Sprite* sprite;
 
-	int sheetY = 5;
-	int sheetX = 14;
-
 	// IDLE
 	clip = new Clip;
 	for (int i = 0; i < 3; ++i)
 	{
-		sprite = new Sprite(m_sheetKey, sheetX, sheetY, i);
+		sprite = new Sprite(m_sheetKey, CHICKEN_SHEET_X, CHICKEN_SHEET_Y, i);
 		clip->AddFrame(sprite, 1 / 12.0f);
 	}
 	m_pAnimation->AddClip(ANIM_STATE::IDLE, clip);
@@ -65,7 +62,7 @@ void Player::InitAnimation()
 	clip = new Clip(PlayMode::Once);
 	for (int i = 0; i < 2; ++i)
 	{
-		sprite = new Sprite(m_sheetKey, sheetX, sheetY, i + 3);
+		sprite = new Sprite(m_sheetKey, CHICKEN_SHEET_X, CHICKEN_SHEET_Y, i + 3);
 		clip->AddFrame(sprite, 1 / 20.0f);
 	}
 	m_pAnimation->AddClip(ANIM_STATE::FLIP_STAND, clip);
@@ -74,7 +71,7 @@ void Player::InitAnimation()
 	clip = new Clip;
 	for (int i = 0; i < 8; ++i)
 	{
-		sprite = new Sprite(m_sheetKey, sheetX, sheetY, i + 5);
+		sprite = new Sprite(m_sheetKey, CHICKEN_SHEET_X, CHICKEN_SHEET_Y, i + 5);
 		clip->AddFrame(sprite, 1 / 12.0f);
 	}
 	m_pAnimation->AddClip(ANIM_STATE::WALK, clip);
@@ -83,7 +80,7 @@ void Player::InitAnimation()
 	clip = new Clip;
 	for (int i = 0; i < 3; ++i)
 	{
-		sprite = new Sprite(m_sheetKey, sheetX, sheetY, sheetX + i);
+		sprite = new Sprite(m_sheetKey, CHICKEN_SHEET_X, CHICKEN_SHEET_Y, CHICKEN_SHEET_X + i);
 		clip->AddFrame(sprite, 1 / 12.0f);
 	}
 	m_pAnimation->AddClip(ANIM_STATE::JUMP_GOING_UP, clip);
@@ -92,7 +89,7 @@ void Player::InitAnimation()
 	clip = new Clip(PlayMode::Once);
 	for (int i = 0; i < 2; ++i)
 	{
-		sprite = new Sprite(m_sheetKey, sheetX, sheetY, sheetX * 2 + i + 3);
+		sprite = new Sprite(m_sheetKey, CHICKEN_SHEET_X, CHICKEN_SHEET_Y, CHICKEN_SHEET_X * 2 + i + 3);
 		clip->AddFrame(sprite, 1 / 12.0f);
 	}
 	m_pAnimation->AddClip(ANIM_STATE::UP_TO_TOP, clip);
@@ -101,7 +98,7 @@ void Player::InitAnimation()
 	clip = new Clip;
 	for (int i = 0; i < 3; ++i)
 	{
-		sprite = new Sprite(m_sheetKey, sheetX, sheetY, sheetX + i + 3);
+		sprite = new Sprite(m_sheetKey, CHICKEN_SHEET_X, CHICKEN_SHEET_Y, CHICKEN_SHEET_X + i + 3);
 		clip->AddFrame(sprite, 1 / 12.0f);
 	}
 	m_pAnimation->AddClip(ANIM_STATE::JUMP_TOP, clip);
@@ -110,7 +107,7 @@ void Player::InitAnimation()
 	clip = new Clip(PlayMode::Once);
 	for (int i = 0; i < 2; ++i)
 	{
-		sprite = new Sprite(m_sheetKey, sheetX, sheetY, sheetX + i + 6);
+		sprite = new Sprite(m_sheetKey, CHICKEN_SHEET_X, CHICKEN_SHEET_Y, CHICKEN_SHEET_X + i + 6);
 		clip->AddFrame(sprite, 1 / 12.0f);
 	}
 	m_pAnimation->AddClip(ANIM_STATE::TOP_TO_DOWN, clip);
@@ -119,7 +116,7 @@ void Player::InitAnimation()
 	clip = new Clip();
 	for (int i = 0; i < 3; ++i)
 	{
-		sprite = new Sprite(m_sheetKey, sheetX, sheetY, sheetX*2 + i);
+		sprite = new Sprite(m_sheetKey, CHICKEN_SHEET_X, CHICKEN_SHEET_Y, CHICKEN_SHEET_X*2 + i);
 		clip->AddFrame(sprite, 1 / 12.0f);
 	}
 	m_pAnimation->AddClip(ANIM_STATE::JUMP_GOING_DOWN, clip);
@@ -128,14 +125,14 @@ void Player::InitAnimation()
 	clip = new Clip(PlayMode::Once);
 	for (int i = 0; i < 3; ++i)
 	{
-		sprite = new Sprite(m_sheetKey, sheetX, sheetY, sheetX + i + 8);
+		sprite = new Sprite(m_sheetKey, CHICKEN_SHEET_X, CHICKEN_SHEET_Y, CHICKEN_SHEET_X + i + 8);
 		clip->AddFrame(sprite, 1 / 12.0f);
 	}
 	m_pAnimation->AddClip(ANIM_STATE::LANDING_SOFT, clip);
 
 	//JUMP_TOP_FLIP
 	clip = new Clip(PlayMode::Once);
-	sprite = new Sprite(m_sheetKey, sheetX / 2, sheetY, sheetX / 2 + 6);
+	sprite = new Sprite(m_sheetKey, CHICKEN_SHEET_X / 2, CHICKEN_SHEET_Y, CHICKEN_SHEET_X / 2 + 6);
 	clip->AddFrame(sprite, 1 / 24.0f);
 	m_pAnimation->AddClip(ANIM_STATE::JUMP_TOP_FLIP, clip);
 
@@ -143,7 +140,7 @@ void Player::InitAnimation()
 	clip = new Clip;
 	for (int i = 0; i < 3; ++i)
 	{
-		sprite = new Sprite(m_sheetKey, sheetX, sheetY, sheetX * 2 + i + 5);
+		sprite = new Sprite(m_sheetKey, CHICKEN_SHEET_X, CHICKEN_SHEET_Y, CHICKEN_SHEET_X * 2 + i + 5);
 		clip->AddFrame(sprite, 1 / 12.0f);
 	}
 	m_pAnimation->AddClip(ANIM_STATE::WALLSLIDE, clip);
@@ -152,7 +149,7 @@ void Player::InitAnimation()
 	clip = new Clip(PlayMode::Once);
 	for (int i = 0; i < 2; ++i)
 	{
-		sprite = new Sprite(m_sheetKey, sheetX, sheetY, sheetX * 2 + i + 8);
+		sprite = new Sprite(m_sheetKey, CHICKEN_SHEET_X, CHICKEN_SHEET_Y, CHICKEN_SHEET_X * 2 + i + 8);
 		clip->AddFrame(sprite, 1 / 12.0f);
 	}
 	m_pAnimation->AddClip(ANIM_STATE::TO_WALLSLIDE_OPPOSITE_START, clip);
@@ -161,7 +158,7 @@ void Player::InitAnimation()
 	clip = new Clip(PlayMode::Once);
 	for (int i = 0; i < 2; ++i)
 	{
-		sprite = new Sprite(m_sheetKey, sheetX, sheetY, sheetX * 2 + i + 10);
+		sprite = new Sprite(m_sheetKey, CHICKEN_SHEET_X, CHICKEN_SHEET_Y, CHICKEN_SHEET_X * 2 + i + 10);
 		clip->AddFrame(sprite, 1 / 12.0f);
 	}
 	m_pAnimation->AddClip(ANIM_STATE::TOP_TO_WALLSLIDE, clip);
@@ -170,7 +167,7 @@ void Player::InitAnimation()
 	clip = new Clip(PlayMode::Once);
 	for (int i = 0; i < 3; ++i)
 	{
-		sprite = new Sprite(m_sheetKey, sheetX, sheetY, sheetX * 3 + i);
+		sprite = new Sprite(m_sheetKey, CHICKEN_SHEET_X, CHICKEN_SHEET_Y, CHICKEN_SHEET_X * 3 + i);
 		clip->AddFrame(sprite, 1 / 16.0f);
 	}
 	m_pAnimation->AddClip(ANIM_STATE::DEATH_SHOCK, clip);
@@ -179,17 +176,27 @@ void Player::InitAnimation()
 	clip = new Clip(PlayMode::Once);
 	for (int i = 0; i < 5; ++i)
 	{
-		sprite = new Sprite(m_sheetKey, sheetX / 2, sheetY, (sheetX/2) * 3 + i + 2);
+		sprite = new Sprite(m_sheetKey, CHICKEN_SHEET_X / 2, CHICKEN_SHEET_Y, (CHICKEN_SHEET_X/2) * 3 + i + 2);
 		clip->AddFrame(sprite, 1 / 12.0f);
 	}
 	m_pAnimation->AddClip(ANIM_STATE::DEAD, clip);
 
+	//VICTORY
+	clip = new Clip;
+	for (int i = 0; i < 12; ++i)
+	{
+		sprite = new Sprite(m_sheetKey, CHICKEN_SHEET_X / 2, CHICKEN_SHEET_Y, (CHICKEN_SHEET_X / 2) * 4 + i);
+		clip->AddFrame(sprite, 1 / 12.0f);
+	}
+	m_pAnimation->AddClip(ANIM_STATE::VICTORY, clip);
+
+	// 애니메이션 크기 조정
 	m_pAnimation->SetScale(0.25f, 0.25f);
 }
 
 void Player::Update(vector<vector<PlaceableObject*>>& objectList)
 {
-	if (!m_isDead)
+	if (!IsGameOver())
 	{
 		if (m_position.y < -100)
 		{
@@ -573,6 +580,7 @@ void Player::GetNextAnimationState()
 {
 	if (m_isDead)
 	{
+		// 사망 관련 애니메이션
 		m_rotation.y = (m_facingRight) ? 0.0f : D3DX_PI;
 		if (m_animState == ANIM_STATE::DEATH_SHOCK)
 		{
@@ -587,6 +595,13 @@ void Player::GetNextAnimationState()
 		}
 		return;
 	}
+	else if (m_isVictory)
+	{
+		m_rotation.y = (m_facingRight) ? 0.0f : D3DX_PI;
+		m_animState = ANIM_STATE::VICTORY;
+		return;
+	}
+
 
 	switch (m_animState)
 	{
@@ -831,17 +846,26 @@ void Player::Release()
 
 void Player::Die()
 {
-	if (!m_isDead)
+	if (!IsGameOver())
 	{
 		m_isDead = true;
 		m_speed.x = 0.0f;
+	}
+}
 
+void Player::Victory()
+{
+	if (!m_isVictory)
+	{
+		m_isVictory = true;
+		m_speed.x = 0.0f;
 	}
 }
 
 void Player::Revive(D3DXVECTOR2 pos)
 {
 	m_isDead = false;
+	m_isVictory = false;
 
 	m_position = pos;
 	m_rotation = { 0.0f, 0.0f, 0.0f };
@@ -861,7 +885,7 @@ void Player::Revive(D3DXVECTOR2 pos)
 
 void Player::Jump()
 {
-	if (m_isDead) return;
+	if (IsGameOver()) return;
 	m_curState = STATE::Jump;
 	m_pressingJumpingButton = false;
 	m_animState = ANIM_STATE::JUMP_GOING_UP;

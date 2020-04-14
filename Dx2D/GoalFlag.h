@@ -11,6 +11,7 @@ class GoalFlag : public PlaceableObject
 	Animation<ANIM_STATE>*	m_pAnimation;
 	Sprite*					m_poleSprite;
 	D3DXVECTOR2				m_poleOffset;
+	D3DXVECTOR2				m_colliderOffset;
 public:
 	GoalFlag();
 	~GoalFlag();

@@ -17,6 +17,8 @@ class PlayScene : public iGameNode
 	Player*						m_player2P;
 	PlayerCursor*				m_cursor1P;
 	PlayerCursor*				m_cursor2P;
+	float						m_mapToolModeTransitionDelay;	// 플레이 모드에서 맵툴 모드로 갈 때 걸리는 시간
+	float						m_transitionCount;				// 시간 측정용 카운터
 
 	// 맵 관련
 	Sprite*						m_mapForeground;				// 맵 포어그라운드 이미지
@@ -34,6 +36,9 @@ private:
 	void SwitchToMapToolMode();
 	void SwitchToPlayMode();
 
+	// 플레이 모드 관련
+	void UpdatePlayMode();
+	void UpdatePlayModeCamera();
 public:
 	PlayScene();
 	~PlayScene();

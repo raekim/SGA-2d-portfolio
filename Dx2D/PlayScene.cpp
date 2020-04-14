@@ -51,7 +51,7 @@ void PlayScene::Init()
 
 	// 플레이어 커서 생성
 	m_cursor1P = new PlayerCursor;
-	m_cursor1P->Init(new Sprite(L"Chicken-Sheet", 7, 5, 7 * 4), new Sprite(L"Chicken-Sheet", 7, 5, 7 * 4 + 1));
+	m_cursor1P->Init(new Sprite(L"Chicken-Sheet", CHICKEN_SHEET_X/2, CHICKEN_SHEET_Y, (CHICKEN_SHEET_X / 2) * 5 + 5), new Sprite(L"Chicken-Sheet", CHICKEN_SHEET_X / 2, CHICKEN_SHEET_Y, (CHICKEN_SHEET_X / 2) *5 + 6));
 	m_cursor1P->SetLeftMoveKey(VK_LEFT);
 	m_cursor1P->SetRightMoveKey(VK_RIGHT);
 	m_cursor1P->SetUpMoveKey(VK_UP);
@@ -60,7 +60,7 @@ void PlayScene::Init()
 	m_cursor1P->SetFlipKey(VK_RSHIFT);
 
 	m_cursor2P = new PlayerCursor;
-	m_cursor2P->Init(new Sprite(L"Chicken-Sheet-2P", 7, 5, 7 * 4), new Sprite(L"Chicken-Sheet", 7, 5, 7 * 4 + 1));
+	m_cursor2P->Init(new Sprite(L"Chicken-Sheet-2P", CHICKEN_SHEET_X / 2, CHICKEN_SHEET_Y, (CHICKEN_SHEET_X / 2) * 5 + 5), new Sprite(L"Chicken-Sheet", CHICKEN_SHEET_X / 2, CHICKEN_SHEET_Y, (CHICKEN_SHEET_X / 2) * 5 + 6));
 	m_cursor2P->SetLeftMoveKey('F');
 	m_cursor2P->SetRightMoveKey('H');
 	m_cursor2P->SetUpMoveKey('T');
@@ -73,7 +73,9 @@ void PlayScene::Init()
 
 	m_goalFlag = new GoalFlag;
 	m_goalFlag->Init();
-	m_goalFlag->SetPosition({ GAMESCREEN_X - 800, GAMESCREEN_Y*0.5f - 150 });
+	m_goalFlag->SetPosition({ GAMESCREEN_X - 550, GAMESCREEN_Y*0.5f - 150 });
+
+	m_mapToolModeTransitionDelay = 3.0f;
 }
 
 void PlayScene::Update()
@@ -100,64 +102,79 @@ void PlayScene::Update()
 			}
 			break;
 		case MODE::PLAY_MODE:
-			// 플레이어가 모두 죽으면 맵툴모드로 전환
-			if (m_player1P->IsDead() && m_player2P->IsDead())
-			{
-				SwitchToMapToolMode();
-				break;
-			}
-
-			// 충돌검사에 쓰일 콜라이더들 정보
-			// 화면을 16x9로 분할했을 때 각각의 벡터에는 해당 영역에 속하는 PlaceableObject들의 포인터들이 있다
-			vector<vector<PlaceableObject*>> objList(GAMESCREEN_X_RATIO*GAMESCREEN_Y_RATIO); 
-
-			// 오브젝트들 각자를 업데이트하고 콜라이더정보를 정해진 벡터에 넣는다
-			for (auto obj : m_mapBlocks) obj->Update(objList);
-			for (auto obj : m_placedObjects) obj->Update(objList);
-
-			m_goalFlag->Update(objList);
-
-			// 콜라이더 정보를 바탕으로 충돌처리
-			m_player1P->Update(objList);
-			m_player2P->Update(objList);
-
-			// 1P와 2P의 상태를 바탕으로 카메라 처리
-			if (m_player1P->IsDead())
-			{
-				// 1P가 죽은 경우 카메라는 2P를 따라간다
-				g_pCamera->SetTarget(m_player2P->GetPosition());
-				g_pCamera->SetPositionRange({ 0, GAMESCREEN_X - WINSIZEX }, { 0, GAMESCREEN_Y - WINSIZEY });
-				g_pCamera->SetEyeVal(-1.0f);
-			}
-			else if(m_player2P->IsDead())
-			{
-				// 2P가 죽은 경우 카메라는 1P를 따라간다
-				g_pCamera->SetTarget(m_player1P->GetPosition());
-				g_pCamera->SetPositionRange({ 0, GAMESCREEN_X - WINSIZEX }, { 0, GAMESCREEN_Y - WINSIZEY });
-				g_pCamera->SetEyeVal(-1.0f);
-			}
-			else
-			{
-				// 1P, 2P 모두가 살아있는 경우 카메라는 둘의 중간 위치로 설정한다
-				m_camPos.x = fabs(m_player1P->GetPosition()->x + m_player2P->GetPosition()->x) / 2;
-				m_camPos.y = fabs(m_player1P->GetPosition()->y + m_player2P->GetPosition()->y) / 2;
-				g_pCamera->SetTarget(&m_camPos);
-
-				float eyeVal;
-				D3DXVECTOR2 distVec = *(m_player1P->GetPosition()) - *(m_player2P->GetPosition());
-				float dist = D3DXVec2Length(&distVec);
-				dist = min(dist, GAMESCREEN_X);
-				eyeVal = LinearInterpolation(-0.9f, -1.666f, dist / GAMESCREEN_X);
-				g_pCamera->SetPositionRange(
-					D3DXVECTOR2( 0, (FLOAT)LinearInterpolation(GAMESCREEN_X - WINSIZEX, 0, (eyeVal + 1) / -0.666f) ),
-					D3DXVECTOR2( 0, (FLOAT)LinearInterpolation(GAMESCREEN_Y - WINSIZEY, 0, (eyeVal + 1) / -0.666f) )
-				);
-				g_pCamera->SetEyeVal(eyeVal);
-			}
-			break;
+			UpdatePlayMode();
 	}
 
 	g_pCamera->Update();
+}
+
+void PlayScene::UpdatePlayMode()
+{
+	// 플레이어가 모두 죽으면 맵툴모드로 전환
+	if (m_player1P->IsGameOver() && m_player2P->IsGameOver())
+	{
+		if (m_transitionCount >= m_mapToolModeTransitionDelay)
+		{
+			SwitchToMapToolMode();
+			return;
+		}
+		else
+		{
+			m_transitionCount += g_pTimeManager->GetDeltaTime();
+		}
+	}
+
+	// 충돌검사에 쓰일 콜라이더들 정보
+	// 화면을 16x9로 분할했을 때 각각의 벡터에는 해당 영역에 속하는 PlaceableObject들의 포인터들이 있다
+	vector<vector<PlaceableObject*>> objList(GAMESCREEN_X_RATIO*GAMESCREEN_Y_RATIO);
+
+	// 오브젝트들 각자를 업데이트하고 콜라이더정보를 정해진 벡터에 넣는다
+	for (auto obj : m_mapBlocks) obj->Update(objList);
+	for (auto obj : m_placedObjects) obj->Update(objList);
+	m_goalFlag->Update(objList);
+
+	// 콜라이더 정보를 바탕으로 충돌처리
+	m_player1P->Update(objList);
+	m_player2P->Update(objList);
+
+	UpdatePlayModeCamera();
+}
+
+void PlayScene::UpdatePlayModeCamera()
+{
+	// 1P와 2P의 상태를 바탕으로 카메라 처리
+	if (m_player1P->IsDead())
+	{
+		// 1P가 죽은 경우 카메라는 2P를 따라간다
+		g_pCamera->SetTarget(m_player2P->GetPosition());
+		g_pCamera->SetPositionRange({ 0, GAMESCREEN_X - WINSIZEX }, { 0, GAMESCREEN_Y - WINSIZEY });
+		g_pCamera->SetEyeVal(-1.0f);
+	}
+	else if (m_player2P->IsDead())
+	{
+		// 2P가 죽은 경우 카메라는 1P를 따라간다
+		g_pCamera->SetTarget(m_player1P->GetPosition());
+		g_pCamera->SetPositionRange({ 0, GAMESCREEN_X - WINSIZEX }, { 0, GAMESCREEN_Y - WINSIZEY });
+		g_pCamera->SetEyeVal(-1.0f);
+	}
+	else
+	{
+		// 1P, 2P 모두가 살아있는 경우 카메라는 둘의 중간 위치로 설정한다
+		m_camPos.x = fabs(m_player1P->GetPosition()->x + m_player2P->GetPosition()->x) / 2;
+		m_camPos.y = fabs(m_player1P->GetPosition()->y + m_player2P->GetPosition()->y) / 2;
+		g_pCamera->SetTarget(&m_camPos);
+
+		float eyeVal;
+		D3DXVECTOR2 distVec = *(m_player1P->GetPosition()) - *(m_player2P->GetPosition());
+		float dist = D3DXVec2Length(&distVec);
+		dist = min(dist, GAMESCREEN_X);
+		eyeVal = LinearInterpolation(-0.9f, -1.666f, dist / GAMESCREEN_X);
+		g_pCamera->SetPositionRange(
+			D3DXVECTOR2(0, (FLOAT)LinearInterpolation(GAMESCREEN_X - WINSIZEX, 0, (eyeVal + 1) / -0.666f)),
+			D3DXVECTOR2(0, (FLOAT)LinearInterpolation(GAMESCREEN_Y - WINSIZEY, 0, (eyeVal + 1) / -0.666f))
+		);
+		g_pCamera->SetEyeVal(eyeVal);
+	}
 }
 
 void PlayScene::Render()
@@ -225,6 +242,7 @@ void PlayScene::SwitchToMapToolMode()
 {
 	// 맵툴 모드로 넘어간다
 	m_curMode = MODE::MAPTOOL_MODE;
+	m_transitionCount = 0.0f;
 
 	// 카메라 시점 설정
 	g_pCamera->SetTarget(NULL);
