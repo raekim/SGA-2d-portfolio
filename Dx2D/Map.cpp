@@ -31,6 +31,16 @@ void Map::Init()
 	{
 		this->SetCellStatus(i, 2, true);
 	}
+	for (int i = 0; i <= 9; ++i)
+	{
+		for (int j = 24; j <= 32; ++j)
+			this->SetCellStatus(i, j, true);
+	}
+	for (int i = 10; i <= 11; ++i)
+	{
+		for (int j = 26; j <= 29; ++j)
+			this->SetCellStatus(i, j, true);
+	}
 
 	// 오브젝트 종이 기준으로 (0,0)지점 (왼쪽 아래) 위치 초기화
 	m_zeroWidthPoint = (GAMESCREEN_X - m_paperWidth)*0.5f + m_cellSize * 0.5f;
@@ -55,7 +65,7 @@ void Map::Init()
 	// 골인깃발 설정
 	m_goalFlag = new GoalFlag;
 	m_goalFlag->Init();
-	m_goalFlag->SetPosition({ GAMESCREEN_X - 550, GAMESCREEN_Y*0.5f - 150 });
+	m_goalFlag->SetPosition({ GAMESCREEN_X - 730, GAMESCREEN_Y*0.5f - 150 });
 }
 
 void Map::Update(vector<vector<PlaceableObject*>>& objList)
@@ -82,6 +92,7 @@ void Map::RenderMapToolMode()
 	// 맵툴모드 맵 렌더
 	m_mapBackground->Render();
 	m_mapPaper->Render();
+	m_goalFlag->RenderPreviewImage();
 	m_mapForeground->Render();
 
 	// 맵 상의 장애물 프리뷰 모드로 렌더

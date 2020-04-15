@@ -49,7 +49,7 @@ void honeyPlatform::Update(vector<vector<PlaceableObject*>>& objList)
 {
 	// 두 기준점 m_movingStartPoint, m_movingEndPoint 사이를 선형 보간을 사용하여 움직인다
 	m_cratePosition = LinearInterpolation(m_movingStartPoint, m_movingEndPoint, min(m_movingDelta / m_moveSecond, 1.0f));
-	m_collider->SetCenter(m_cratePosition);
+	m_collider->SetCenter(m_cratePosition + m_crateOffset);
 	m_moveDelta = m_cratePosition - m_oldPosition;
 
 	// 한 쪽 기준점에 도달하였으면 반대쪽 정점으로 이동 방향을 바꾼다

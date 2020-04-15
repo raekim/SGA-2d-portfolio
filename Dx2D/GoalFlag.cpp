@@ -53,7 +53,6 @@ void GoalFlag::Render()
 	m_collider->Render();
 	m_pAnimation->Render();
 	m_poleSprite->Render();
-	
 }
 
 void GoalFlag::Release()
@@ -75,6 +74,10 @@ bool GoalFlag::handleCollision(D3DXVECTOR2 pos, Player * player, collisionCheckD
 
 void GoalFlag::RenderPreviewImage()
 {
+	m_poleSprite->SetPosition(m_position + m_poleOffset);
+	m_poleSprite->Update();
+	m_pAnimation->SetPosition(m_position);
+	m_pAnimation->Update();
 	m_poleSprite->Render();
 	m_pAnimation->Render();
 }

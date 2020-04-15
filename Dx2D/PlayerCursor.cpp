@@ -48,7 +48,7 @@ bool PlayerCursor::Update(vector<PlaceableObject*>& objList)
 	
 	// 현재 위치에 오브젝트를 놓을 수 있나 검사
 	auto placeIndex = m_map->PosToIndex(m_objectPos);
-	bool canPlaceObjectOnCurPos = m_objectToPlace->CanPlaceObject(placeIndex.second, placeIndex.first, m_map);
+	m_canPlaceObjectOnCurPos = m_objectToPlace->CanPlaceObject(placeIndex.second, placeIndex.first, m_map);
 
 	// 오브젝트 flip 하기
 	if (g_pKeyManager->IsOnceKeyDown(m_flipKey))
@@ -58,7 +58,7 @@ bool PlayerCursor::Update(vector<PlaceableObject*>& objList)
 	}
 
 	// 오브젝트 놓기
-	if (canPlaceObjectOnCurPos)
+	if (m_canPlaceObjectOnCurPos)
 	{
 		// 오브젝트를 놓을 수 있는 상황
 		m_objectToPlace->SetPreviewImageColor({ 1,1,1,1 });
@@ -119,8 +119,6 @@ void PlayerCursor::MoveCursor()
 		m_cursorPos += moveVec;
 		SetCursorPosition(m_cursorPos);
 	}
-	m_cursorDefaultImage->SetPosition(m_cursorPos);
-	m_cursorDefaultImage->Update();
 
 	// 오브젝트 위치 설정
 	m_objectToPlace->SetPosition(m_map->IndexToPos(m_map->PosToIndex(m_objectPos)));
@@ -130,8 +128,24 @@ void PlayerCursor::Render()
 {
 	if (!m_placed)
 	{
+		// 놓고자 하는 오브젝트 렌더
 		m_objectToPlace->RenderPreviewImage();
-		m_cursorDefaultImage->Render();
+
+		// 커서 렌더
+		if (m_canPlaceObjectOnCurPos)
+		{
+			// 오브젝트 놓기 가능
+			m_cursorDefaultImage->SetPosition(m_cursorPos);
+			m_cursorDefaultImage->Update();
+			m_cursorDefaultImage->Render();
+		}
+		else
+		{
+			// 오브젝트 놓기 불가능
+			m_cursorOutOfBoundsImage->SetPosition(m_cursorPos);
+			m_cursorOutOfBoundsImage->Update();
+			m_cursorOutOfBoundsImage->Render();
+		}
 	}
 }
 

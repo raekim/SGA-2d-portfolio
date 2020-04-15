@@ -16,6 +16,7 @@ class PlayerCursor
 	PlaceableObject*	m_objectToPlace;				// 현재 놓고자 하는 오브젝트
 	bool				m_isFlipped;
 	bool				m_placed;						// 오브젝트를 놓았는가?
+	bool				m_canPlaceObjectOnCurPos;		// 현재 위치에 놓고자 하는 오브젝트를 놓을 수 있는가?
 
 	Map*				m_map;
 private:
