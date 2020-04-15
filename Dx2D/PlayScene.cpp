@@ -181,7 +181,7 @@ void PlayScene::Render()
 
 PlaceableObject* GetRandomPlaceableObject()
 {
-	return new honeyPlatform;
+	return new SimplePlatform(static_cast<SimplePlatform::Platform_Type>(3));
 	int rnd = rand() % 6;
 	
 	//switch (rnd)

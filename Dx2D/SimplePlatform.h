@@ -4,10 +4,6 @@
 
 class SimplePlatform : public PlaceableObject
 {
-	D3DXVECTOR3				m_rotation;
-	//AABB*					m_AABB;
-	Sprite*					m_sprite;
-	D3DXVECTOR2				m_positionOffset;
 public:
 	enum class Platform_Type
 	{
@@ -17,6 +13,12 @@ public:
 		MID_HORIZONTAL,
 		Max
 	};
+private:
+	D3DXVECTOR3				m_rotation;
+	//AABB*					m_AABB;
+	Sprite*					m_sprite;
+	D3DXVECTOR2				m_positionOffset;
+	Platform_Type			m_platformType;
 public:
 	SimplePlatform() {};
 	SimplePlatform(D3DXVECTOR2 AABBHalfSize, D3DXVECTOR2 pos);
@@ -32,7 +34,7 @@ public:
 	virtual void RenderPreviewImage();
 
 	virtual void SetPreviewImageColor(D3DXCOLOR color) override;
-	virtual bool CanPlaceObject(int w, int h, Map* map) override;
-	virtual void PlaceObject(int w, int h, Map* map) override;
+	virtual bool CanPlaceObject(int h, int w, Map* map) override;
+	virtual void PlaceObject(int h, int w, Map* map) override;
 };
 

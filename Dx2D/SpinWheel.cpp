@@ -2,14 +2,15 @@
 #include "SpinWheel.h"
 #include "Player.h"
 #include "CircleCollider.h"
+#include "Map.h"
 
 SpinWheel::SpinWheel()
 {
 	m_AABB = new AABB;
-	m_AABB->SetHalfSize({ 21.0f, 21.0f });
+	m_AABB->SetHalfSize({ 23.0f, 23.0f });
 
 	m_blockSprite = new Sprite(L"Object-Sheet-1", 6, 6, 14);
-	m_blockSprite->SetSize(0.65f, 0.65f);
+	m_blockSprite->SetSize(0.7f, 0.7f);
 	m_barSprite = new Sprite(L"Object-Sheet-1", 6, 6, 8);
 	m_barSprite->SetSize(0.65f, 0.65f);
 	m_wheelSprite = new Sprite(L"Object-Sheet-1", 6, 6, 13);
@@ -141,15 +142,28 @@ void SpinWheel::RenderPreviewImage()
 	m_barSprite->Update();
 	m_wheelSprite->Update();
 
-	m_blockSprite->SetSize(1,1);
 	m_blockSprite->Render();
-	m_barSprite->SetSize(0.8f, 0.8f);
 	m_barSprite->Render();
-	m_wheelSprite->SetSize(1,1);
 	m_wheelSprite->Render();
+}
 
-	// 원래 사이즈로 돌아가기
-	m_blockSprite->SetSize(0.65f, 0.65f);
-	m_barSprite->SetSize(0.65f, 0.65f);
-	m_wheelSprite->SetSize(0.65f, 0.65f);
+void SpinWheel::SetPreviewImageColor(D3DXCOLOR color)
+{
+	m_blockSprite->SetColor(color);
+	m_barSprite->SetColor(color);
+	m_wheelSprite->SetColor(color);
+
+	m_blockSprite->Update();
+	m_barSprite->Update();
+	m_wheelSprite->Update();
+}
+
+bool SpinWheel::CanPlaceObject(int h, int w, Map * map)
+{
+	return !(map->GetCellStatus(h, w));
+}
+
+void SpinWheel::PlaceObject(int h, int w, Map * map)
+{
+	map->SetCellStatus(h, w, true);
 }

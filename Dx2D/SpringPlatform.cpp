@@ -1,7 +1,7 @@
 #include "stdafx.h"
 #include "SpringPlatform.h"
 #include "Player.h"
-
+#include "Map.h"
 
 SpringPlatform::SpringPlatform()
 {
@@ -167,4 +167,19 @@ void SpringPlatform::RenderPreviewImage()
 	m_previewImage->SetPosition(m_position + D3DXVECTOR2(3, 7));
 	m_previewImage->Update();
 	m_previewImage->Render();
+}
+
+void SpringPlatform::SetPreviewImageColor(D3DXCOLOR color)
+{
+	m_previewImage->SetColor(color);
+}
+
+bool SpringPlatform::CanPlaceObject(int h, int w, Map * map)
+{
+	return !(map->GetCellStatus(h, w));
+}
+
+void SpringPlatform::PlaceObject(int h, int w, Map * map)
+{
+	map->SetCellStatus(h, w, true);
 }

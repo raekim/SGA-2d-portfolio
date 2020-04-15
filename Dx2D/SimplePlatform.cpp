@@ -1,6 +1,7 @@
 #include "stdafx.h"
 #include "SimplePlatform.h"
 #include "Player.h"
+#include "Map.h"
 
 SimplePlatform::SimplePlatform(D3DXVECTOR2 AABBHalfSize, D3DXVECTOR2 pos)
 {
@@ -12,6 +13,7 @@ SimplePlatform::SimplePlatform(D3DXVECTOR2 AABBHalfSize, D3DXVECTOR2 pos)
 
 SimplePlatform::SimplePlatform(Platform_Type type)
 {
+	m_platformType = type;
 	m_positionOffset = { 0,0 };
 	m_collider = new AABB;
 	switch (type)
@@ -135,13 +137,63 @@ void SimplePlatform::RenderPreviewImage()
 
 void SimplePlatform::SetPreviewImageColor(D3DXCOLOR color)
 {
+	m_sprite->SetColor(color);
 }
 
-bool SimplePlatform::CanPlaceObject(int w, int h, Map * map)
+bool SimplePlatform::CanPlaceObject(int h, int w, Map * map)
 {
-	return false;
+	bool res = false;
+
+	// 비어있지 않은 칸은 true로 표현된다
+	// 검사하는 칸들 중 하나라도 비어있지 않은 칸이 있었다면 res는 true가 될 것
+	switch (m_platformType)
+	{
+	case Platform_Type::SHORT_VERTICAL:
+		res |= map->GetCellStatus(h, w);
+		res |= map->GetCellStatus(h + 1, w);
+		break;
+	case Platform_Type::SHORT_HORIZONTAL:
+		res |= map->GetCellStatus(h, w);
+		res |= map->GetCellStatus(h, w + 1);
+		break;
+	case Platform_Type::MID_VERTICAL:
+		res |= map->GetCellStatus(h, w);
+		res |= map->GetCellStatus(h + 1, w);
+		res |= map->GetCellStatus(h - 1, w);
+		break;
+	case Platform_Type::MID_HORIZONTAL:
+		res |= map->GetCellStatus(h, w + 1);
+		res |= map->GetCellStatus(h, w - 1);
+		res |= map->GetCellStatus(h, w);
+		break;
+	default:
+		return false;
+	}
+
+	return !res;
 }
 
-void SimplePlatform::PlaceObject(int w, int h, Map * map)
+void SimplePlatform::PlaceObject(int h, int w, Map * map)
 {
+	switch (m_platformType)
+	{
+	case Platform_Type::SHORT_VERTICAL:
+		map->SetCellStatus(h, w, true);
+		map->SetCellStatus(h + 1, w, true);
+		break;
+	case Platform_Type::SHORT_HORIZONTAL:
+		map->SetCellStatus(h, w, true);
+		map->SetCellStatus(h, w + 1, true);
+		break;
+	case Platform_Type::MID_VERTICAL:
+		map->SetCellStatus(h + 1, w, true);
+		map->SetCellStatus(h, w, true);
+		map->SetCellStatus(h - 1, w, true);
+		break;
+	case Platform_Type::MID_HORIZONTAL:
+		map->SetCellStatus(h, w + 1, true);
+		map->SetCellStatus(h, w - 1, true);
+		map->SetCellStatus(h, w, true);
+		break;
+	}
 }
