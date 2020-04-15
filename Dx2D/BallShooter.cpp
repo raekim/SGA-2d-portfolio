@@ -3,6 +3,7 @@
 #include "Player.h"
 #include "Primitive2DObejct.h"
 #include "Ball.h"
+#include "Map.h"
 
 BallShooter::BallShooter()
 {
@@ -11,6 +12,8 @@ BallShooter::BallShooter()
 	m_shootDelay = 3.5f;
 	m_AABB = new AABB;
 	m_AABB->SetHalfSize({ 25.0f, 25.0f });
+
+	m_machineOffset = { 0,20 };
 }
 
 BallShooter::~BallShooter()
@@ -31,12 +34,12 @@ void BallShooter::Init()
 	if (m_flipped)
 	{
 		m_machineSprite->SetRotation(0, D3DX_PI, 0);
-		m_shootStartPoint = { m_position.x - 20.0f, m_position.y };
+		m_shootStartPoint = D3DXVECTOR2( m_position.x - 20.0f, m_position.y ) + m_machineOffset;
 		m_shootStartSpeed = D3DXVECTOR2(-600.f, 500.0f);
 	}
 	else
 	{
-		m_shootStartPoint = { m_position.x + 20.0f, m_position.y };
+		m_shootStartPoint = D3DXVECTOR2( m_position.x + 20.0f, m_position.y ) + m_machineOffset;
 		m_shootStartSpeed = D3DXVECTOR2(600.f, 500.0f);
 	}
 }
@@ -72,8 +75,8 @@ void BallShooter::Update(vector<vector<PlaceableObject*>>& objList)
 	{
 		Ball* pBall = *(it);
 		// 게임 화면의 범위를 벗어났거나 disable된 발사체에 대해서는 Update를 skip하고 비활성화된 발사체들의 벡터에 저장한다
-		if (pBall->m_position.x < 0 || pBall->m_position.x > GAMESCREEN_X ||
-			pBall->m_position.y < 0 || pBall->m_position.y > GAMESCREEN_Y || !pBall->GetEnabled())
+		if (pBall->m_position.x + m_machineOffset.x < 0 || pBall->m_position.x + m_machineOffset.x > GAMESCREEN_X ||
+			pBall->m_position.y + m_machineOffset.y < 0 || pBall->m_position.y + m_machineOffset.y > GAMESCREEN_Y || !pBall->GetEnabled())
 		{
 			pBall->SetEnabled(false);
 			m_disabledBalls.push_back(pBall);
@@ -83,8 +86,8 @@ void BallShooter::Update(vector<vector<PlaceableObject*>>& objList)
 		pBall->Update(objList);
 	}
 
-	m_AABB->SetCenter(m_position);
-	m_machineSprite->SetPosition(m_position);
+	m_AABB->SetCenter(m_position + m_machineOffset);
+	m_machineSprite->SetPosition(m_position + m_machineOffset);
 	m_machineSprite->Update();
 
 	PlaceableObject::RegisterObjectCollider(m_AABB, objList);
@@ -151,12 +154,26 @@ bool BallShooter::handleCollision(D3DXVECTOR2 pos, Player * player, collisionChe
 
 void BallShooter::RenderPreviewImage()
 {
-	m_machineSprite->SetPosition(m_position);
-	m_machineSprite->SetSize(1,1);
+	m_machineSprite->SetPosition(m_position + m_machineOffset);
 	float rotate = (m_flipped) ? D3DX_PI : 0;
 	m_machineSprite->SetRotation({ 0,rotate,0 });
 	m_machineSprite->Update();
 	m_machineSprite->Render();
 
 	m_machineSprite->SetSize(0.7f, 0.7f);
+}
+
+void BallShooter::SetPreviewImageColor(D3DXCOLOR color)
+{
+	m_machineSprite->SetColor(color);
+}
+
+bool BallShooter::CanPlaceObject(int h, int w, Map * map)
+{
+	return !(map->GetCellStatus(h, w));
+}
+
+void BallShooter::PlaceObject(int h, int w, Map * map)
+{
+	map->SetCellStatus(h, w, true);
 }

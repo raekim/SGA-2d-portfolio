@@ -18,6 +18,10 @@ public:
 	virtual bool handleCollision(D3DXVECTOR2 pos, Player* player, collisionCheckDir dir) override;
 	virtual void RenderPreviewImage() override {};
 
+	virtual void SetPreviewImageColor(D3DXCOLOR color) override {};
+	virtual bool CanPlaceObject(int h, int w, Map* map) override { return false; }
+	virtual void PlaceObject(int h, int w, Map* map) override {};
+
 	void SetEnabled(bool val) { m_enabled = val; }
 	bool GetEnabled() { return m_enabled; }
 	void SetSpeed(D3DXVECTOR2 speed) { m_speed = speed; }

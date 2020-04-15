@@ -181,26 +181,26 @@ void PlayScene::Render()
 
 PlaceableObject* GetRandomPlaceableObject()
 {
-	return new SimplePlatform(static_cast<SimplePlatform::Platform_Type>(3));
+	return new BallShooter;
 	int rnd = rand() % 6;
 	
-	//switch (rnd)
-	//{
-	//case 0:
-	//case 1:
-	//{
-	//	int rnd = rand() % (int)SimplePlatform::Platform_Type::Max;
-	//	return new SimplePlatform(static_cast<SimplePlatform::Platform_Type>(rnd));
-	//}
-	//case 2:
-	//	return new honeyPlatform; // applied cannot-place
-	//case 3:
-	//	return new SpinWheel;
-	//case 4:
-	//	return new SpringPlatform;
-	//case 5:
-	//	return new BallShooter;
-	//}
+	switch (rnd)
+	{
+	case 0:
+	case 1:
+	{
+		int rnd = rand() % (int)SimplePlatform::Platform_Type::Max;
+		return new SimplePlatform(static_cast<SimplePlatform::Platform_Type>(rnd));
+	}
+	case 2:
+		return new honeyPlatform; // applied cannot-place
+	case 3:
+		return new SpinWheel;
+	case 4:
+		return new SpringPlatform;
+	case 5:
+		return new BallShooter;
+	}
 }
 
 void PlayScene::SwitchToMapToolMode()

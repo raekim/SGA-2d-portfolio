@@ -19,6 +19,7 @@ class BallShooter : public PlaceableObject
 
 	D3DXVECTOR2				m_ballOffset;				// 공 이미지 offset
 	D3DXVECTOR2				m_ballRotationOffest;		// 공 회전 중심점 offset
+	D3DXVECTOR2				m_machineOffset;
 
 public:
 	BallShooter();
@@ -31,5 +32,9 @@ public:
 
 	virtual bool handleCollision(D3DXVECTOR2 pos, Player* player, collisionCheckDir dir) override;
 	virtual void RenderPreviewImage() override;
+
+	virtual void SetPreviewImageColor(D3DXCOLOR color) override;
+	virtual bool CanPlaceObject(int h, int w, Map* map) override;
+	virtual void PlaceObject(int h, int w, Map* map) override;
 };
 
