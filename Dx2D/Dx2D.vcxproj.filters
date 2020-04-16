@@ -234,6 +234,9 @@
     <ClInclude Include="Ball.h">
       <Filter>Dx2D Framework\Scene\Objects\PlaceableObjects</Filter>
     </ClInclude>
+    <ClInclude Include="PlaySceneUI.h">
+      <Filter>Dx2D Framework\Scene\PlayScene</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="MainGame.cpp">
@@ -358,6 +361,9 @@
     </ClCompile>
     <ClCompile Include="Ball.cpp">
       <Filter>Dx2D Framework\Scene\Objects\PlaceableObjects</Filter>
+    </ClCompile>
+    <ClCompile Include="PlaySceneUI.cpp">
+      <Filter>Dx2D Framework\Scene\PlayScene</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

@@ -57,6 +57,8 @@ void PlayScene::Init()
 	SwitchToMapToolMode();
 
 	m_mapToolModeTransitionDelay = 3.0f;
+
+	m_UI = new PlaySceneUI;
 }
 
 void PlayScene::Update()
@@ -86,22 +88,33 @@ void PlayScene::Update()
 			UpdatePlayMode();
 	}
 
+	m_UI->Update();
 	g_pCamera->Update();
 }
 
 void PlayScene::UpdatePlayMode()
 {
-	// 플레이어가 모두 죽으면 맵툴모드로 전환
+	// 플레이어가 모두 게임오버
 	if (m_player1P->IsGameOver() && m_player2P->IsGameOver())
 	{
-		if (m_transitionCount >= m_mapToolModeTransitionDelay)
+		// 카메라 줌아웃 시킨다
+		g_pCamera->SetTarget(NULL);
+		g_pCamera->SetPositionRange({ 0, GAMESCREEN_X - WINSIZEX }, { 0, GAMESCREEN_Y - WINSIZEY });
+		// 점수판을 보여준다
+		m_UI->ShowScoreBoard();
+		if (ZoomOutCamera())
 		{
-			SwitchToMapToolMode();
-			return;
-		}
-		else
-		{
-			m_transitionCount += g_pTimeManager->GetDeltaTime();
+			// 카메라 줌아웃이 끝났다
+			if (m_transitionCount >= m_mapToolModeTransitionDelay)
+			{
+				// 맵툴모드로 전환한다
+				SwitchToMapToolMode();
+				return;
+			}
+			else
+			{
+				m_transitionCount += g_pTimeManager->GetDeltaTime();
+			}
 		}
 	}
 
@@ -119,8 +132,39 @@ void PlayScene::UpdatePlayMode()
 	UpdatePlayModeCamera();
 }
 
+bool PlayScene::ZoomOutCamera()
+{
+	auto eye = g_pCamera->GetEyeVal();
+
+	if (fabs(g_pCamera->GetPosition().x) <= 0.01f && fabs(g_pCamera->GetPosition().y) <= 0.01f &&
+		fabs(g_pCamera->GetEyeVal() - (-1.666f)) <= 0.01f)
+	{
+		return true;
+	}
+
+	// 카메라 줌을 최대한 당긴다
+	float moveSpeed = 3.0f;
+	float zoomOutSpeed = 2.0f;
+	g_pCamera->SetPosition(g_pCamera->GetPosition() + 
+		(D3DXVECTOR2(0, 0) - g_pCamera->GetPosition())*g_pTimeManager->GetDeltaTime()*moveSpeed);
+
+	g_pCamera->SetEyeVal(g_pCamera->GetEyeVal() +
+		(-1.666f - g_pCamera->GetEyeVal())*g_pTimeManager->GetDeltaTime()*zoomOutSpeed);
+
+	
+	g_pCamera->Update();
+
+	return false;
+}
+
 void PlayScene::UpdatePlayModeCamera()
 {
+	// 1P, 2P 둘 다 게임오버(죽거나 골인하거나) 인 경우 ZoomOutCamera에서 처리
+	if (m_player1P->IsGameOver() && m_player2P->IsGameOver())
+	{
+		return;
+	}
+
 	// 1P와 2P의 상태를 바탕으로 카메라 처리
 	if (m_player1P->IsDead())
 	{
@@ -177,6 +221,7 @@ void PlayScene::Render()
 		m_player2P->Render();
 		break;
 	}
+	m_UI->Render();
 }
 
 PlaceableObject* GetRandomPlaceableObject()

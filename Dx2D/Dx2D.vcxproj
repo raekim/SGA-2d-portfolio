@@ -179,6 +179,7 @@
     <ClInclude Include="Player.h" />
     <ClInclude Include="PlayerCursor.h" />
     <ClInclude Include="PlayScene.h" />
+    <ClInclude Include="PlaySceneUI.h" />
     <ClInclude Include="Primitive2DObejct.h">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">false</ExcludedFromBuild>
     </ClInclude>
@@ -230,6 +231,7 @@
     <ClCompile Include="Player.cpp" />
     <ClCompile Include="PlayerCursor.cpp" />
     <ClCompile Include="PlayScene.cpp" />
+    <ClCompile Include="PlaySceneUI.cpp" />
     <ClCompile Include="Primitive2DObejct.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">false</ExcludedFromBuild>
     </ClCompile>

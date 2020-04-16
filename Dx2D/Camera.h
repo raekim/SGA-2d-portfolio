@@ -45,6 +45,7 @@ public:
 
 	void SetRenderScale(float widht = WINSIZEX, float height = WINSIZEY);
 	void SetEyeVal(float val) { m_eyeVal = val; }
+	float GetEyeVal() { return m_eyeVal; }
 	void SetPosition(D3DXVECTOR2 pos) { m_vPosition = pos; }
 	void SetPositionRange(D3DXVECTOR2 xRange, D3DXVECTOR2 yRange) { m_positionRangeX = xRange; m_positionRangeY = yRange;}
 };

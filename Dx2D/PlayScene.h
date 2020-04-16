@@ -10,6 +10,7 @@
 #include "BallShooter.h"
 #include "SpringPlatform.h"
 #include "SpinWheel.h"
+#include "PlaySceneUI.h"
 
 class PlayScene : public iGameNode
 {
@@ -19,6 +20,7 @@ class PlayScene : public iGameNode
 		PLAY_MODE
 	};
 
+	PlaySceneUI*				m_UI;
 	Map*						m_map;
 	MODE						m_curMode;
 	Player*						m_player1P;
@@ -37,6 +39,9 @@ private:
 	// 플레이 모드 관련
 	void UpdatePlayMode();
 	void UpdatePlayModeCamera();
+
+	// 카메라 관련
+	bool ZoomOutCamera();
 public:
 	PlayScene();
 	~PlayScene();
