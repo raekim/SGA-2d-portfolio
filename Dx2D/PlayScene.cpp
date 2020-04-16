@@ -59,6 +59,7 @@ void PlayScene::Init()
 	m_mapToolModeTransitionDelay = 3.0f;
 
 	m_UI = new PlaySceneUI;
+	m_score1P = m_score2P = 0;
 }
 
 void PlayScene::Update()
@@ -86,6 +87,18 @@ void PlayScene::Update()
 			break;
 		case MODE::PLAY_MODE:
 			UpdatePlayMode();
+			break;
+		case MODE::GAME_OVER:
+			auto playerWhoWon = (m_score1P > m_score2P) ? m_player1P : m_player2P;
+			ZoomInOnPlayer(playerWhoWon);
+
+			// 캐릭터와 오브젝트 업데이트
+			vector<vector<PlaceableObject*>> objList(GAMESCREEN_X_RATIO*GAMESCREEN_Y_RATIO);
+			m_map->Update(objList);
+			m_player1P->Update(objList);
+			m_player2P->Update(objList);
+
+			break;
 	}
 
 	m_UI->Update();
@@ -94,21 +107,39 @@ void PlayScene::Update()
 
 void PlayScene::UpdatePlayMode()
 {
+	static bool calculatedScore = false;
 	// 플레이어가 모두 게임오버
 	if (m_player1P->IsGameOver() && m_player2P->IsGameOver())
 	{
+		if (!calculatedScore)
+		{
+			if (m_player1P->IsVictory() && !m_player2P->IsVictory()) m_score1P++;
+			else if(!m_player1P->IsVictory() && m_player2P->IsVictory()) m_score2P++;
+			m_score1P = min(m_score1P, 3);
+			m_score2P = min(m_score2P, 3);
+			calculatedScore = true;
+		}
 		// 카메라 줌아웃 시킨다
 		g_pCamera->SetTarget(NULL);
 		g_pCamera->SetPositionRange({ 0, GAMESCREEN_X - WINSIZEX }, { 0, GAMESCREEN_Y - WINSIZEY });
 		// 점수판을 보여준다
-		m_UI->ShowScoreBoard();
+		m_UI->ShowScoreBoard(m_score1P, m_score2P);
 		if (ZoomOutCamera())
 		{
 			// 카메라 줌아웃이 끝났다
 			if (m_transitionCount >= m_mapToolModeTransitionDelay)
 			{
-				// 맵툴모드로 전환한다
-				SwitchToMapToolMode();
+				if (m_score1P >= 1 || m_score2P >= 1)
+				{
+					// 게임오버 모드로 전환한다
+					SwitchToGameOver();
+				}
+				else
+				{
+					// 맵툴모드로 전환한다
+					SwitchToMapToolMode();
+				}
+				calculatedScore = false;
 				return;
 			}
 			else
@@ -132,10 +163,49 @@ void PlayScene::UpdatePlayMode()
 	UpdatePlayModeCamera();
 }
 
+void PlayScene::SwitchToGameOver()
+{
+	// 맵툴 모드로 넘어간다
+	m_curMode = MODE::GAME_OVER;
+	m_transitionCount = 0.0f;
+
+	g_pCamera->SetPosition(g_pCamera->GetPosition());
+	g_pCamera->SetTarget(NULL);
+	//g_pCamera->SetPositionRange({ 0, GAMESCREEN_X - WINSIZEX }, { 0, GAMESCREEN_Y - WINSIZEY });
+	g_pCamera->Update();
+}
+
+bool PlayScene::ZoomInOnPlayer(Player* target)
+{
+	// 현재 카메라 위치와 시점으로부터 특정 캐릭터를 향해 서서히 줌인한다
+	if (fabs(g_pCamera->GetPosition().x - target->GetPosition()->x) <= 0.01f && 
+		fabs(g_pCamera->GetPosition().y - target->GetPosition()->y) <= 0.01f &&
+		fabs(g_pCamera->GetEyeVal() - (-1.0f)) <= 0.01f)
+	{
+		// 대상 캐릭터의 위치를 타겟으로 지정
+		g_pCamera->SetTarget(target->GetPosition());
+		g_pCamera->Update();
+		return true;
+	}
+
+	// 카메라를 캐릭터 쪽으로 가져간다
+	float moveSpeed = 2.0f;
+	float zoomInSpeed = 3.0f;
+	
+	g_pCamera->SetEyeVal(g_pCamera->GetEyeVal() +
+		(-1.0f - g_pCamera->GetEyeVal())*g_pTimeManager->GetDeltaTime()*zoomInSpeed);
+
+	// *m_pTarget - m_vFocus
+	g_pCamera->SetPosition(g_pCamera->GetPosition() +
+		(*(target->GetPosition()) - g_pCamera->GetFocus() -  g_pCamera->GetPosition())*g_pTimeManager->GetDeltaTime()*moveSpeed);
+
+	g_pCamera->Update();
+
+	return false;
+}
+
 bool PlayScene::ZoomOutCamera()
 {
-	auto eye = g_pCamera->GetEyeVal();
-
 	if (fabs(g_pCamera->GetPosition().x) <= 0.01f && fabs(g_pCamera->GetPosition().y) <= 0.01f &&
 		fabs(g_pCamera->GetEyeVal() - (-1.666f)) <= 0.01f)
 	{
@@ -151,6 +221,12 @@ bool PlayScene::ZoomOutCamera()
 	g_pCamera->SetEyeVal(g_pCamera->GetEyeVal() +
 		(-1.666f - g_pCamera->GetEyeVal())*g_pTimeManager->GetDeltaTime()*zoomOutSpeed);
 
+	float eyeVal = g_pCamera->GetEyeVal();
+	g_pCamera->SetPositionRange(
+		D3DXVECTOR2(0, (FLOAT)LinearInterpolation(GAMESCREEN_X - WINSIZEX, 0, (eyeVal + 1) / -0.666f)),
+		D3DXVECTOR2(0, (FLOAT)LinearInterpolation(GAMESCREEN_Y - WINSIZEY, 0, (eyeVal + 1) / -0.666f))
+	);
+	g_pCamera->SetEyeVal(eyeVal);
 	
 	g_pCamera->Update();
 
@@ -220,13 +296,20 @@ void PlayScene::Render()
 		m_player1P->Render();
 		m_player2P->Render();
 		break;
+	case MODE::GAME_OVER:
+		// 플레이 모드 맵 렌더
+		m_map->RenderPlayMode();
+
+		// 캐릭터 렌더
+		m_player1P->Render();
+		m_player2P->Render();
+		break;
 	}
 	m_UI->Render();
 }
 
 PlaceableObject* GetRandomPlaceableObject()
 {
-	return new BallShooter;
 	int rnd = rand() % 6;
 	
 	switch (rnd)

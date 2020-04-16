@@ -17,7 +17,8 @@ class PlayScene : public iGameNode
 	enum class MODE
 	{
 		MAPTOOL_MODE,
-		PLAY_MODE
+		PLAY_MODE,
+		GAME_OVER
 	};
 
 	PlaySceneUI*				m_UI;
@@ -25,6 +26,7 @@ class PlayScene : public iGameNode
 	MODE						m_curMode;
 	Player*						m_player1P;
 	Player*						m_player2P;
+	int							m_score1P, m_score2P;			// 1P, 2P 점수
 	PlayerCursor*				m_cursor1P;
 	PlayerCursor*				m_cursor2P;
 	float						m_mapToolModeTransitionDelay;	// 플레이 모드에서 맵툴 모드로 갈 때 걸리는 시간
@@ -35,6 +37,7 @@ class PlayScene : public iGameNode
 private:
 	void SwitchToMapToolMode();
 	void SwitchToPlayMode();
+	void SwitchToGameOver();
 
 	// 플레이 모드 관련
 	void UpdatePlayMode();
@@ -42,6 +45,7 @@ private:
 
 	// 카메라 관련
 	bool ZoomOutCamera();
+	bool ZoomInOnPlayer(Player* target);
 public:
 	PlayScene();
 	~PlayScene();

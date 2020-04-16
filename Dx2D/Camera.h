@@ -42,6 +42,7 @@ public:
 	ID3D11Buffer *const *GetViewProjBuffer() { return &m_pViewProjBuffer; }
 	D3DXVECTOR2& GetPosition() { return m_vPosition; }
 	D3DXVECTOR2 GetMapSize() { return m_vMapSize; }
+	D3DXVECTOR2 GetFocus() { return m_vFocus; }
 
 	void SetRenderScale(float widht = WINSIZEX, float height = WINSIZEY);
 	void SetEyeVal(float val) { m_eyeVal = val; }

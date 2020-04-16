@@ -59,8 +59,8 @@ void Map::Init()
 	m_mapPaper->Update();
 
 	// ¸Ê ÁöÇü ¼³Á¤
-	m_mapBlocks.push_back(new SimplePlatform({ 200.0f, 350.0f }, { 465.0f, 300.0f }));
-	m_mapBlocks.push_back(new SimplePlatform({ 447.0f, 380.0f }, { GAMESCREEN_X - 653, 300.0f }));
+	m_mapBlocks.push_back(new SimplePlatform({ 200.0f, 350.0f }, { 500.0f, 300.0f }));
+	m_mapBlocks.push_back(new SimplePlatform({ 447.0f, 380.0f }, { GAMESCREEN_X - 625, 264.0f }));
 
 	// °ñÀÎ±ê¹ß ¼³Á¤
 	m_goalFlag = new GoalFlag;
@@ -85,6 +85,7 @@ void Map::RenderPlayMode()
 
 	// ¸Ê »óÀÇ Àå¾Ö¹° ·»´õ
 	for (auto obj : m_placedObjects) obj->Render();
+	for (auto obj : m_mapBlocks) obj->Render();
 }
 
 void Map::RenderMapToolMode()

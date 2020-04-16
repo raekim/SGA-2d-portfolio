@@ -23,8 +23,8 @@ GoalFlag::GoalFlag()
 	m_poleOffset = { -40, -40 };
 
 	m_collider = new AABB;
-	m_collider->SetHalfSize({ 65, 60 });
-	m_colliderOffset = D3DXVECTOR2(-15, -5);
+	m_collider->SetHalfSize({ 65, 90 });
+	m_colliderOffset = D3DXVECTOR2(-15, -15);
 }
 
 

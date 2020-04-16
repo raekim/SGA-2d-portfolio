@@ -102,6 +102,7 @@ void LoadManager::MakeAResourcesList()
 			m_vecResourceList.push_back(new tagTextureInfo(RESOURCE_TYPE::Image, L"Flag-Sheet", L"kim-rae-hyang-images/flag-flutter-sheet.png"));
 			m_vecResourceList.push_back(new tagTextureInfo(RESOURCE_TYPE::Image, L"Flag-Pole", L"kim-rae-hyang-images/Flag-FlagPole.000.png"));
 			m_vecResourceList.push_back(new tagTextureInfo(RESOURCE_TYPE::Image, L"ScoreBoard", L"kim-rae-hyang-images/score-board.png"));
+			m_vecResourceList.push_back(new tagTextureInfo(RESOURCE_TYPE::Image, L"scoreCheckMark", L"kim-rae-hyang-images/checkmark00001.png"));
 			break;
 	//case SCENE_KIND::Title:
 	//	m_vecResourceList.push_back(new tagTextureInfo(RESOURCE_TYPE::Image, L"TitleBack", L"ChloeBennet.bmp"));

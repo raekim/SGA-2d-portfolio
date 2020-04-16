@@ -148,6 +148,7 @@ public:
 	D3DXVECTOR2* GetPosition() { return &m_position; }
 	bool IsDead() { return m_isDead; }
 	bool IsGameOver() { return m_isDead || m_isVictory; }
+	bool IsVictory() { return m_isVictory; }
 	D3DXVECTOR2 GetAABBHalfSize() { return m_AABB->GetHalfSize(); }
 	void SetPosition(D3DXVECTOR2 pos) { m_position = pos; }
 	void SetPositionY(float val) { m_position.y = val; }
